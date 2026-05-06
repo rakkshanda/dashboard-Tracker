@@ -389,16 +389,23 @@
         <!-- Stats Cards -->
         <div class="stats-section">
             <!-- Countdown card placed alongside stats -->
-            <!-- Secondary countdown card -->
-            <div class="stat-card" id="countdown-card-march">
+            <!-- Secondary countdown card (hidden by default, toggled by eye button) -->
+            <div class="stat-card" id="countdown-card-march" style="display:none;position:relative;">
                 <div class="stat-icon">
                     <i class="fas fa-calendar-day"></i>
                 </div>
                 <div class="stat-content">
                     <div class="stat-number" id="countdown-text-march">…</div>
-                    <div class="stat-label" id="countdown-subtext-march" style="font-size: 0.8rem; opacity: 0.8;">days to March 1, 2026</div>
+                    <div class="stat-label" id="countdown-subtext-march" style="font-size: 0.8rem; opacity: 0.8;">days till Sep 14, 2026</div>
                 </div>
+                <button id="countdown-hide-btn" title="Hide countdown" style="position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;opacity:0.5;font-size:0.75rem;padding:2px 4px;" aria-label="Hide countdown">
+                    <i class="fas fa-eye-slash"></i>
+                </button>
             </div>
+            <!-- Show countdown toggle (visible when card is hidden) -->
+            <button id="countdown-show-btn" title="Show countdown" style="display:none;align-self:center;background:none;border:1px dashed #aaa;border-radius:8px;padding:4px 10px;cursor:pointer;opacity:0.5;font-size:0.75rem;white-space:nowrap;" aria-label="Show countdown">
+                <i class="fas fa-calendar-day"></i> countdown
+            </button>
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-briefcase"></i>

@@ -4581,8 +4581,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.warn('Theme toggle re-render failed:', e);
             }
         });
-        // Countdown banner: Mar 1, 2026
-        renderCountdown('2026-03-01T00:00:00', 'countdown-text-march', 'countdown-subtext-march', 'days to Mar 1, 2026');
+        // Countdown banner: Sep 14, 2026
+        renderCountdown('2026-09-14T00:00:00', 'countdown-text-march', 'countdown-subtext-march', 'days till Sep 14, 2026');
+
+        // Show/hide countdown card with localStorage persistence (default: hidden)
+        const countdownCard = document.getElementById('countdown-card-march');
+        const showBtn = document.getElementById('countdown-show-btn');
+        const hideBtn = document.getElementById('countdown-hide-btn');
+        const isVisible = localStorage.getItem('countdownVisible') === 'true';
+
+        function setCountdownVisible(visible) {
+            countdownCard.style.display = visible ? '' : 'none';
+            showBtn.style.display = visible ? 'none' : 'inline-flex';
+            localStorage.setItem('countdownVisible', visible);
+        }
+
+        setCountdownVisible(isVisible);
+        hideBtn && hideBtn.addEventListener('click', () => setCountdownVisible(false));
+        showBtn && showBtn.addEventListener('click', () => setCountdownVisible(true));
     } catch (error) {
         console.error('Error initializing Supabase JobTracker:', error);
     }
