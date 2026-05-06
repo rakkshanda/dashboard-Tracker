@@ -171,11 +171,18 @@ button#save:active { transform: scale(.98); }
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
       <h3 style="margin: 0;">Save job for later..</h3>
       <div style="display: flex; gap: 5px; align-items: center;">
+        <button type="button" id="starToggle" title="Star this job" aria-pressed="false" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0 4px;line-height:1;color:#aaa;transition:color 0.15s;">&#9734;</button>
         <button type="button" id="save" class="header-btn" title="Save job">Save Job</button>
         <button type="button" id="clearTop" class="header-btn" title="Clear all fields">Clear</button>
         <button type="button" id="redoTop" class="header-btn" title="Clear and refetch job data">Redo</button>
         <button type="button" id="close" style="background: none; border: none; font-size: 18px; color: #999; cursor: pointer; padding: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">×</button>
       </div>
+    </div>
+
+    <div class="role-tag-tabs" id="roleTagTabs" style="display:flex;gap:6px;margin-bottom:6px;">
+      <button type="button" class="role-tag-tab" data-tag="sde"  style="flex:1;padding:5px 8px;border-radius:8px;border:1.5px solid #bfdbfe;background:#dbeafe;color:#1d4ed8;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;">SDE</button>
+      <button type="button" class="role-tag-tab" data-tag="pm"   style="flex:1;padding:5px 8px;border-radius:8px;border:1.5px solid #bbf7d0;background:#dcfce7;color:#166534;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;">PM</button>
+      <button type="button" class="role-tag-tab" data-tag="data" style="flex:1;padding:5px 8px;border-radius:8px;border:1.5px solid #fbcfe8;background:#fce7f3;color:#9d174d;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;">Data</button>
     </div>
 
     <label>Company</label>

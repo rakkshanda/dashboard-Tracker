@@ -5,10 +5,11 @@ class SupabaseJobTracker {
         this.filteredJobs = [];
         this.currentFilters = {
             search: '',
-            status: ['saved', 'applied'], // Default: show only saved and applied
+            status: ['saved'], // Default: show only saved
             company: 'all',
             location: 'all',
             source: 'all',
+            tag: 'all',
             dateRange: 'all'
         };
         this.editingJobId = null;
@@ -16,6 +17,11 @@ class SupabaseJobTracker {
         this.statusOptions = ['saved', 'applied', 'resume_screening', 'interview', 'offer', 'rejected', 'withdrawn', 'ended'];
         this.sourceOptions = ['LinkedIn', 'Handshake', 'Indeed', 'URL'];
         this.isRefreshing = false;
+
+        // Numbering feature
+        this.isNumberingMode = false;
+        this.numberingCounter = 1;
+        this.activeView = 'all'; // 'all' | 'numbered'
         
         // Temporary status history (not saved until "Save Job" is clicked)
         this.tempStatusHistory = [];
@@ -915,12 +921,13 @@ class SupabaseJobTracker {
             ? this.currentFilters.company.length > 0
             : this.currentFilters.company !== 'all';
         
-        const hasActiveFilters = 
+        const hasActiveFilters =
             this.currentFilters.search !== '' ||
             !isDefaultStatus ||
             hasCompanyFilter ||
             this.currentFilters.location !== 'all' ||
             this.currentFilters.source !== 'all' ||
+            this.currentFilters.tag !== 'all' ||
             this.currentFilters.dateRange !== 'all';
         
         // Show/hide button based on filter state
@@ -1141,6 +1148,17 @@ class SupabaseJobTracker {
             ? companyFilterRaw.map(name => this.normalizeCompanyName(name).toLowerCase())
             : null;
         
+        // Numbered view: only ranked jobs, sorted by rank
+        if (this.activeView === 'numbered') {
+            this.filteredJobs = this.jobs
+                .filter(j => j.priority_rank != null)
+                .sort((a, b) => a.priority_rank - b.priority_rank);
+            this.renderJobs();
+            this.updateStats();
+            this.updateNumberedTabCount();
+            return;
+        }
+
         this.filteredJobs = this.jobs.filter(job => {
             // Search filter
             const matchesSearch = !this.currentFilters.search || 
@@ -1163,8 +1181,12 @@ class SupabaseJobTracker {
                 (job.location || '') === this.currentFilters.location;
 
             // Source filter
-            const matchesSource = this.currentFilters.source === 'all' || 
+            const matchesSource = this.currentFilters.source === 'all' ||
                 (job.source || '') === this.currentFilters.source;
+
+            // Tag filter
+            const matchesTag = this.currentFilters.tag === 'all' ||
+                (job.role_tag || getJobTag(job.title)) === this.currentFilters.tag;
 
             // Date range filter
             let matchesDateRange = true;
@@ -1209,12 +1231,13 @@ class SupabaseJobTracker {
                 }
             }
 
-            return matchesSearch && matchesStatus && matchesCompany && 
-                   matchesLocation && matchesSource && matchesDateRange;
+            return matchesSearch && matchesStatus && matchesCompany &&
+                   matchesLocation && matchesSource && matchesTag && matchesDateRange;
         });
 
         this.renderJobs();
         this.updateStats();
+        this.updateNumberedTabCount();
     }
 
     // Job Management
@@ -1337,10 +1360,24 @@ class SupabaseJobTracker {
                 this.jobs[jobIndex] = data;
             }
 
+            // When status becomes "applied", clear this job's rank and shift others down
+            if (newStatus === 'applied' && job.priority_rank != null) {
+                const removedRank = job.priority_rank;
+                this.jobs[jobIndex].priority_rank = null;
+                this.jobs.filter(j => j.priority_rank != null && j.priority_rank > removedRank)
+                    .forEach(j => j.priority_rank--);
+                this.numberingCounter = Math.max(1, this.jobs.filter(j => j.priority_rank != null).length + 1);
+                await this.updateJobRank(normalizedId, null);
+                await Promise.all(
+                    this.jobs.filter(j => j.priority_rank != null).map(j => this.updateJobRank(j.id, j.priority_rank))
+                );
+                this.updateNumberedTabCount();
+            }
+
             await this.saveJobs();
             this.applyFilters();
             this.populateFilterOptions();
-            
+
             console.log('✅ Status updated successfully in Supabase with history');
             return true;
         } catch (error) {
@@ -1375,6 +1412,257 @@ class SupabaseJobTracker {
             alert('Could not update favorite. Please try again.');
             return false;
         }
+    }
+
+    async updateJobRank(id, rank) {
+        try {
+            const normalizedId = this.normalizeId(id);
+            if (!normalizedId) return false;
+            const { data, error } = await this.supabase
+                .from('jobs')
+                .update({ priority_rank: rank })
+                .eq('id', normalizedId)
+                .select()
+                .single();
+            if (error) { console.error('Error updating rank:', error); return false; }
+            const idx = this.jobs.findIndex(j => this.idsMatch(j.id, normalizedId));
+            if (idx !== -1) this.jobs[idx] = { ...this.jobs[idx], priority_rank: data.priority_rank };
+            return true;
+        } catch (e) {
+            console.error('Exception updating rank:', e);
+            return false;
+        }
+    }
+
+    // Fire-and-forget rank persist — does NOT update local state (use after optimistic update)
+    _persistRank(id, rank) {
+        const normalizedId = this.normalizeId(id);
+        if (!normalizedId) return;
+        this.supabase.from('jobs').update({ priority_rank: rank }).eq('id', normalizedId).then(({ error }) => {
+            if (error) console.error('Error persisting rank:', error);
+        });
+    }
+
+    async reorderRanks(draggedId, targetId) {
+        const dragged = this.jobs.find(j => this.idsMatch(j.id, draggedId));
+        const target = this.jobs.find(j => this.idsMatch(j.id, targetId));
+        if (!dragged || !target || dragged === target) return;
+
+        // Get ranked jobs sorted by current rank
+        const ranked = this.jobs
+            .filter(j => j.priority_rank != null)
+            .sort((a, b) => a.priority_rank - b.priority_rank);
+
+        // Remove dragged from its position, insert before target
+        const from = ranked.findIndex(j => this.idsMatch(j.id, draggedId));
+        const to = ranked.findIndex(j => this.idsMatch(j.id, targetId));
+        if (from === -1 || to === -1) return;
+
+        ranked.splice(from, 1);
+        ranked.splice(to, 0, dragged);
+
+        // Reassign ranks 1..n optimistically
+        ranked.forEach((j, i) => { j.priority_rank = i + 1; });
+        this.numberingCounter = ranked.length + 1;
+        this.updateNumberingCounter();
+        this.applyFilters();
+
+        // Persist (fire-and-forget, no local state overwrite)
+        ranked.forEach(j => this._persistRank(j.id, j.priority_rank));
+        this.updateNumberedTabCount();
+    }
+
+    clearAllRanks() {
+        const ranked = this.jobs.filter(j => j.priority_rank != null);
+        // Optimistic: clear locally and re-render immediately
+        ranked.forEach(j => { j.priority_rank = null; });
+        this.numberingCounter = 1;
+        this.updateNumberedTabCount();
+        this.applyFilters();
+        // Persist (fire-and-forget, no local state overwrite)
+        ranked.forEach(j => this._persistRank(j.id, null));
+    }
+
+    toggleNumberingMode() {
+        this.isNumberingMode = !this.isNumberingMode;
+        const btn = document.getElementById('numbering-btn');
+        const banner = document.getElementById('numbering-banner');
+        const table = document.querySelector('.jobs-table');
+
+        if (this.isNumberingMode) {
+            this.numberingCounter = (this.jobs.filter(j => j.priority_rank != null).length) + 1;
+            btn && btn.classList.add('active');
+            banner && banner.classList.add('visible');
+            table && table.closest('.table-container').classList.add('numbering-mode');
+            this.updateNumberingCounter();
+            // Switch to all view so rows are visible
+            this.setActiveView('all');
+        } else {
+            btn && btn.classList.remove('active');
+            banner && banner.classList.remove('visible');
+            table && table.closest('.table-container').classList.remove('numbering-mode');
+            this.updateNumberedTabCount();
+            this.renderJobs();
+        }
+    }
+
+    updateNumberingCounter() {
+        const el = document.getElementById('numbering-counter');
+        if (el) el.textContent = `#${this.numberingCounter}`;
+    }
+
+    updateNumberedTabCount() {
+        const count = this.jobs.filter(j => j.priority_rank != null).length;
+        const el = document.getElementById('numbered-jobs-count');
+        if (el) el.textContent = count;
+        const allEl = document.getElementById('all-jobs-count');
+        if (allEl) allEl.textContent = this.filteredJobs.length;
+    }
+
+    setActiveView(view) {
+        this.activeView = view;
+        document.querySelectorAll('.view-tab').forEach(t => {
+            t.classList.toggle('active', t.dataset.view === view);
+        });
+        this.applyFilters();
+    }
+
+    async handleRankClick(jobId) {
+        const job = this.jobs.find(j => this.idsMatch(j.id, jobId));
+        if (!job) return;
+
+        if (job.priority_rank != null) {
+            const removedRank = job.priority_rank;
+            // Optimistic
+            job.priority_rank = null;
+            const toShift = this.jobs.filter(j => j.priority_rank != null && j.priority_rank > removedRank);
+            toShift.forEach(j => j.priority_rank--);
+            this.numberingCounter = this.jobs.filter(j => j.priority_rank != null).length + 1;
+            this.updateNumberingCounter();
+            this.renderJobs();
+            this.updateNumberedTabCount();
+            // Persist (fire-and-forget, no local state overwrite)
+            this._persistRank(jobId, null);
+            toShift.forEach(j => this._persistRank(j.id, j.priority_rank));
+        } else {
+            const newRank = this.numberingCounter;
+            // Optimistic
+            job.priority_rank = newRank;
+            this.numberingCounter++;
+            this.updateNumberingCounter();
+            this.renderJobs();
+            this.updateNumberedTabCount();
+            // Persist (fire-and-forget, no local state overwrite)
+            this._persistRank(jobId, newRank);
+        }
+    }
+
+    showToast(message, type = 'success') {
+        const existing = document.getElementById('resume-toast');
+        if (existing) existing.remove();
+        const toast = document.createElement('div');
+        toast.id = 'resume-toast';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position:fixed;bottom:24px;right:24px;z-index:99999;
+            padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;
+            color:#fff;box-shadow:0 4px 16px rgba(0,0,0,0.18);
+            background:${type === 'error' ? '#dc2626' : '#16a34a'};
+            opacity:0;transition:opacity 0.2s ease;
+        `;
+        document.body.appendChild(toast);
+        requestAnimationFrame(() => { toast.style.opacity = '1'; });
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    async uploadResume(jobId, file) {
+        const normalizedId = this.normalizeId(jobId);
+        if (!normalizedId || !file) return;
+
+        const ext = file.name.split('.').pop();
+        const path = `${normalizedId}/resume.${ext}`;
+
+        // Show uploading state immediately
+        const cell = document.querySelector(`.resume-file-input[data-id="${jobId}"]`)?.closest('.resume-cell');
+        if (cell) cell.innerHTML = `<span class="resume-uploading"><i class="fas fa-spinner fa-spin"></i> Uploading…</span>`;
+
+        const { error: uploadError } = await this.supabase.storage
+            .from('resumes')
+            .upload(path, file, { upsert: true, contentType: 'application/pdf' });
+
+        if (uploadError) {
+            console.error('Resume upload error:', uploadError);
+            this.showToast(`Upload failed: ${uploadError.message || JSON.stringify(uploadError)}`, 'error');
+            this.applyFilters();
+            return;
+        }
+
+        const { data: urlData } = this.supabase.storage.from('resumes').getPublicUrl(path);
+        const publicUrl = urlData?.publicUrl;
+        if (!publicUrl) {
+            this.showToast('Upload failed — could not get URL.', 'error');
+            this.applyFilters();
+            return;
+        }
+
+        const { error: dbError } = await this.supabase
+            .from('jobs')
+            .update({ resume_url: publicUrl })
+            .eq('id', normalizedId);
+
+        if (dbError) {
+            console.error('Resume URL save error:', dbError);
+            this.showToast('Resume saved to storage but failed to link to job.', 'error');
+            this.applyFilters();
+            return;
+        }
+
+        const idx = this.jobs.findIndex(j => this.idsMatch(j.id, normalizedId));
+        if (idx !== -1) this.jobs[idx].resume_url = publicUrl;
+        const fidx = this.filteredJobs?.findIndex(j => this.idsMatch(j.id, normalizedId));
+        if (fidx !== -1 && fidx != null) this.filteredJobs[fidx].resume_url = publicUrl;
+        this.showToast('Resume uploaded successfully!');
+        this.applyFilters();
+    }
+
+    async downloadResume(url) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = 'resume.pdf';
+            a.click();
+            URL.revokeObjectURL(blobUrl);
+        } catch (e) {
+            console.error('Download failed:', e);
+            window.open(url, '_blank');
+        }
+    }
+
+    async deleteResume(jobId) {
+        const normalizedId = this.normalizeId(jobId);
+        if (!normalizedId) return;
+
+        const { error: dbError } = await this.supabase
+            .from('jobs')
+            .update({ resume_url: null })
+            .eq('id', normalizedId);
+
+        if (dbError) {
+            console.error('Delete resume error:', dbError);
+            this.showToast('Failed to delete resume.', 'error');
+            return;
+        }
+
+        const idx = this.jobs.findIndex(j => this.idsMatch(j.id, normalizedId));
+        if (idx !== -1) this.jobs[idx].resume_url = null;
+        this.showToast('Resume deleted.');
+        this.applyFilters();
     }
 
     async updateJobSource(id, newSource) {
@@ -1673,6 +1961,10 @@ class SupabaseJobTracker {
             const linkMarkup = url
                 ? `<a href="${url}" class="job-link" target="_blank" rel="noopener noreferrer" title="${this.sanitize(url)}"><i class="fas fa-external-link-alt"></i> View here</a>`
                 : '<span class="job-link muted">No link</span>';
+            const resumeUrl = job.resume_url ? this.sanitizeUrl(job.resume_url) : null;
+            const resumeMarkup = resumeUrl
+                ? `<div class="resume-cell-inner"><a href="${resumeUrl}" target="_blank" rel="noopener noreferrer" class="resume-link" title="View resume"><i class="fas fa-file-pdf"></i> View</a><button class="resume-download-btn" data-url="${resumeUrl}" title="Download resume"><i class="fas fa-download"></i></button><button class="resume-delete-btn" data-id="${jobId}" title="Remove resume">✕</button></div>`
+                : `<label class="resume-upload-btn upload-empty" title="Upload resume"><i class="fas fa-upload"></i> Upload<input type="file" accept="application/pdf" class="resume-file-input" data-id="${jobId}" style="display:none;"></label>`;
             const favorite = !!job.favorite;
             const favoriteIconClass = favorite ? 'fas' : 'far';
             const favoriteLabel = favorite ? 'Unstar job' : 'Star job';
@@ -1688,18 +1980,25 @@ class SupabaseJobTracker {
                 return `<option value="${option}"${isSelected ? ' selected' : ''}>${this.sanitize(option)}</option>`;
             }).join('');
 
+            const rank = job.priority_rank;
+            const rankColors = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f59e0b'];
+            const rankColor = rank != null ? rankColors[(rank - 1) % rankColors.length] : '#ccc';
+            // Always render badge to reserve space; hide it when unranked
+            const rankBadge = `<span class="rank-badge" style="background:${rankColor};${rank == null ? 'visibility:hidden;' : ''}">${rank ?? ''}</span>`;
+            const rankCell = ``;
+            const rowClass = rank != null ? 'is-ranked' : '';
+            const isDraggable = this.activeView === 'numbered' && rank != null;
+
             return `
-                <tr data-id="${jobId}">
+                <tr data-id="${jobId}" class="${rowClass}" ${isDraggable ? 'draggable="true"' : ''}>
                     <td class="select-cell">
                         <input type="checkbox" class="job-checkbox" data-id="${jobId}">
                     </td>
                     <td>${appliedDate}</td>
                     <td class="favorite-cell">
-                        <button class="favorite-toggle ${favorite ? 'active' : ''}" data-id="${jobId}" title="${favoriteLabel}" aria-label="${favoriteLabel}">
-                            <i class="${favoriteIconClass} fa-star"></i>
-                        </button>
+                        <div style="display:flex;align-items:center;gap:4px;"><button class="favorite-toggle ${favorite ? 'active' : ''}" data-id="${jobId}" title="${favoriteLabel}" aria-label="${favoriteLabel}"><i class="${favoriteIconClass} fa-star"></i></button>${rankBadge}</div>
                     </td>
-                    <td>${company}</td>
+                    <td>${company}<br><span class="role-tag ${getJobTag(job.role_tag ? job.role_tag : job.title)}">${(job.role_tag || getJobTag(job.title)).toUpperCase()}</span></td>
                     <td class="title-cell">
                         <div class="title-row">
                             <div class="job-title">${title}</div>
@@ -1722,6 +2021,7 @@ class SupabaseJobTracker {
                         </select>
                     </td>
                     <td class="url-cell">${linkMarkup}</td>
+                    <td class="resume-cell">${resumeMarkup}</td>
                     <td class="actions-cell">
                         <div class="actions-cell-content">
                         <i class="fas fa-edit action-icon edit" data-id="${jobId}" title="Edit job"></i>
@@ -2500,37 +2800,27 @@ class SupabaseJobTracker {
         const canvas = document.getElementById('job-type-chart');
         if (!canvas) return;
 
-        // Filter to exclude jobs with "Saved" status (include everything else)
         const activeJobs = this.jobs.filter(job =>
             (job.status || '').toLowerCase() !== 'saved'
         );
 
-        // Classify jobs as Product/Program vs SDE based on title
-        let productCount = 0;
-        let sdeCount = 0;
-
+        let sdeCount = 0, pmCount = 0, dataCount = 0;
         activeJobs.forEach(job => {
-            const title = (job.title || '').toLowerCase();
-            if (title.includes('product') || title.includes('program') || title.includes('Technology')) {
-                productCount++;
-            } else {
-                sdeCount++;
-            }
+            const tag = job.role_tag || getJobTag(job.title);
+            if (tag === 'pm') pmCount++;
+            else if (tag === 'data') dataCount++;
+            else sdeCount++;
         });
 
-        // Destroy existing chart if it exists
-        if (this.jobTypeChart) {
-            this.jobTypeChart.destroy();
-        }
+        if (this.jobTypeChart) this.jobTypeChart.destroy();
 
-        // Create new chart
         this.jobTypeChart = new Chart(canvas, {
             type: 'pie',
             data: {
-                labels: ['Product/Program', 'SDE/Other'],
+                labels: ['SDE', 'PM', 'Data'],
                 datasets: [{
-                    data: [productCount, sdeCount],
-                    backgroundColor: ['#6366f1', '#10b981'],
+                    data: [sdeCount, pmCount, dataCount],
+                    backgroundColor: ['#3b82f6', '#22c55e', '#ec4899'],
                     borderWidth: 2,
                     borderColor: '#fff'
                 }]
@@ -2698,9 +2988,9 @@ class SupabaseJobTracker {
                     }
                 },
                 tooltip: {
-                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(0, 0, 0, 0.8)',
-                    titleColor: textColor,
-                    bodyColor: textColor,
+                    backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(30, 30, 30, 0.92)',
+                    titleColor: '#fff',
+                    bodyColor: 'rgba(255,255,255,0.85)',
                     padding: 12,
                     cornerRadius: 8,
                     displayColors: true,
@@ -4525,6 +4815,14 @@ function updateThemeIcon(isDark) {
     }
 }
 
+// Role tag helper — shared by dashboard and popup
+function getJobTag(title) {
+    const t = (title || '').toLowerCase();
+    if (/product|program|operations|project|account manager|category manager/.test(t)) return 'pm';
+    if (/data|business intel|analyst/.test(t)) return 'data';
+    return 'sde';
+}
+
 // Reusable countdown renderer for event cards
 function renderCountdown(targetDateIso, numberId, subId, labelWhenActive = 'days to go') {
     try {
@@ -4842,6 +5140,107 @@ function setupEventListeners() {
     document.getElementById('streak-btn')?.addEventListener('click', openStreakSettings);
     document.getElementById('import-csv-btn')?.addEventListener('click', importCSV);
 
+    // Numbering feature
+    document.getElementById('numbering-btn')?.addEventListener('click', () => {
+        jobTracker?.toggleNumberingMode();
+    });
+    document.getElementById('numbering-done-btn')?.addEventListener('click', () => {
+        if (jobTracker?.isNumberingMode) jobTracker.toggleNumberingMode();
+    });
+    document.getElementById('numbering-clear-btn')?.addEventListener('click', () => {
+        jobTracker?.clearAllRanks();
+    });
+
+    // View sub-tabs
+    document.querySelectorAll('.view-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            jobTracker?.setActiveView(tab.dataset.view);
+        });
+    });
+
+    // Row click in numbering mode (delegated)
+    document.getElementById('jobs-container')?.addEventListener('click', (e) => {
+        if (!jobTracker?.isNumberingMode) return;
+        // Ignore clicks on interactive elements
+        if (e.target.closest('button, select, input, a, .action-icon')) return;
+        const row = e.target.closest('tr[data-id]');
+        if (row) jobTracker.handleRankClick(row.dataset.id);
+    });
+
+    // Resume file upload (delegated)
+    document.getElementById('jobs-container')?.addEventListener('change', (e) => {
+        const input = e.target.closest('.resume-file-input');
+        if (!input || !input.files?.[0]) return;
+        jobTracker?.uploadResume(input.dataset.id, input.files[0]);
+    });
+
+    // Resume download (delegated)
+    document.getElementById('jobs-container')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.resume-download-btn');
+        if (!btn) return;
+        e.stopPropagation();
+        jobTracker?.downloadResume(btn.dataset.url);
+    });
+
+    // Resume delete — show confirm modal
+    let pendingResumeDeleteId = null;
+    document.getElementById('jobs-container')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.resume-delete-btn');
+        if (!btn) return;
+        e.stopPropagation();
+        pendingResumeDeleteId = btn.dataset.id;
+        document.getElementById('resume-delete-modal').style.display = 'flex';
+    });
+    document.getElementById('confirm-resume-delete')?.addEventListener('click', () => {
+        document.getElementById('resume-delete-modal').style.display = 'none';
+        if (pendingResumeDeleteId) jobTracker?.deleteResume(pendingResumeDeleteId);
+        pendingResumeDeleteId = null;
+    });
+    document.getElementById('cancel-resume-delete')?.addEventListener('click', () => {
+        document.getElementById('resume-delete-modal').style.display = 'none';
+        pendingResumeDeleteId = null;
+    });
+    document.getElementById('close-resume-delete-modal')?.addEventListener('click', () => {
+        document.getElementById('resume-delete-modal').style.display = 'none';
+        pendingResumeDeleteId = null;
+    });
+
+    // Drag-to-reorder in Numbered tab
+    let dragSrcId = null;
+    const jobsContainer = document.getElementById('jobs-container');
+    jobsContainer?.addEventListener('dragstart', (e) => {
+        const row = e.target.closest('tr[draggable="true"]');
+        if (!row) return;
+        dragSrcId = row.dataset.id;
+        row.classList.add('drag-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    });
+    jobsContainer?.addEventListener('dragend', (e) => {
+        const row = e.target.closest('tr');
+        row?.classList.remove('drag-dragging');
+        jobsContainer.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+    });
+    jobsContainer?.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        const row = e.target.closest('tr[draggable="true"]');
+        if (!row || row.dataset.id === dragSrcId) return;
+        jobsContainer.querySelectorAll('.drag-over').forEach(r => r.classList.remove('drag-over'));
+        row.classList.add('drag-over');
+    });
+    jobsContainer?.addEventListener('dragleave', (e) => {
+        const row = e.target.closest('tr');
+        row?.classList.remove('drag-over');
+    });
+    jobsContainer?.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const row = e.target.closest('tr[draggable="true"]');
+        if (!row || !dragSrcId || row.dataset.id === dragSrcId) return;
+        row.classList.remove('drag-over');
+        jobTracker?.reorderRanks(dragSrcId, row.dataset.id);
+        dragSrcId = null;
+    });
+
     // Download CSV backup buttons (both in header and insights section)
     const downloadCsvBtn = document.getElementById('download-csv-btn');
     const downloadCsvBtnInsights = document.getElementById('download-csv-btn-insights');
@@ -4900,10 +5299,11 @@ function setupEventListeners() {
                 // Reset all filters to default (saved & applied)
                 jobTracker.currentFilters = {
                     search: '',
-                    status: ['saved', 'applied'],
+                    status: ['saved'],
                     company: 'all',
                     location: 'all',
                     source: 'all',
+                    tag: 'all',
                     dateRange: 'all'
                 };
 
@@ -4940,6 +5340,9 @@ function setupEventListeners() {
                                 break;
                             case 'source':
                                 filterValueSpan.textContent = 'All Sources';
+                                break;
+                            case 'tag':
+                                filterValueSpan.textContent = 'All Tags';
                                 break;
                         }
                     }

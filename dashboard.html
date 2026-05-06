@@ -449,6 +449,22 @@
 
         <!-- Jobs Table -->
         <div class="jobs-section table-section">
+
+            <!-- View sub-tabs -->
+            <div class="view-tabs">
+                <button class="view-tab active" id="view-tab-all" data-view="all">All Jobs <span class="tab-count" id="all-jobs-count">0</span></button>
+                <button class="view-tab" id="view-tab-numbered" data-view="numbered">⭐ Numbered <span class="tab-count" id="numbered-jobs-count">0</span></button>
+            </div>
+
+            <!-- Numbering mode banner -->
+            <div class="numbering-banner" id="numbering-banner">
+                <span>Numbering mode — tap a job to assign <span class="numbering-counter" id="numbering-counter">#1</span></span>
+                <div>
+                    <button class="numbering-clear-btn" id="numbering-clear-btn">Clear all</button>
+                    <button class="numbering-done-btn" id="numbering-done-btn">Done</button>
+                </div>
+            </div>
+
             <div class="table-header">
                 <!-- Search Bar -->
                 <div class="search-container">
@@ -510,8 +526,23 @@
                                 <div class="filter-option" data-value="all">All Sources</div>
                             </div>
                         </div>
+                        <div class="filter-group">
+                            <button class="filter-btn" data-filter="tag">
+                                <i class="fas fa-tag"></i>
+                                <span class="filter-value">All Tags</span>
+                            </button>
+                            <div class="filter-dropdown">
+                                <div class="filter-option" data-value="all">All Tags</div>
+                                <div class="filter-option" data-value="sde" style="color:#1d4ed8;font-weight:600;">SDE</div>
+                                <div class="filter-option" data-value="pm"  style="color:#166534;font-weight:600;">PM</div>
+                                <div class="filter-option" data-value="data" style="color:#9d174d;font-weight:600;">Data</div>
+                            </div>
+                        </div>
                         <button class="refresh-icon-btn" id="refresh-btn" title="Refresh Data">
                             <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="numbering-btn" id="numbering-btn" title="Enter numbering mode">
+                            <i class="fas fa-list-ol"></i> Numbering
                         </button>
                 </div>
             </div>
@@ -523,6 +554,7 @@
                             <th class="col-select" style="width: 40px;">
                                 <input type="checkbox" id="select-all-checkbox" title="Select/Deselect All">
                             </th>
+                            <th class="col-rank" id="rank-col-header" style="display:none;">#</th>
                             <th class="col-date">Applied Date</th>
                             <th class="col-favorite" title="Favorite">★</th>
                             <th class="col-company">Company</th>
@@ -531,6 +563,7 @@
                             <th class="col-status">Status</th>
                             <th class="col-source">Source</th>
                             <th class="col-url">URL</th>
+                            <th class="col-resume">Resume</th>
                             <th class="col-actions">Actions</th>
                         </tr>
                     </thead>
@@ -718,6 +751,23 @@
             <div class="modal-actions" style="justify-content: flex-end; gap: 0.75rem;">
                 <button type="button" class="btn-secondary" id="cancel-status-delete">Cancel</button>
                 <button type="button" class="btn-danger" id="confirm-status-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Delete Confirm Modal -->
+    <div class="modal" id="resume-delete-modal" style="display:none;">
+        <div class="modal-content status-confirm-card">
+            <div class="modal-header">
+                <h2>Remove resume?</h2>
+                <button class="close-btn" id="close-resume-delete-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin:0;color:var(--text-secondary);">This will remove the resume link from this job. You can re-upload anytime.</p>
+            </div>
+            <div class="modal-actions" style="justify-content:flex-end;gap:0.75rem;">
+                <button type="button" class="btn-secondary" id="cancel-resume-delete">Cancel</button>
+                <button type="button" class="btn-danger" id="confirm-resume-delete">Remove</button>
             </div>
         </div>
     </div>

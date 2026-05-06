@@ -2,6 +2,13 @@ const $ = (id) => document.getElementById(id);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 const DEFAULT_STATUS = 'saved';
 
+function getJobTag(title) {
+  const t = (title || '').toLowerCase();
+  if (/product|program|operations|project|account manager|category manager/.test(t)) return 'pm';
+  if (/data|business intel|analyst/.test(t)) return 'data';
+  return 'sde';
+}
+
 function getDefaultStatusForUrl(url) {
   return /linkedin\.com|joinhandshake\.com/i.test(url || '') ? 'applied' : 'saved';
 }
@@ -462,6 +469,8 @@ async function saveRow(payload) {
     notes: '',
     comments: '',
     source: payload.source || 'URL',
+    favorite: payload.favorite || false,
+    role_tag: payload.role_tag || 'sde',
     status_history: initialStatusHistory
   };
   
@@ -703,6 +712,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const detectedSource = detectSource(scrapedData.url);
         $('source').value = detectedSource;
+        setRoleTag(getJobTag(scrapedData.title));
         console.log('🔍 Auto-detected source:', detectedSource);
         console.log('🆔 Job ID:', scrapedData.job_id || scrapedData.jobId || 'Not found');
         
@@ -816,6 +826,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (e) {
     console.warn('Auto-scrape on open failed:', e);
   }
+  // Auto-select role tag from title
+  if ($('title').value) setRoleTag(getJobTag($('title').value));
 
   // Secondary guesses — only fill still-empty fields
   const meta = await getMetaGuess(tab.id);
@@ -934,7 +946,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       status: getStatusValue(),
       source: $('source').value,
       url: $('url').value.trim(),
-      description: $('description').value.trim()
+      description: $('description').value.trim(),
+      favorite: isStarred,
+      role_tag: getActiveRoleTag()
     };
   
     const missingTitle = !payload.title;
@@ -990,11 +1004,45 @@ document.addEventListener('DOMContentLoaded', async () => {
   
 
   // clear fields button (top)
+  // Star toggle
+  let isStarred = false;
+  const starBtn = $('starToggle');
+  if (starBtn) {
+    starBtn.addEventListener('click', () => {
+      isStarred = !isStarred;
+      starBtn.textContent = isStarred ? '★' : '☆';
+      starBtn.style.color = isStarred ? '#f5a623' : '#aaa';
+      starBtn.setAttribute('aria-pressed', isStarred);
+      starBtn.title = isStarred ? 'Starred — click to unstar' : 'Star this job';
+    });
+  }
+
+  // Role tag tabs
+  const roleTagBtns = $$('#roleTagTabs .role-tag-tab');
+  function setRoleTag(tag) {
+    roleTagBtns.forEach(b => {
+      const active = b.dataset.tag === tag;
+      b.style.opacity = active ? '1' : '0.45';
+      b.style.fontWeight = active ? '700' : '500';
+      b.style.boxShadow = active ? '0 0 0 2px currentColor' : 'none';
+    });
+  }
+  function getActiveRoleTag() {
+    const active = roleTagBtns.find(b => b.style.opacity === '1' || b.style.fontWeight === '700');
+    return active ? active.dataset.tag : 'sde';
+  }
+  roleTagBtns.forEach(b => b.addEventListener('click', () => setRoleTag(b.dataset.tag)));
+  // Default: sde
+  setRoleTag('sde');
+
   const clearBtn = $('clearTop');
   if (clearBtn) {
     console.log('✅ Clear button found, attaching event listener');
     clearBtn.addEventListener('click', () => {
       console.log('🧹 Clear button clicked!');
+      isStarred = false;
+      if (starBtn) { starBtn.textContent = '☆'; starBtn.style.color = '#aaa'; starBtn.setAttribute('aria-pressed', false); }
+      setRoleTag('sde');
       clearFields();
     });
   } else {

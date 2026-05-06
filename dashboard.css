@@ -1306,6 +1306,79 @@ body.dark-mode .jobs-table tr.selected {
     min-width: 140px;
 }
 
+.jobs-table td.resume-cell {
+    min-width: 110px;
+    text-align: center;
+}
+
+.resume-cell-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.resume-link {
+    font-size: 12px;
+    color: #dc2626;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.resume-link:hover { text-decoration: underline; }
+
+.resume-upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 3px 7px;
+    border: 1px dashed #d1d5db;
+    border-radius: 6px;
+    transition: all 0.15s;
+}
+
+.resume-upload-btn:hover {
+    border-color: #6b7280;
+    color: #374151;
+    background: #f9fafb;
+}
+
+.resume-upload-btn.upload-empty {
+    color: #9ca3af;
+}
+
+.resume-uploading {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.resume-download-btn,
+.resume-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 12px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+}
+
+.resume-download-btn:hover {
+    color: #111;
+    background: #f3f4f6;
+}
+
+.resume-delete-btn:hover {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
 .jobs-table td.comments-cell,
 .jobs-table td.actions-cell {
     text-align: center;
@@ -1377,6 +1450,164 @@ body.dark-mode .jobs-table tr.selected {
 .status-badge:hover {
     transform: scale(1.05);
 }
+
+/* ===== NUMBERING FEATURE ===== */
+
+/* Sub-tabs: All Jobs | Numbered */
+.view-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+.view-tab {
+    padding: 5px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #e5e7eb;
+    background: #f5f5f5;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.15s;
+}
+.view-tab:hover { background: #e9ecef; }
+.view-tab.active { background: #111; color: #fff; border-color: #111; }
+.view-tab .tab-count {
+    display: inline-block;
+    background: rgba(255,255,255,0.25);
+    border-radius: 10px;
+    padding: 0 6px;
+    margin-left: 4px;
+    font-size: 10px;
+}
+.view-tab:not(.active) .tab-count {
+    background: #ddd;
+    color: #555;
+}
+
+/* Numbering button */
+.numbering-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e5e7eb;
+    background: #f5f5f5;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    transition: all 0.15s;
+}
+.numbering-btn:hover { background: #e9ecef; }
+.numbering-btn.active {
+    background: #7c3aed;
+    color: #fff;
+    border-color: #7c3aed;
+    box-shadow: 0 2px 8px rgba(124,58,237,0.25);
+}
+
+/* Numbering mode banner */
+.numbering-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f3ff;
+    border: 1.5px solid #ddd6fe;
+    border-radius: 10px;
+    padding: 8px 14px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #5b21b6;
+}
+.numbering-banner.visible { display: flex; }
+.numbering-counter {
+    font-weight: 700;
+    font-size: 15px;
+    color: #7c3aed;
+}
+.numbering-done-btn {
+    padding: 4px 14px;
+    border-radius: 8px;
+    border: none;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.numbering-clear-btn {
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd6fe;
+    background: #fff;
+    color: #7c3aed;
+    font-size: 12px;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+/* Numbering mode — rows are clickable */
+.numbering-mode tbody tr {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+.numbering-mode tbody tr:hover {
+    background: #f5f3ff !important;
+    outline: 2px solid #ddd6fe;
+    outline-offset: -2px;
+}
+.numbering-mode tbody tr.is-ranked {
+    background: #faf5ff !important;
+}
+
+tr[draggable="true"] {
+    cursor: grab;
+}
+tr[draggable="true"]:active {
+    cursor: grabbing;
+}
+tr.drag-dragging {
+    opacity: 0.4;
+}
+tr.drag-over {
+    border-top: 2px solid #8b5cf6;
+    background: #f3e8ff !important;
+}
+
+/* Rank badge sticker */
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #7c3aed;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Rank column in Numbered tab */
+.col-rank { width: 40px; text-align: center; }
+
+/* Role tag badges */
+.role-tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    margin-top: 3px;
+    text-transform: uppercase;
+}
+.role-tag.sde  { background: #dbeafe; color: #1d4ed8; }
+.role-tag.pm   { background: #dcfce7; color: #166534; }
+.role-tag.data { background: #fce7f3; color: #9d174d; }
 
 /* Action Buttons */
 .action-icon {
