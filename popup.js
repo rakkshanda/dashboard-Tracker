@@ -1,6 +1,10 @@
 const $ = (id) => document.getElementById(id);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
-const DEFAULT_STATUS = 'applied';
+const DEFAULT_STATUS = 'saved';
+
+function getDefaultStatusForUrl(url) {
+  return /linkedin\.com|joinhandshake\.com/i.test(url || '') ? 'applied' : 'saved';
+}
 // Buffer incoming messages until DOM + listeners are ready
 let popupReady = false;
 const pendingMessages = [];
@@ -656,7 +660,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       hideSkeletonLoading();
       
       enableStatusTabs();
-      setStatusValue(DEFAULT_STATUS);
+      setStatusValue(getDefaultStatusForUrl(scrapedData.url));
       setLocationTabActive(scrapedData.location || '');
 
       // 🔐 Ensure TikTok jobId is present if this is a TikTok referral URL
@@ -714,7 +718,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('url').value = currentUrl;
     $('source').value = detectSource(currentUrl);
   }
-  setStatusValue(DEFAULT_STATUS);
+  setStatusValue(getDefaultStatusForUrl(tab && tab.url));
 
   if (isStandalone) {
     document.title = 'Save Job — Sticky Editor';
@@ -794,14 +798,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     await restorePosition();
   }
 
-  // Form starts empty - will be populated by messages or redo
-  console.log('ℹ️ Popup ready. Waiting for scraped data from floating button...');
-  $('company').value    = '';
-  $('title').value      = '';
-  $('location').value   = '';
-  $('description').value= '';
+  // Auto-scrape on open (same logic as redo button)
+  console.log('ℹ️ Auto-scraping on popup open...');
+  try {
+    const autoScraped = await scrapeFromPage(tab.id);
+    if (autoScraped && autoScraped.title) {
+      $('company').value     = sanitizeCommas(autoScraped.company || '');
+      $('title').value       = sanitizeCommas(autoScraped.title || '');
+      $('location').value    = sanitizeCommas(autoScraped.location || '');
+      setLocationTabActive(autoScraped.location || '');
+      $('jobId').value       = sanitizeCommas(autoScraped.job_id || autoScraped.jobId || '');
+      $('url').value         = sanitizeCommas(autoScraped.url || tab.url || '');
+      $('description').value = autoScraped.description || '';
+      $('source').value      = detectSource(autoScraped.url);
+      setStatusValue(getDefaultStatusForUrl(tab.url));
+    }
+  } catch (e) {
+    console.warn('Auto-scrape on open failed:', e);
+  }
 
-  // secondary guesses
+  // Secondary guesses — only fill still-empty fields
   const meta = await getMetaGuess(tab.id);
   if (!$('company').value) {
     $('company').value = sanitizeCommas(

@@ -396,7 +396,88 @@
       ))),
     }),
 
-    // Microsoft Careers
+    // Microsoft Careers (new Phenom-based layout at careers.microsoft.com)
+    "careers.microsoft.com": () => {
+      const company = "Microsoft";
+
+      // Title: detail panel h2 first, then first job card title
+      const title = clean(txt(first(
+        "h2.position-title-3TPtN",
+        "[class*='position-title']",
+        "div.title-1aNJK",
+        "[class*='title-'][class*='aNJK']",
+        "h1",
+        "h2"
+      )));
+
+      // Location: detail panel div first, then job card field value
+      const locationVal = (() => {
+        const loc = clean(txt(first(
+          "div.position-location-12ZUO",
+          "[class*='position-location']",
+          "div.fieldValue-3kEar",
+          "[class*='fieldValue']"
+        )));
+        // "United States, Washington, Redmond" → keep as-is; strip "+ N more" suffix
+        return loc.replace(/\s*\+\s*\d+\s+more$/i, "").trim();
+      })();
+
+      // Job ID: scan for visible "Job number" label first, then URL-based fallbacks
+      const jobId = (() => {
+        // Scan all elements for a "Job number" label and grab the adjacent value
+        const allEls = document.querySelectorAll("span, div, p, dt, dd, li, td, th");
+        for (const el of allEls) {
+          if (/^job\s*number$/i.test((el.textContent || "").trim())) {
+            console.log('[MS scraper] Found "Job number" label el:', el, 'parent:', el.parentElement);
+            // Try next sibling
+            const sibling = el.nextElementSibling;
+            const sibVal = clean(txt(sibling || {}));
+            console.log('[MS scraper] nextElementSibling text:', sibVal);
+            if (sibVal && /^\d+$/.test(sibVal)) return sibVal;
+            // Try parent's next sibling
+            const parentSib = el.parentElement && el.parentElement.nextElementSibling;
+            const parentSibVal = clean(txt(parentSib || {}));
+            console.log('[MS scraper] parent.nextElementSibling text:', parentSibVal);
+            if (parentSibVal && /^\d+$/.test(parentSibVal)) return parentSibVal;
+          }
+        }
+        console.log('[MS scraper] No "Job number" label found in DOM');
+        // Apply button has href="/careers/apply?pid=JOBID&domain=..."
+        const applyLink = document.querySelector("a[href*='/careers/apply?pid=']");
+        console.log('[MS scraper] applyLink:', applyLink && applyLink.href);
+        if (applyLink) {
+          const pid = new URL(applyLink.href, location.origin).searchParams.get("pid");
+          if (pid) { console.log('[MS scraper] jobId from applyLink pid:', pid); return pid; }
+        }
+        // Selected card has href="/careers/job/JOBID?domain=..."
+        const selectedCard = document.querySelector("a.card-F1ebU.selected-3V9EA, a[class*='selected'][href*='/careers/job/']");
+        console.log('[MS scraper] selectedCard href:', selectedCard && selectedCard.getAttribute("href"));
+        if (selectedCard) {
+          const m = (selectedCard.getAttribute("href") || "").match(/\/careers\/job\/(\d+)/);
+          if (m) { console.log('[MS scraper] jobId from selectedCard:', m[1]); return m[1]; }
+        }
+        // Current URL if on a job detail page
+        const urlMatch = location.pathname.match(/\/careers\/job\/(\d+)/);
+        console.log('[MS scraper] URL pathname:', location.pathname, '→ urlMatch:', urlMatch);
+        if (urlMatch) return urlMatch[1];
+        console.log('[MS scraper] ⚠ jobId not found');
+        return "";
+      })();
+      console.log('[MS scraper] Final jobId:', jobId, '| title:', title, '| location:', locationVal);
+
+      // Description: right-side detail container
+      const description = clean(txt(first(
+        "div.rightcontainer-2NrZP",
+        "div.container-2ugKC",
+        "[class*='rightcontainer']",
+        "main",
+        "article"
+      )));
+
+      return { company, title, location: locationVal, description, job_id: jobId };
+    },
+
+    // Microsoft Careers (old layout)
     "jobs.careers.microsoft.com": () => {
       const root = first('.SearchJobDetailsCard', '.SearchJobDetailsCardViewHelper', '[role="group"].SearchJobDetailsCard') || document;
       const company = "Microsoft";
@@ -504,26 +585,59 @@
     // Amazon (amazon.jobs)
     "amazon.jobs": () => {
       const company = "Amazon";
+
+      // Title: h1.title inside the apply-header info block
       const title = clean(txt(first(
+        "h1.title",
         "h1.job-title",
         "[data-test-id='job-title']",
         "h1"
       )));
-      const locationVal = clean(txt(first(
-        ".job-location",
-        "[data-test-id='job-location']",
-        ".location",
-        ".job-info-location"
-      )));
-      const description = clean(txt(first(
-        "#job-detail",
-        ".job-detail",
-        ".job-description",
-        ".description",
-        "main",
-        "article"
-      )));
-      return { company, title, location: locationVal, description };
+
+      // Job ID: from "Job ID: XXXXX | ..." meta line, or URL path, or data-react-props JSON
+      const jobId = (() => {
+        const metaEl = document.querySelector("p.meta, .details-line p.meta");
+        if (metaEl) {
+          const m = (metaEl.textContent || "").match(/Job\s+ID[:\s]+(\d+)/i);
+          if (m) return m[1];
+        }
+        // URL: /en/jobs/3169056/...
+        const urlMatch = location.pathname.match(/\/jobs\/(\d+)/);
+        if (urlMatch) return urlMatch[1];
+        // data-react-props JSON fallback
+        const reactEl = document.querySelector("[data-react-props*='job_id']");
+        if (reactEl) {
+          try {
+            const props = JSON.parse(reactEl.getAttribute("data-react-props") || "{}");
+            if (props.currentJob && props.currentJob.job_id) return String(props.currentJob.job_id);
+          } catch {}
+        }
+        return "";
+      })();
+
+      // Location: sidebar associations location item
+      const locationVal = (() => {
+        const locItem = document.querySelector(
+          ".associations .association.location-icon .association-content li, " +
+          ".associations .location-icon .association-content li"
+        );
+        if (locItem) return clean(txt(locItem));
+        // fallback
+        return clean(txt(first(".job-location", ".location")));
+      })();
+
+      // Description: only the job content sections (not sidebar/related jobs)
+      const description = (() => {
+        const contentCol = document.querySelector(
+          "#job-detail-body .col-md-7 .content, " +
+          "#job-detail-body .col-lg-8 .content, " +
+          "#job-detail-body .col-xl-9 .content"
+        );
+        if (contentCol) return clean(txt(contentCol));
+        return clean(txt(first("#job-detail-body", "#job-detail", ".job-description", "main")));
+      })();
+
+      return { company, title, location: locationVal, description, job_id: jobId };
     },
 
     // Amazon hiring (hiring.amazon.com)
@@ -762,7 +876,7 @@
         console.log('[scrape.js] ✓ Matched strategy for:', key);
         let data = strategies[key]();
         console.log('[scrape.js] Scraped data from', key, ':', data);
-        if (key === 'jobs.careers.microsoft.com' && (!data.title || data.title.length < 2)) {
+        if ((key === 'jobs.careers.microsoft.com' || key === 'careers.microsoft.com') && (!data.title || data.title.length < 2)) {
           const start = Date.now();
           while (Date.now() - start < 1000) {
             data = strategies[key]();
@@ -942,6 +1056,24 @@
     data = data || {};
     data.url = data.url || location.href;
 
+    // For Microsoft pages: extract job_id from URL pid param if not already set
+    if (!data.job_id && /microsoft\.com/i.test(location.hostname)) {
+      const pid = new URLSearchParams(location.search).get("pid");
+      if (pid) {
+        data.job_id = pid;
+        console.log('[scrape.js] MS job_id from URL pid:', pid);
+      }
+    }
+
+    // For Amazon pages: extract job_id from URL path /jobs/XXXXX if not already set
+    if (!data.job_id && /amazon\.jobs/i.test(location.hostname)) {
+      const m = location.pathname.match(/\/jobs\/(\d+)/);
+      if (m) {
+        data.job_id = m[1];
+        console.log('[scrape.js] Amazon job_id from URL:', m[1]);
+      }
+    }
+
     data = selectionAsDescription(data);
 
     data.company = clean(data.company || "");
@@ -950,7 +1082,7 @@
     data.url = clean(data.url || "");
     data.description = truncateDescription(data.description || "");
 
-    console.log('[scrape.js] Final scraped data:', { company: data.company, title: data.title, location: data.location, hasDesc: !!data.description });
+    console.log('[scrape.js] Final scraped data:', { company: data.company, title: data.title, location: data.location, job_id: data.job_id, hasDesc: !!data.description });
     return data;
   }
 
