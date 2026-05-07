@@ -4,7 +4,7 @@ const DEFAULT_STATUS = 'saved';
 
 function getJobTag(title) {
   const t = (title || '').toLowerCase();
-  if (/product|program|operations|project|account manager|category manager/.test(t)) return 'pm';
+  if (/product|program|operations|project|manager/.test(t)) return 'pm';
   if (/data|business intel|analyst/.test(t)) return 'data';
   return 'sde';
 }
@@ -968,21 +968,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Saving…';
-      setStatus('saving', 'Saving to Supabase…');
+      setStatus('saving', 'Saving…');
       progress.style.width = '35%';
-  
-      await saveRow(payload);
+
+      const result = await saveRow(payload);
+      if (!result || !result.success) {
+        throw new Error(result?.message || 'Save failed — unknown error');
+      }
+
       try { chrome.storage?.local?.remove?.(DRAFT_KEY); } catch {}
       progress.style.width = '100%';
-  
+
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({ type: 'JOB_SAVED' }, '*');
-        console.log('📤 Sent JOB_SAVED message to parent window');
       }
-  
+
       setTimeout(() => {
         btn.innerHTML = 'Saved ✓';
-        setStatus('success', 'Saved to Supabase & Dashboard!');
+        setStatus('success', 'Saved!');
         clearFields();
       }, 150);
 
@@ -993,12 +996,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         progress.style.width = '0%';
         setTimeout(() => { btn.classList.remove('success'); btn.textContent = 'Save Job'; }, 1200);
       }, 600);
-  
+
     } catch (e) {
+      console.error('Save error:', e);
       btn.disabled = false;
       btn.textContent = 'Save Job';
+      btn.classList.add('error');
       progress.style.width = '0%';
-      setStatus('error', 'Could not save. Check your network connection.');
+      setStatus('error', e.message || 'Could not save. Check console.');
+      const hint = $('validationHint');
+      if (hint) { hint.style.display = ''; hint.textContent = '⛔ ' + (e.message || 'Save failed'); }
     }
   });
   

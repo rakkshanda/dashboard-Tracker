@@ -4818,7 +4818,7 @@ function updateThemeIcon(isDark) {
 // Role tag helper — shared by dashboard and popup
 function getJobTag(title) {
     const t = (title || '').toLowerCase();
-    if (/product|program|operations|project|account manager|category manager/.test(t)) return 'pm';
+    if (/product|program|operations|project|manager/.test(t)) return 'pm';
     if (/data|business intel|analyst/.test(t)) return 'data';
     return 'sde';
 }
