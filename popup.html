@@ -4,161 +4,140 @@
     <meta charset="utf-8" />
     <title>Save Job</title>
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; width: 400px; margin: 8px; }
-      h3 { margin: 0 0 6px; font-size: 16px; }
-      label { display: block; font-size: 11px; color: #444; margin-top: 6px; margin-bottom: 2px; }
-      input, textarea { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
-      select { width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 6px; background-color: white; font-size: 13px; }
+      :root {
+        --acc: #FF5C2C;
+        --acc-2: #FFD93D;
+        --acc-3: #6BE3B0;
+        --acc-5: #FF8FB1;
+        --acc-6: #4DA3FF;
+        --ink: #0E0E10;
+        --ink-2: #2A2A2E;
+        --ink-3: #5C5C63;
+        --bg: #F2EFE8;
+        --bg-2: #ECE7DC;
+        --card: #FFFFFF;
+        --line: #1B1B1F;
+        --line-soft: #E1DACB;
+        --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+        --display: 'Bricolage Grotesque', -apple-system, sans-serif;
+        --radius: 14px;
+        --radius-sm: 8px;
+      }
+      *{box-sizing:border-box;margin:0;padding:0}
+      body { font-family: var(--sans);  background: var(--bg); color: var(--ink); padding: 25px 40px 10px 40px; -webkit-font-smoothing: antialiased; }
+      h3 { font-family: var(--display); font-size: 17px; font-weight: 800; color: var(--ink); }
+      label { display: block; font-family: var(--mono); font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); margin-top: 10px; margin-bottom: 4px; }
+      input, textarea {
+        width: 100%; padding: 8px 10px;
+        border: 1.5px solid var(--line-soft); border-radius: var(--radius-sm);
+        font-size: 13px; font-family: var(--sans);
+        background: var(--card); color: var(--ink);
+        outline: none; transition: border-color .15s;
+      }
+      input:focus, textarea:focus { border-color: var(--acc); }
+      select {
+        width: 100%; padding: 8px 10px;
+        border: 1.5px solid var(--line-soft); border-radius: var(--radius-sm);
+        background: var(--card); color: var(--ink);
+        font-size: 13px; font-family: var(--sans); outline: none;
+        transition: border-color .15s;
+      }
+      select:focus { border-color: var(--acc); }
       textarea { min-height: 60px; resize: vertical; }
-      .hint { font-size: 10px; color: #777; margin-top: 2px; }
-      .row-actions { margin-top: 2px; display: flex; gap: 6px; }
-      .link { font-size: 11px; color: #276EF1; cursor: pointer; text-decoration: underline; }
-      button { padding: 8px 12px; border: 0; border-radius: 8px; cursor: pointer; }
-      .header-btn { background: #111; color: #fff; font-size: 12px; transition: all 0.2s ease; }
-      .header-btn:hover { background: #333; }
+      .hint { font-family: var(--mono); font-size: 9px; color: var(--ink-3); margin-top: 3px; letter-spacing: .04em; }
+      .row-actions { margin-top: 3px; display: flex; gap: 6px; }
+      .link { font-size: 11px; color: var(--acc-6); cursor: pointer; text-decoration: underline; }
+      button { padding: 7px 12px; border: 1.5px solid var(--line); border-radius: 999px; cursor: pointer; font-family: var(--sans); font-size: 12px; font-weight: 600; transition: all .15s; }
+      .header-btn { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .header-btn:hover { opacity: .8; }
       #status { display: none; }
-      .status-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-      .status-tab { flex: 1 1 calc(50% - 6px); min-width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e7eb; background: #f5f5f5; font-size: 12px; color: #111; text-transform: capitalize; transition: all 0.15s ease; }
-      .status-tab:hover { background: #e9ecef; border-color: #d6d6d6; }
-      .status-tab.active { background: #111; color: #fff; border-color: #111; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-      .status-tabs.disabled .status-tab { opacity: 0.6; pointer-events: none; }
-      .location-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-      .location-tab { flex: 1 1 calc(50% - 6px); min-width: 120px; padding: 6px 10px; border-radius: 8px; border: 1px solid #e5e7eb; background: #f5f5f5; font-size: 12px; color: #111; transition: all 0.15s ease; }
-      .location-tab:hover { background: #e9ecef; border-color: #d6d6d6; }
-      .location-tab.active { background: #111; color: #fff; border-color: #111; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-      .location-tabs.disabled .location-tab { opacity: 0.6; pointer-events: none; }
-      .missing { border-color: #f33; }
-      #close { background: none !important; color: #999 !important; }
-      #close:hover { color: #666 !important; background: #f5f5f5 !important; border-radius: 50%; }
-      /* === fancy save animations === */
-button#save {
-  position: relative;
-  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-  background: #111;
-  color: #fff;
-}
-button#save:hover { background: #333; }
-button#save:active { transform: scale(.98); }
+      .status-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+      .status-tab { flex: 1 1 calc(50% - 5px); min-width: 100px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--line-soft); background: var(--card); font-size: 11px; font-weight: 600; color: var(--ink-2); font-family: var(--sans); text-transform: capitalize; transition: all .15s; }
+      .status-tab:hover { border-color: var(--acc); color: var(--ink); }
+      .status-tab.active { background: var(--acc); color: var(--ink); border-color: var(--acc); box-shadow: 3px 3px 0 var(--line); }
+      .status-tabs.disabled .status-tab { opacity: 0.5; pointer-events: none; }
+      .location-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+      .location-tab { flex: 1 1 calc(50% - 5px); min-width: 80px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1.5px solid var(--line-soft); background: var(--card); font-size: 11px; font-weight: 600; color: var(--ink-2); font-family: var(--sans); transition: all .15s; }
+      .location-tab:hover { border-color: var(--acc); color: var(--ink); }
+      .location-tab.active { background: var(--ink); color: var(--bg); border-color: var(--ink); box-shadow: 3px 3px 0 var(--acc); }
+      .location-tabs.disabled .location-tab { opacity: 0.5; pointer-events: none; }
+      .missing { border-color: #f33 !important; }
+      #close { background: none !important; border-color: transparent !important; color: var(--ink-3) !important; width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 50% !important; }
+      #close:hover { background: var(--bg-2) !important; color: var(--ink) !important; }
+      .role-tag-tab { border-radius: var(--radius-sm) !important; border: 1.5px solid var(--line-soft) !important; font-family: var(--mono) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: .06em !important; transition: all .15s !important; }
+      .role-tag-tab[data-tag="sde"] { background: #dbeafe !important; color: #1d4ed8 !important; border-color: #bfdbfe !important; }
+      .role-tag-tab[data-tag="pm"] { background: #fce7f3 !important; color: #9d174d !important; border-color: #fbcfe8 !important; }
+      .role-tag-tab[data-tag="data"] { background: #dcfce7 !important; color: #166534 !important; border-color: #bbf7d0 !important; }
+      .role-tag-tab.active[data-tag="sde"] { background: #3b82f6 !important; color: #fff !important; border-color: #3b82f6 !important; box-shadow: 3px 3px 0 var(--line); }
+      .role-tag-tab.active[data-tag="pm"] { background: #ec4899 !important; color: #fff !important; border-color: #ec4899 !important; box-shadow: 3px 3px 0 var(--line); }
+      .role-tag-tab.active[data-tag="data"] { background: #22c55e !important; color: #fff !important; border-color: #22c55e !important; box-shadow: 3px 3px 0 var(--line); }
 
-#save.saving {
-  background: #0a66c2; /* LinkedIn blue vibes */
-  color: #fff;
-}
+      /* SAVE BUTTON */
+      button#save {
+        background: #FF5C2C; color: #0E0E10; border: 2.5px solid #0E0E10;
+        border-radius: 999px; font-weight: 800; font-family: var(--sans);
+        font-size: 13px; padding: 10px 20px;
+        box-shadow: 5px 5px 0 #0E0E10;
+        transition: all .15s ease;
+        letter-spacing: .01em;
+      }
+      button#save:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #0E0E10; }
+      button#save:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #0E0E10; }
+      #save.saving { background: var(--acc-6); color: #fff; }
+      #save.success { background: var(--acc-3); color: var(--ink); animation: pop .4s ease; }
+      #save.error { background: var(--acc-5); color: var(--ink); animation: shake .3s ease; }
 
-#save.success {
-  background: #16a34a; /* green */
-  color: #fff;
-  animation: pop .4s ease;
-}
+      #save .spinner {
+        width: 14px; height: 14px; border-radius: 50%;
+        border: 2px solid rgba(0,0,0,.2); border-top-color: var(--ink);
+        animation: spin .8s linear infinite;
+        display: inline-block; vertical-align: -2px; margin-right: 6px;
+      }
+      #progress {
+        height: 3px; width: 0%;
+        background: linear-gradient(90deg, var(--acc-6), var(--acc-3));
+        border-radius: 999px; transition: width .4s ease; margin-top: 6px;
+      }
+      #status { margin-top: 8px; font-size: 12px; min-height: 16px; color: var(--ink-3); }
+      #statusMessage {
+        display: none; margin-top: 8px; padding: 8px 12px;
+        border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; text-align: center;
+        border: 1.5px solid transparent;
+      }
+      #statusMessage.visible { display: block; }
+      #statusMessage.success { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+      #statusMessage.error   { background: #ffe4e6; color: #9f1239; border-color: #fda4af; }
+      #statusMessage.saving  { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
 
-#save.error {
-  background: #dc2626; /* red */
-  color: #fff;
-  animation: shake .3s ease;
-}
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes pop  { 0%{transform:scale(.95)} 60%{transform:scale(1.02)} 100%{transform:scale(1)} }
+      @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
 
-/* spinner inside the button */
-#save .spinner {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.35);
-  border-top-color: #fff;
-  animation: spin .8s linear infinite;
-  display: inline-block;
-  vertical-align: -3px;
-  margin-right: 8px;
-}
+      .ai-loading { position: relative; color: var(--ink-3) !important; pointer-events: none; }
+      .ai-loading::after {
+        content: ''; position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+        width: 12px; height: 12px; border: 2px solid var(--line-soft); border-top-color: var(--acc);
+        border-radius: 50%; animation: spin 1s linear infinite;
+      }
+      .ai-processing {
+        background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg) 50%, var(--bg-2) 75%);
+        background-size: 200% 100%; animation: shimmer 1.5s infinite;
+      }
+      @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+      .ai-status-loading { display: block !important; color: var(--acc-6); }
+      .ai-status-loading::before { content: '🤖 '; animation: pulse 1.5s infinite; }
+      @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+      .skeleton-loading {
+        background: linear-gradient(90deg, var(--bg-2) 25%, var(--bg) 50%, var(--bg-2) 75%);
+        background-size: 200% 100%; animation: skeleton-shimmer 1.5s infinite;
+        color: transparent !important; pointer-events: none; border-color: var(--line-soft) !important;
+      }
+      .skeleton-loading::placeholder { color: transparent; }
+      @keyframes skeleton-shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
 
-/* subtle progress line under the button */
-#progress {
-  height: 3px;
-  width: 0%;
-  background: linear-gradient(90deg, #60a5fa, #22c55e);
-  border-radius: 999px;
-  transition: width .4s ease;
-  margin-top: 6px;
-}
-
-/* status text */
-#status {
-  margin-top: 8px; font-size: 12px; min-height: 16px;
-  color: #374151;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes pop  { 0%{transform:scale(.95)} 60%{transform:scale(1.02)} 100%{transform:scale(1)} }
-@keyframes shake{
-  0%,100%{transform: translateX(0)}
-  25%{transform: translateX(-3px)}
-  75%{transform: translateX(3px)}
-}
-
-/* AI Loading animations */
-.ai-loading {
-  position: relative;
-  color: #666 !important;
-  pointer-events: none;
-}
-
-.ai-loading::after {
-  content: '';
-  position: absolute;
-  right: -20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  border: 2px solid #e0e0e0;
-  border-top: 2px solid #0073b1;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-.ai-processing {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.ai-status-loading {
-  display: block !important;
-  color: #0073b1;
-}
-
-
-.ai-status-loading::before {
-  content: '🤖 ';
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Skeleton Loading Animation */
-.skeleton-loading {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s infinite;
-  color: transparent !important;
-  pointer-events: none;
-  border-color: #e8e8e8 !important;
-}
-
-.skeleton-loading::placeholder {
-  color: transparent;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
+      /* Header area */
+      .popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1.5px solid var(--line-soft); }
     </style>
   </head>
   <body>
@@ -168,15 +147,14 @@ button#save:active { transform: scale(.98); }
         Loading job info…
       </div>
     </div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <h3 style="margin: 0;">Save job for later..</h3>
-      <div style="display: flex; gap: 5px; align-items: center;">
-        <button type="button" id="starToggle" title="Star this job" aria-pressed="false" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0 4px;line-height:1;color:#aaa;transition:color 0.15s;">&#9734;</button>
-        <button type="button" id="save" class="header-btn" title="Save job">Save Job</button>
+    <div class="popup-header">
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button type="button" id="starToggle" title="Star this job" aria-pressed="false" style="background:none;border:none;cursor:pointer;font-size:20px;padding:0 4px;line-height:1;color:var(--ink-3);transition:color 0.15s;">&#9734;</button>
+        <button type="button" id="save" title="Save job">Save Job</button>
         <button type="button" id="clearTop" class="header-btn" title="Clear all fields">Clear</button>
-        <button type="button" id="redoTop" class="header-btn" title="Clear and refetch job data">Redo</button>
-        <button type="button" id="close" style="background: none; border: none; font-size: 18px; color: #999; cursor: pointer; padding: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">×</button>
+        <button type="button" id="redoTop" class="header-btn" title="Redo">Redo</button>
       </div>
+      <button type="button" id="close">×</button>
     </div>
 
     <div class="role-tag-tabs" id="roleTagTabs" style="display:flex;gap:6px;margin-bottom:6px;">

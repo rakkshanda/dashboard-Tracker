@@ -1,12 +1,33 @@
-// Background script for fetching Google Sheets data
-// This runs in the extension context and can bypass CORS
+// Background script — runs in extension context, bypasses page CSP
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  // Scrape the sender's tab using chrome.scripting (bypasses page CSP)
+  if (request.type === 'SCRAPE_TAB') {
+    const tabId = sender.tab?.id;
+    if (!tabId) { sendResponse({ data: {} }); return true; }
+    (async () => {
+      try {
+        // Inject scrape.js — runs in tab context, defines window.__scrapeJob
+        await chrome.scripting.executeScript({ target: { tabId }, files: ['scrape.js'] });
+        // Call the scraper and return the data
+        const [{ result }] = await chrome.scripting.executeScript({
+          target: { tabId },
+          func: () => { try { return window.__scrapeJob?.() || {}; } catch(e) { return {}; } }
+        });
+        sendResponse({ data: result || {} });
+      } catch (e) {
+        console.error('SCRAPE_TAB error:', e.message);
+        sendResponse({ data: {} });
+      }
+    })();
+    return true; // keep channel open for async response
+  }
+
   if (request.action === 'fetchGoogleSheetsData') {
     fetchGoogleSheetsData()
       .then(data => sendResponse({ success: true, data }))
       .catch(error => sendResponse({ success: false, error: error.message }));
-    return true; // Keep message channel open for async response
+    return true;
   }
 });
 

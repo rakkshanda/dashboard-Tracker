@@ -216,111 +216,85 @@
 
   // Site-specific strategies (only the ones you want)
   const strategies = {
-    // LinkedIn
-   // LinkedIn
+    // LinkedIn — handles both the full job detail page and the new side-panel layout.
+    // The new side panel uses randomised CSS class names, so we rely on stable href
+    // patterns and data-testid attributes first, then fall back to the old class selectors.
 "linkedin.com": () => {
-  const company = clean(txt(first(
-    ".job-details-jobs-unified-top-card__company-name",
-    ".job-details-jobs-unified-top-card__company-name a",
-    ".jobs-unified-top-card__company-name",
-    ".jobs-unified-top-card__company-name a",
-    ".job-card-container__company-name",
-    ".job-card-container__company-name a",
-    ".job-card-list__company-name",
-    ".job-card-list__company-name a",
-    ".jobs-details__main-content .jobs-details__company-name",
-    ".jobs-details__main-content .jobs-details__company-name a",
-    ".jobs-details__main-content h3",
-    ".jobs-details__main-content .jobs-details__company-info h3",
-    "[data-testid='company-name']",
-    ".company-name",
-    ".employer-name",
-    ".organization-name",
-    ".topcard__org-name-link",
-    "h3[class*='company']",
-    "a[class*='company']"
-  )));
 
-  const title = clean(txt(first(
-    ".job-details-jobs-unified-top-card__job-title",
-    ".job-details-jobs-unified-top-card__job-title a",
-    ".jobs-unified-top-card__job-title",
-    ".jobs-unified-top-card__job-title a",
-    ".job-card-container__title",
-    ".job-card-container__title a",
-    ".job-card-list__title",
-    ".job-card-list__title a",
-    ".jobs-details__main-content h1",
-    ".jobs-details__main-content .jobs-details__job-title",
-    ".jobs-details__main-content .jobs-details__job-title a",
-    "[data-testid='job-title']",
-    "h1",
-    ".job-title",
-    ".position-title",
-    ".topcard__title",
-    "h1[class*='title']",
-    "a[class*='title']"
-  )));
-
-  // ---- LOCATION (robust + normalized) ----
-  const rawLocationText = clean(txt(first(
-    ".job-details-jobs-unified-top-card__primary-description-container",
-    ".job-details-jobs-unified-top-card__primary-description",
-    ".job-details-jobs-unified-top-card__subtitle",
-    ".jobs-unified-top-card__subtitle",
-    ".job-details-jobs-unified-top-card__bullet",
-    ".jobs-unified-top-card__bullet",
-    ".jobs-unified-top-card__subtitle-item",
-    ".job-details-jobs-unified-top-card__subtitle-item",
-    ".top-card-layout__second-subline",
-    ".top-card-layout__second-subline .topcard__flavor",
-    ".top-card-layout__second-subline .topcard__flavor--bullet",
-    "[data-testid='inlineHeader-companyLocation']",
-    "[data-testid='job-location']",
-    "[data-testid='location']",
-    ".jobs-details__main-content .jobs-details__location",
-    ".jobs-details__main-content .jobs-details__metadata",
-    ".job-card-container__metadata-item",
-    ".job-card-list__metadata-item",
-    ".location",
-    ".job-location",
-    ".work-location"
-  )));
-
-  const extractLocationChunk = (text) => {
-    if (!text) return "";
-
-    const parts = text.split("·").map(t => clean(t)).filter(Boolean);
-
-    // Prefer City, ST or Country
-    for (const p of parts) {
-      if (/[A-Za-z .'-]+,\s*[A-Z]{2}\b/.test(p)) return p;
-      if (/(United States|USA|Canada|UK|India|Europe|Australia)/i.test(p)) return p;
-      if (/Remote/i.test(p)) return "Remote";
-      if (/Hybrid/i.test(p)) return "Hybrid";
-      if (/On[-\s]?site|Onsite/i.test(p)) return "On-site";
+  // ---- JOB ID ----
+  // Side-panel URL carries ?currentJobId=XXXXXXX; detail page has /jobs/view/XXXXXXX/
+  const jobId = (() => {
+    const urlParam = new URLSearchParams(location.search).get('currentJobId');
+    if (urlParam) return urlParam;
+    const viewLink = document.querySelector('a[href*="/jobs/view/"]:not([href*="/apply"])');
+    if (viewLink) {
+      const m = (viewLink.getAttribute('href') || '').match(/\/jobs\/view\/(\d+)/);
+      if (m) return m[1];
     }
+    const m = location.pathname.match(/\/jobs\/view\/(\d+)/);
+    return m ? m[1] : '';
+  })();
 
-    return parts[0] || "";
-  };
-
-  const locationFallbackFromText = () => {
-    const pageText = document.body.innerText || "";
-    const patterns = [
-      /(?:Location|Work Location|Office Location|Job Location)\s*[:\-]\s*([^\n\r]+)/i,
-      /(?:Based in|Located in|Office in)\s*[:\-]\s*([^\n\r]+)/i,
-      /\b(Remote|Hybrid|On[-\s]?site|Onsite|Work from home|WFH)\b/i,
-      /\b([A-Za-z .'-]+,\s*[A-Z]{2})\b/,
-      /\b(United States|USA|Canada|UK|India|Europe|Australia)\b/i
-    ];
-
-    for (const p of patterns) {
-      const m = pageText.match(p);
-      if (m) return clean(m[1] || m[0]);
+  // ---- COMPANY ----
+  // New UI: company name is always an <a> whose href contains /company/
+  const company = (() => {
+    const companyLinks = Array.from(document.querySelectorAll('a[href*="/company/"]'));
+    for (const link of companyLinks) {
+      const t = clean(link.innerText || link.textContent || '');
+      if (t && t.length > 1 && t.length < 80 && !/^(follow|see all|life|about)$/i.test(t)) {
+        return t;
+      }
     }
-    return "";
-  };
+    // Old UI class-based fallbacks
+    return clean(txt(first(
+      ".job-details-jobs-unified-top-card__company-name",
+      ".job-details-jobs-unified-top-card__company-name a",
+      ".jobs-unified-top-card__company-name",
+      ".jobs-unified-top-card__company-name a",
+      ".job-card-container__company-name",
+      ".job-card-container__company-name a",
+      ".job-card-list__company-name",
+      ".job-card-list__company-name a",
+      ".jobs-details__main-content .jobs-details__company-name",
+      ".jobs-details__main-content .jobs-details__company-name a",
+      ".jobs-details__main-content h3",
+      "[data-testid='company-name']",
+      ".company-name",
+      ".employer-name",
+      ".organization-name",
+      ".topcard__org-name-link"
+    )));
+  })();
 
+  // ---- TITLE ----
+  // New UI: job title is a link to /jobs/view/ID/ (not the /apply/ variant)
+  const title = (() => {
+    const jobLinks = Array.from(document.querySelectorAll('a[href*="/jobs/view/"]:not([href*="/apply"])'));
+    for (const link of jobLinks) {
+      const t = clean(link.innerText || link.textContent || '');
+      if (t && t.length > 1 && t.length < 200) return t;
+    }
+    // Old UI fallbacks
+    return clean(txt(first(
+      ".job-details-jobs-unified-top-card__job-title",
+      ".job-details-jobs-unified-top-card__job-title a",
+      ".jobs-unified-top-card__job-title",
+      ".jobs-unified-top-card__job-title a",
+      ".job-card-container__title",
+      ".job-card-container__title a",
+      ".job-card-list__title",
+      ".job-card-list__title a",
+      ".jobs-details__main-content h1",
+      ".jobs-details__main-content .jobs-details__job-title",
+      "[data-testid='job-title']",
+      "h1",
+      ".job-title",
+      ".position-title",
+      ".topcard__title"
+    )));
+  })();
+
+  // ---- LOCATION ----
   const normalizeLocation = (loc) => {
     if (!loc) return "";
     if (/remote/i.test(loc)) return "Remote";
@@ -329,30 +303,104 @@
     return loc;
   };
 
-  const locationVal = normalizeLocation(
-    extractLocationChunk(rawLocationText) || locationFallbackFromText()
-  );
+  const extractLocationChunk = (text) => {
+    if (!text) return "";
+    const parts = text.split("·").map(t => clean(t)).filter(Boolean);
+    for (const p of parts) {
+      if (/[A-Za-z .'-]+,\s*[A-Z]{2}\b/.test(p)) return p;
+      if (/(United States|USA|Canada|UK|India|Europe|Australia)/i.test(p)) return p;
+      if (/Remote/i.test(p)) return "Remote";
+      if (/Hybrid/i.test(p)) return "Hybrid";
+      if (/On[-\s]?site|Onsite/i.test(p)) return "On-site";
+    }
+    return parts[0] || "";
+  };
 
-  // ---- DESCRIPTION ----
-  const description = clean(txt(first(
-    ".jobs-description-content__text",
-    ".jobs-description-content",
-    ".jobs-description",
-    ".jobs-box__html-content",
-    "[data-testid='job-description']",
-    "article",
-    "main"
-  ))) || (() => {
-    const els = document.querySelectorAll(
-      ".jobs-description-content__text p, .jobs-description-content__text div, .jobs-description-content p, .jobs-description-content div"
-    );
-    if (els.length) {
-      return Array.from(els)
-        .map(el => clean(el.textContent || ""))
-        .join(" ")
-        .trim();
+  const locationVal = (() => {
+    // New UI: metadata paragraph has pattern "City, ST · Reposted X ago · Y applicants"
+    const paras = Array.from(document.querySelectorAll('p'));
+    for (const p of paras) {
+      const text = (p.innerText || p.textContent || '').trim();
+      if (!text || text.length > 200) continue;
+      const segments = text.split('·').map(s => s.trim()).filter(Boolean);
+      if (segments.length >= 2) {
+        const locCandidate = segments[0];
+        const timeSegment = segments[1];
+        if (
+          /\b(ago|day|week|month|hour|minute|Reposted|Just now)\b/i.test(timeSegment) &&
+          locCandidate.length > 1 && locCandidate.length < 80
+        ) {
+          if (
+            /,\s*[A-Z]{2}\b/.test(locCandidate) ||
+            /\b(Remote|Hybrid|On[-\s]?site|United States|USA|Canada|UK|India|Europe)\b/i.test(locCandidate)
+          ) {
+            return normalizeLocation(clean(locCandidate));
+          }
+        }
+      }
+    }
+
+    // Old UI class-based fallbacks
+    const rawLocationText = clean(txt(first(
+      ".job-details-jobs-unified-top-card__primary-description-container",
+      ".job-details-jobs-unified-top-card__primary-description",
+      ".job-details-jobs-unified-top-card__subtitle",
+      ".jobs-unified-top-card__subtitle",
+      ".job-details-jobs-unified-top-card__bullet",
+      ".job-details-jobs-unified-top-card__subtitle-item",
+      ".top-card-layout__second-subline",
+      "[data-testid='inlineHeader-companyLocation']",
+      "[data-testid='job-location']",
+      "[data-testid='location']",
+      ".job-card-container__metadata-item",
+      ".location",
+      ".job-location",
+      ".work-location"
+    )));
+
+    if (rawLocationText) return normalizeLocation(extractLocationChunk(rawLocationText));
+
+    // Last resort: scan page text for location patterns
+    const pageText = document.body.innerText || "";
+    const patterns = [
+      /(?:Location|Work Location|Office Location)\s*[:\-]\s*([^\n\r]+)/i,
+      /\b(Remote|Hybrid|On[-\s]?site|Work from home|WFH)\b/i,
+      /\b([A-Za-z .'-]+,\s*[A-Z]{2})\b/,
+      /\b(United States|USA|Canada|UK|India|Europe|Australia)\b/i
+    ];
+    for (const pat of patterns) {
+      const m = pageText.match(pat);
+      if (m) return normalizeLocation(clean(m[1] || m[0]));
     }
     return "";
+  })();
+
+  // ---- DESCRIPTION ----
+  const description = (() => {
+    // New UI: stable data-testid on the expandable text box
+    const expandable = document.querySelector('[data-testid="expandable-text-box"]');
+    if (expandable) {
+      const t = clean(txt(expandable));
+      if (t.length > 50) return t;
+    }
+    // Old UI fallbacks
+    return clean(txt(first(
+      ".jobs-description-content__text",
+      ".jobs-description-content",
+      ".jobs-description",
+      ".jobs-box__html-content",
+      "[data-testid='job-description']",
+      "article",
+      "main"
+    ))) || (() => {
+      const els = document.querySelectorAll(
+        ".jobs-description-content__text p, .jobs-description-content__text div, .jobs-description-content p, .jobs-description-content div"
+      );
+      if (els.length) {
+        return Array.from(els).map(el => clean(el.textContent || "")).join(" ").trim();
+      }
+      return "";
+    })();
   })();
 
   return {
@@ -360,7 +408,8 @@
     title: title || "",
     location: locationVal || "",
     url: location.href,
-    description: description || ""
+    description: description || "",
+    job_id: jobId || ""
   };
 },
 
@@ -766,6 +815,54 @@
       };
     },
 
+    // Apple Jobs (jobs.apple.com)
+    "jobs.apple.com": () => {
+      const company = "Apple";
+
+      const title = clean(txt(first(
+        "h1#jobdetails-postingtitle",
+        "h1[id*='postingtitle']",
+        "h1"
+      )));
+
+      const locationVal = clean(txt(first(
+        "label#jobdetails-joblocation",
+        "[id*='joblocation']"
+      )));
+
+      // Job ID: from URL path /details/200661396-0836/... or DOM element
+      const jobId = (() => {
+        const urlMatch = location.pathname.match(/\/details\/([^/]+)\//);
+        if (urlMatch) return urlMatch[1];
+        const domEl = document.querySelector("strong#jobdetails-jobnumber, [id*='jobnumber']");
+        if (domEl) return clean(txt(domEl));
+        return "";
+      })();
+
+      // Build description from all named sections
+      const description = (() => {
+        const sections = [
+          { id: "jobdetails-jobsummary", label: "Summary" },
+          { id: "jobdetails-jobdescription", label: "Description" },
+          { id: "jobdetails-responsibilities", label: "Responsibilities" },
+          { id: "jobdetails-minimumqualifications", label: "Minimum Qualifications" },
+          { id: "jobdetails-preferredqualifications", label: "Preferred Qualifications" },
+          { id: "jobdetails-posting-footer-0", label: "Pay & Benefits" },
+        ];
+        const parts = [];
+        for (const { id, label } of sections) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const contentEl = el.querySelector("[id*='content-row'], .t-body");
+          const text = clean(txt(contentEl || el));
+          if (text) parts.push(`${label}\n${text}`);
+        }
+        return parts.join("\n\n");
+      })();
+
+      return { company, title, location: locationVal, description, job_id: jobId };
+    },
+
     "app.joinhandshake.com": () => {
       const bodyText = () => (document.body?.innerText || "").replace(/\s+/g, " ").trim();
       const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
@@ -1040,9 +1137,23 @@
         tiktokData.title = clean(tiktokData.title || '');
         tiktokData.location = clean(tiktokData.location || '');
         tiktokData.url = clean(tiktokData.url || '');
-        // jobId is always present as a key from __scrapeTikTokJob_internal
         return tiktokData;
       }
+    }
+
+    // Apple Jobs override — skip JSON-LD and generic, use Apple scraper only
+    if (hrefLower.includes('jobs.apple.com')) {
+      console.log('[scrape.js] Apple Jobs detected — using Apple scraper');
+      let appleData = strategies['jobs.apple.com']();
+      appleData = appleData || {};
+      appleData.url = location.href;
+      appleData.company = clean(appleData.company || 'Apple');
+      appleData.title = clean(appleData.title || '');
+      appleData.location = clean(appleData.location || '');
+      appleData.description = truncateDescription(appleData.description || '');
+      appleData.job_id = appleData.job_id || '';
+      console.log('[scrape.js] Apple scraped data:', { title: appleData.title, location: appleData.location, job_id: appleData.job_id });
+      return appleData;
     }
 
     // 1) JSON-LD
@@ -1071,6 +1182,15 @@
       if (m) {
         data.job_id = m[1];
         console.log('[scrape.js] Amazon job_id from URL:', m[1]);
+      }
+    }
+
+    // For Apple pages: extract job_id from URL path /details/XXXXX/ if not already set
+    if (!data.job_id && /jobs\.apple\.com/i.test(location.hostname)) {
+      const m = location.pathname.match(/\/details\/([^/]+)\//);
+      if (m) {
+        data.job_id = m[1];
+        console.log('[scrape.js] Apple job_id from URL:', m[1]);
       }
     }
 

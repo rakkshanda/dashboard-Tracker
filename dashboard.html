@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JobTracker - Supabase Dashboard</title>
     <link rel="icon" type="image/png" href="icon16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="dashboard-funky.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,37 +22,33 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-brand">
-            <div class="logo">
-                <i class="fas fa-heart" style="color: #ff6b9d;"></i>
-                <span id="live-datetime">Loading...</span>
-            </div>
-        </div>
-        <div class="nav-actions">
-            <!--
-            <button class="pomodoro-toggle-btn" id="pomodoro-toggle-btn" title="Show Pomodoro Timer">
-                <i class="fas fa-clock"></i>
-                <span>Pomodoro</span>
-            </button>
-            -->
-            <button class="tasks-toggle-btn" id="tasks-toggle-btn" title="Show Tasks">
-                <i class="fas fa-list-check"></i>
-                <span>Tasks</span>
-            </button>
-            <button class="insights-toggle-btn" id="insights-toggle-btn" title="Show Insights">
-                <i class="fas fa-chart-bar"></i>
-                <span>Insights</span>
-            </button>
-            <button class="sankey-toggle-btn" id="sankey-toggle-btn" title="Show Sankey diagram">
-                <i class="fas fa-chart-line"></i>
-                <span>Sankey</span>
-            </button>
-            <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">
-                <i class="fas fa-moon"></i>
-            </button>
-        </div>
-    </nav>
+    <header class="top">
+      <div class="brand">
+        <span class="heart">♥</span>
+        job<span class="slash">/</span>tracker
+      </div>
+      <div class="date-strip">
+        <span class="pip"></span>
+        <span id="live-datetime">Loading…</span>
+      </div>
+      <div class="top-actions">
+        <button class="pill outline" id="tasks-toggle-btn" title="Show Tasks">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4.5h10M3 8h10M3 11.5h7"></path><circle cx="13" cy="11.5" r="1" fill="currentColor"></circle></svg>
+          Tasks
+        </button>
+        <button class="pill outline" id="insights-toggle-btn" title="Show Insights">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 13V3M2 13h12M5 10V7M8 10V5M11 10V8"></path></svg>
+          Insights
+        </button>
+        <button class="pill outline" id="sankey-toggle-btn" title="Show Sankey diagram">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12L6 8l3 3 5-6"></path><path d="M11 5h3v3"></path></svg>
+          Sankey
+        </button>
+        <button class="pill outline icon-only" id="theme-toggle" aria-label="Toggle theme" title="Toggle dark mode">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 9.5A5 5 0 016.5 3a.5.5 0 00-.7-.45A6 6 0 1013.45 10.2a.5.5 0 00-.45-.7z"></path></svg>
+        </button>
+      </div>
+    </header>
 
     <!-- Main Content -->
     <div class="main-container" id="main-container">
@@ -316,6 +316,7 @@
             <!-- This Month Card -->
                 <div class="activity-card">
                 <div class="activity-header">
+                    <h3 class="activity-title">Monthly</h3>
                     <div class="month-nav">
                         <button type="button" class="month-arrow" id="month-prev" aria-label="Previous month">‹</button>
                         <select class="month-selector" id="month-selector">
@@ -324,7 +325,8 @@
                         <button type="button" class="month-arrow" id="month-next" aria-label="Next month">›</button>
                     </div>
                 </div>
-                <div class="activity-total" id="month-total">0 applications</div>
+                <div class="activity-total" id="month-total">0</div>
+                <div class="activity-sublabel">applications this month</div>
                 <div class="activity-weeks">
                     <div class="week-item">
                         <div class="week-label">Week 1</div>
@@ -351,8 +353,12 @@
 
             <!-- This Week Card -->
             <div class="activity-card">
-                <h3 class="activity-title">This Week <span class="week-range" id="week-range"></span></h3>
-                <div class="activity-total" id="week-total">0 applications</div>
+                <div class="activity-header">
+                    <h3 class="activity-title">This Week <span class="week-range" id="week-range"></span></h3>
+                    <span class="week-days-label">7 Days</span>
+                </div>
+                <div class="activity-total" id="week-total">0</div>
+                <div class="activity-sublabel">applications submitted</div>
                 <div class="activity-days">
                     <div class="day-item">
                         <div class="day-label">Mon</div>
@@ -447,13 +453,38 @@
             </div>
         </div>
 
-        <!-- Jobs Table -->
+        <!-- Jobs Panel -->
         <div class="jobs-section table-section">
 
-            <!-- View sub-tabs -->
-            <div class="view-tabs">
-                <button class="view-tab active" id="view-tab-all" data-view="all">All Jobs <span class="tab-count" id="all-jobs-count">0</span></button>
-                <button class="view-tab" id="view-tab-numbered" data-view="numbered">⭐ Numbered <span class="tab-count" id="numbered-jobs-count">0</span></button>
+            <!-- Panel head -->
+            <div class="jobs-head">
+                <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+                    <div class="jobs-title">
+                        all the jobs
+                        <span class="badge-num" id="all-jobs-count-badge">0</span>
+                    </div>
+                    <div class="f-tabs">
+                        <button class="f-tab active" id="view-tab-all" data-view="all">All <span class="f-tab-count" id="all-jobs-count">0</span></button>
+                        <button class="f-tab" id="view-tab-numbered" data-view="numbered">Priority <span class="f-tab-count" id="numbered-jobs-count">0</span></button>
+                        <button class="f-tab" id="view-tab-active" data-view="active">Active <span class="f-tab-count" id="active-jobs-count">0</span></button>
+                        <button class="f-tab" id="view-tab-archive" data-view="archive">Archive <span class="f-tab-count" id="archive-jobs-count">0</span></button>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <button class="numbering-btn" id="numbering-btn" title="Enter numbering mode to rank jobs">
+                        <i class="fas fa-list-ol"></i> Number
+                    </button>
+                    <div class="view-toggle" id="view-toggle">
+                        <button data-view="table" class="active">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h12M2 12h12"></path></svg>
+                            Table
+                        </button>
+                        <button data-view="cards">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5"></rect><rect x="9" y="2" width="5" height="5"></rect><rect x="2" y="9" width="5" height="5"></rect><rect x="9" y="9" width="5" height="5"></rect></svg>
+                            Cards
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Numbering mode banner -->
@@ -465,113 +496,94 @@
                 </div>
             </div>
 
-            <div class="table-header">
-                <!-- Search Bar -->
+            <!-- Filter bar -->
+            <div class="filter-bar">
                 <div class="search-container">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" id="search-input" class="search-input" placeholder="Search jobs by company, position...">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search company, role, notes…">
                 </div>
-                
-                <!-- Filter Buttons -->
-                <div class="filter-buttons">
-                        <button class="clear-filters-btn" id="clear-filters-btn" title="Clear all filters" style="display: none;">
-                            <i class="fas fa-times"></i>
-                        </button>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="date">
-                                <i class="fas fa-calendar"></i>
-                                <span class="filter-value">All Time</span>
-                            </button>
-                            <div class="filter-dropdown">
-                                <div class="filter-option" data-value="all">All Time</div>
-                                <div class="filter-option" data-value="today">Today</div>
-                                <div class="filter-option" data-value="week">This Week</div>
-                                <div class="filter-option" data-value="month">This Month</div>
-                                <div class="filter-option" data-value="3months">Last 3 Months</div>
-                            </div>
+                <div class="filter-chips">
+                    <button class="clear-filters-btn" id="clear-filters-btn" title="Clear all filters" style="display:none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="date">📅 <span class="filter-value">All Time</span></button>
+                        <div class="filter-dropdown">
+                            <div class="filter-option" data-value="all">All Time</div>
+                            <div class="filter-option" data-value="today">Today</div>
+                            <div class="filter-option" data-value="week">This Week</div>
+                            <div class="filter-option" data-value="month">This Month</div>
+                            <div class="filter-option" data-value="3months">Last 3 Months</div>
                         </div>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="status">
-                                <i class="fas fa-filter"></i>
-                                <span class="filter-value">Status</span>
-                            </button>
-                            <div class="filter-dropdown status-dropdown" data-multiselect="status">
-                                <!-- Populated dynamically -->
-                            </div>
+                    </div>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="status">▾ <span class="filter-value">Status</span></button>
+                        <div class="filter-dropdown status-dropdown" data-multiselect="status"></div>
+                    </div>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="company">🏢 <span class="filter-value">Companies</span></button>
+                        <div class="filter-dropdown company-dropdown" data-multiselect="company">
+                            <div class="filter-option" data-value="all">All Companies</div>
                         </div>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="company">
-                                <i class="fas fa-building"></i>
-                                <span class="filter-value">All Companies</span>
-                            </button>
-                            <div class="filter-dropdown company-dropdown" data-multiselect="company">
-                                <div class="filter-option" data-value="all">All Companies</div>
-                            </div>
+                    </div>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="location">📍 <span class="filter-value">Locations</span></button>
+                        <div class="filter-dropdown">
+                            <div class="filter-option" data-value="all">All Locations</div>
                         </div>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span class="filter-value">All Locations</span>
-                            </button>
-                            <div class="filter-dropdown">
-                                <div class="filter-option" data-value="all">All Locations</div>
-                            </div>
+                    </div>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="source">🌐 <span class="filter-value">Sources</span></button>
+                        <div class="filter-dropdown">
+                            <div class="filter-option" data-value="all">All Sources</div>
                         </div>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="source">
-                                <i class="fas fa-globe"></i>
-                                <span class="filter-value">All Sources</span>
-                            </button>
-                            <div class="filter-dropdown">
-                                <div class="filter-option" data-value="all">All Sources</div>
-                            </div>
+                    </div>
+                    <div class="filter-group">
+                        <button class="chip" data-filter="tag">🏷 <span class="filter-value">Tags</span></button>
+                        <div class="filter-dropdown">
+                            <div class="filter-option" data-value="all">All Tags</div>
+                            <div class="filter-option" data-value="sde" style="color:#1d4ed8;font-weight:600;">SDE</div>
+                            <div class="filter-option" data-value="pm"  style="color:#166534;font-weight:600;">PM</div>
+                            <div class="filter-option" data-value="data" style="color:#9d174d;font-weight:600;">Data</div>
                         </div>
-                        <div class="filter-group">
-                            <button class="filter-btn" data-filter="tag">
-                                <i class="fas fa-tag"></i>
-                                <span class="filter-value">All Tags</span>
-                            </button>
-                            <div class="filter-dropdown">
-                                <div class="filter-option" data-value="all">All Tags</div>
-                                <div class="filter-option" data-value="sde" style="color:#1d4ed8;font-weight:600;">SDE</div>
-                                <div class="filter-option" data-value="pm"  style="color:#166534;font-weight:600;">PM</div>
-                                <div class="filter-option" data-value="data" style="color:#9d174d;font-weight:600;">Data</div>
-                            </div>
-                        </div>
-                        <button class="refresh-icon-btn" id="refresh-btn" title="Refresh Data">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+                    </div>
+                    <button class="refresh-icon-btn" id="refresh-btn" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
-            
-            <div class="table-container">
+
+            <!-- Table view -->
+            <div class="jobs-table-wrap" id="jobs-table-wrap">
                 <table class="jobs-table">
                     <thead>
                         <tr>
-                            <th class="col-select" style="width: 40px;">
-                                <input type="checkbox" id="select-all-checkbox" title="Select/Deselect All">
-                            </th>
+                            <th style="width:32px;"><input type="checkbox" id="select-all-checkbox" title="Select/Deselect All"></th>
                             <th class="col-rank" id="rank-col-header" style="display:none;">#</th>
-                            <th class="col-date">Applied Date</th>
-                            <th class="col-favorite" title="Favorite">★</th>
-                            <th class="col-company">Company</th>
-                            <th class="col-title">Title</th>
-                            <th class="col-location">Location</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-source">Source</th>
-                            <th class="col-url">URL</th>
-                            <th class="col-resume">Resume</th>
-                            <th class="col-actions">Actions</th>
+                            <th style="width:72px;">Date</th>
+                            <th style="width:58px;"></th>
+                            <th style="width:140px;">Company</th>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Source</th>
+                            <th>URL</th>
+                            <th>Resume</th>
+                            <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="jobs-container">
-                        <!-- Jobs will be rendered here -->
-                    </tbody>
+                    <tbody id="jobs-container"></tbody>
                 </table>
             </div>
-            
-            <!-- Pagination -->
-            <div class="pagination-container" id="pagination-container"></div>
+
+            <!-- Cards view -->
+            <div class="jobs-cards" id="jobs-cards" style="display:none;"></div>
+
+            <!-- Footer -->
+            <div class="table-foot">
+                <span class="pagination-info-text" id="pagination-info-text">0 applications</span>
+                <div class="pagination-container" id="pagination-container"></div>
+            </div>
         </div>
     </div>
 

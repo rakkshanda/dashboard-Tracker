@@ -1200,7 +1200,7 @@ body.dark-mode .filter-action-btn.clear {
 }
 
 .jobs-table tbody tr:nth-child(even) {
-    background: var(--bg-tertiary);
+    background: transparent;
 }
 
 .jobs-table tbody tr:hover {

@@ -238,19 +238,17 @@ class SupabaseJobTracker {
                 }
                 
                 return date.toLocaleDateString(undefined, {
-                    year: 'numeric',
                     month: 'short',
                     day: 'numeric'
                 });
             }
-            
+
             // Fallback for other formats
             const date = new Date(dateString);
             if (Number.isNaN(date.getTime())) {
                 return this.sanitize(dateString);
             }
             return date.toLocaleDateString(undefined, {
-                year: 'numeric',
                 month: 'short',
                 day: 'numeric'
             });
@@ -400,11 +398,10 @@ class SupabaseJobTracker {
         mainContainer.style.display = 'none';
         sankeyContainer.style.display = 'block';
         
-        // Update button text
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-table"></i><span>Show Tracker</span>';
+            btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M2 6h12M6 6v8"/></svg> Tracker';
         }
-        
+
         this.renderSankeyWithFilters();
     }
 
@@ -421,9 +418,8 @@ class SupabaseJobTracker {
         sankeyContainer.style.display = 'none';
         mainContainer.style.display = 'block';
         
-        // Update button text
         if (btn) {
-            btn.innerHTML = '<i class="fas fa-chart-line"></i><span>Show Sankey</span>';
+            btn.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M2 12L6 8l3 3 5-6"/><path d="M11 5h3v3"/></svg> Sankey';
         }
     }
 
@@ -949,8 +945,12 @@ class SupabaseJobTracker {
         // Filter buttons and dropdowns
         document.addEventListener('click', (e) => {
             // Close all dropdowns when clicking filter button
-            if (e.target.classList.contains('filter-btn') || e.target.closest('.filter-btn')) {
-                const btn = e.target.classList.contains('filter-btn') ? e.target : e.target.closest('.filter-btn');
+            if (e.target.classList.contains('filter-btn') || e.target.closest('.filter-btn') ||
+                e.target.classList.contains('chip') || e.target.closest('.chip')) {
+                const btn = e.target.classList.contains('filter-btn') ? e.target
+                    : e.target.closest('.filter-btn') ? e.target.closest('.filter-btn')
+                    : e.target.classList.contains('chip') ? e.target
+                    : e.target.closest('.chip');
                 const dropdown = btn?.nextElementSibling;
                 
                 // Close all other dropdowns first
@@ -1084,6 +1084,14 @@ class SupabaseJobTracker {
                     dropdown.classList.remove('show');
                 }
             });
+            // Close custom status dropdowns
+            if (!e.target.closest('.status-custom-dd')) {
+                document.querySelectorAll('.status-dd-menu.open').forEach(m => {
+                    m.classList.remove('open');
+                    m.style.top = '';
+                    m.style.left = '';
+                });
+            }
         });
 
         document.addEventListener('input', (e) => {
@@ -1095,6 +1103,21 @@ class SupabaseJobTracker {
                     option.style.display = labelText.includes(query) ? '' : 'none';
                 });
             }
+        });
+
+        document.addEventListener('change', (e) => {
+            const checkbox = e.target;
+            if (checkbox.type !== 'checkbox') return;
+            const dropdown = checkbox.closest('.filter-dropdown[data-multiselect="status"]');
+            if (!dropdown) return;
+            const selected = Array.from(dropdown.querySelectorAll('input[type="checkbox"]'))
+                .filter(cb => cb.checked)
+                .map(cb => cb.value)
+                .filter(Boolean);
+            this.currentFilters.status = selected.length ? selected : 'all';
+            this.updateStatusFilterLabel();
+            this.applyFilters();
+            this.updateClearFiltersButton();
         });
 
         // Multi-select functionality
@@ -1153,6 +1176,26 @@ class SupabaseJobTracker {
             this.filteredJobs = this.jobs
                 .filter(j => j.priority_rank != null)
                 .sort((a, b) => a.priority_rank - b.priority_rank);
+            this.renderJobs();
+            this.updateStats();
+            this.updateNumberedTabCount();
+            return;
+        }
+
+        // Active view: in-progress statuses
+        const activeStatuses = ['saved', 'applied', 'resume_screening', 'interview'];
+        if (this.activeView === 'active') {
+            this.filteredJobs = this.jobs.filter(j => activeStatuses.includes((j.status || 'saved').toLowerCase()));
+            this.renderJobs();
+            this.updateStats();
+            this.updateNumberedTabCount();
+            return;
+        }
+
+        // Archive view: terminal statuses
+        const archiveStatuses = ['rejected', 'withdrawn', 'ended', 'ghosted', 'offer'];
+        if (this.activeView === 'archive') {
+            this.filteredJobs = this.jobs.filter(j => archiveStatuses.includes((j.status || 'saved').toLowerCase()));
             this.renderJobs();
             this.updateStats();
             this.updateNumberedTabCount();
@@ -1512,16 +1555,79 @@ class SupabaseJobTracker {
     }
 
     updateNumberedTabCount() {
-        const count = this.jobs.filter(j => j.priority_rank != null).length;
-        const el = document.getElementById('numbered-jobs-count');
-        if (el) el.textContent = count;
-        const allEl = document.getElementById('all-jobs-count');
-        if (allEl) allEl.textContent = this.filteredJobs.length;
+        const numbered = this.jobs.filter(j => j.priority_rank != null).length;
+        const activeStatuses = ['saved', 'applied', 'resume_screening', 'interview'];
+        const archiveStatuses = ['rejected', 'withdrawn', 'ended', 'ghosted', 'offer'];
+
+        const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+        set('numbered-jobs-count', numbered);
+        set('all-jobs-count', this.jobs.length);
+        set('all-jobs-count-badge', this.jobs.length);
+        set('active-jobs-count', this.jobs.filter(j => activeStatuses.includes((j.status || 'saved').toLowerCase())).length);
+        set('archive-jobs-count', this.jobs.filter(j => archiveStatuses.includes((j.status || 'saved').toLowerCase())).length);
+
+        const infoEl = document.getElementById('pagination-info-text');
+        if (infoEl) infoEl.textContent = `${this.filteredJobs.length} of ${this.jobs.length} applications`;
+    }
+
+    renderCards() {
+        const container = document.getElementById('jobs-cards');
+        if (!container) return;
+        const logoColors = ['c1','c2','c3','c4','c5','c6'];
+        const html = this.filteredJobs.map(job => {
+            const company = this.sanitize(job.company || '—');
+            const title = this.sanitize(job.title || 'Untitled role');
+            const location = this.sanitize(job.location || '—');
+            const status = (job.status || 'saved').toLowerCase();
+            const source = this.sanitize(job.source || '');
+            const logoLetter = company.charAt(0).toUpperCase();
+            const logoColor = logoColors[company.charCodeAt(0) % 6];
+            const logoInner = getCompanyLogoHTML(company, logoLetter);
+            const favorite = !!job.favorite;
+            const jobId = this.normalizeId(job.id);
+            const dateStr = this.formatDate(job.applied_date);
+            const url = this.sanitizeUrl(job.url);
+
+            return `
+                <div class="job-card">
+                    <div class="job-card-head">
+                        <div style="display:flex;gap:10px;align-items:flex-start;">
+                            <div class="logo ${logoColor}">${logoInner}</div>
+                            <div>
+                                <div class="role">${title}</div>
+                                <div class="meta-row" style="margin-top:3px;">
+                                    <strong style="color:var(--f-ink);font-family:var(--f-display);">${company}</strong>
+                                    <span class="sep">·</span>
+                                    <span>${location}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="star-btn ${favorite ? 'on' : ''} favorite-toggle" data-id="${jobId}" title="${favorite ? 'Unstar' : 'Star'}">
+                            <svg viewBox="0 0 16 16" fill="${favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.4"><path d="M8 1.5l2 4.5 5 .5-3.7 3.4 1.1 4.9L8 12.4 3.6 14.8l1.1-4.9L1 6.5l5-.5z"></path></svg>
+                        </button>
+                    </div>
+                    <div class="meta-row">
+                        <span class="status-badge ${status}">${this.formatStatus(status)}</span>
+                        ${source ? `<span class="sep">·</span><span style="font-family:var(--f-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--f-ink3);font-weight:600;">${source}</span>` : ''}
+                    </div>
+                    <div class="job-card-foot">
+                        <span style="font-family:var(--f-mono);font-size:11px;color:var(--f-ink3);">${dateStr}</span>
+                        <div style="display:flex;gap:4px;">
+                            ${url ? `<a class="row-action" href="${url}" target="_blank" rel="noopener noreferrer" title="URL"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 3h4v4M13 3l-6 6"></path></svg></a>` : ''}
+                            <button class="row-action edit" data-id="${jobId}" title="Edit"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-8 8H3v-3z"></path></svg></button>
+                            <button class="row-action danger delete" data-id="${jobId}" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"></path></svg></button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        container.innerHTML = html || '<div class="empty-state"><i class="fas fa-inbox"></i><h3>No jobs found</h3></div>';
+        this.addJobCardEventListeners();
     }
 
     setActiveView(view) {
         this.activeView = view;
-        document.querySelectorAll('.view-tab').forEach(t => {
+        document.querySelectorAll('.f-tab, .view-tab').forEach(t => {
             t.classList.toggle('active', t.dataset.view === view);
         });
         this.applyFilters();
@@ -1989,43 +2095,79 @@ class SupabaseJobTracker {
             const rowClass = rank != null ? 'is-ranked' : '';
             const isDraggable = this.activeView === 'numbered' && rank != null;
 
+            const tag = (job.role_tag || getJobTag(job.title)).toUpperCase();
+            const logoLetter = company.charAt(0).toUpperCase();
+            const logoColor = 'c' + ((company.charCodeAt(0) % 6) + 1);
+            const logoInner = getCompanyLogoHTML(company, logoLetter);
+            const dateParts = appliedDate.split(' ');
+            const dateDay = dateParts.slice(0, 2).join(' ');
+            const dateYear = dateParts[2] || '';
+            const [city, ...countryParts] = location.split(',');
+            const country = countryParts.join(',').trim() || '';
+
             return `
                 <tr data-id="${jobId}" class="${rowClass}" ${isDraggable ? 'draggable="true"' : ''}>
-                    <td class="select-cell">
-                        <input type="checkbox" class="job-checkbox" data-id="${jobId}">
+                    <td><input type="checkbox" class="job-checkbox" data-id="${jobId}"></td>
+                    <td>
+                        <div class="cell-date"><strong>${dateDay}</strong>${dateYear}</div>
                     </td>
-                    <td>${appliedDate}</td>
-                    <td class="favorite-cell">
-                        <div style="display:flex;align-items:center;gap:4px;"><button class="favorite-toggle ${favorite ? 'active' : ''}" data-id="${jobId}" title="${favoriteLabel}" aria-label="${favoriteLabel}"><i class="${favoriteIconClass} fa-star"></i></button>${rankBadge}</div>
-                    </td>
-                    <td>${company}<br><span class="role-tag ${getJobTag(job.role_tag ? job.role_tag : job.title)}">${(job.role_tag || getJobTag(job.title)).toUpperCase()}</span></td>
-                    <td class="title-cell">
-                        <div class="title-row">
-                            <div class="job-title">${title}</div>
+                    <td>
+                        <div class="star-rank-cell">
+                            <button class="star-btn ${favorite ? 'on' : ''} favorite-toggle" data-id="${jobId}" title="${favoriteLabel}" aria-label="${favoriteLabel}">
+                                <svg viewBox="0 0 16 16" fill="${favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.4"><path d="M8 1.5l2 4.5 5 .5-3.7 3.4 1.1 4.9L8 12.4 3.6 14.8l1.1-4.9L1 6.5l5-.5z"></path></svg>
+                            </button>
+                            ${rankBadge}
                         </div>
-                        ${jobIdMarkup}
                     </td>
-                    <td>${location}</td>
+                    <td>
+                        <div class="company-cell">
+                            <div class="logo ${logoColor}">${logoInner}</div>
+                            <div>
+                                <span class="name">${company}</span>
+                                <span class="tag">${tag}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="title-cell">
+                            <span class="role">${title}</span>
+                            ${job.job_id ? `<span class="id">ID #${this.sanitize(job.job_id)}</span>` : ''}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="loc-city">${city}</span>
+                        ${country ? `<span class="loc-country">${country}</span>` : ''}
+                    </td>
                     <td class="status-cell">
-                        <select class="status-dropdown" data-id="${jobId}">
-                            ${statusOptions}
-                        </select>
-                        <div class="status-date" data-id="${jobId}">
-                            ${this.getLastStatusChangeDate(job)}
+                        <div class="status-custom-dd" data-id="${jobId}">
+                            <button class="status-dd-trigger" data-id="${jobId}">
+                                <span class="status-badge ${status}">${this.formatStatus(status)}</span>
+                                <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" style="width:9px;height:9px;flex-shrink:0;"><path d="M1 1l4 4 4-4"></path></svg>
+                            </button>
+                            <div class="status-dd-menu">
+                                ${this.statusOptions.map(opt => `<div class="status-dd-option" data-id="${jobId}" data-value="${opt.toLowerCase()}">${this.formatStatus(opt.toLowerCase())}</div>`).join('')}
+                            </div>
                         </div>
+                        <div class="status-date" data-id="${jobId}">${this.getLastStatusChangeDate(job)}</div>
                     </td>
                     <td class="source-cell">
-                        <select class="source-dropdown" data-id="${jobId}">
-                            <option value="">Select Source</option>
-                            ${sourceOptions}
-                        </select>
+                        <div class="src-select">
+                            <select class="source-dropdown" data-id="${jobId}">
+                                <option value="">Source</option>
+                                ${sourceOptions}
+                            </select>
+                        </div>
                     </td>
                     <td class="url-cell">${linkMarkup}</td>
                     <td class="resume-cell">${resumeMarkup}</td>
                     <td class="actions-cell">
                         <div class="actions-cell-content">
-                        <i class="fas fa-edit action-icon edit" data-id="${jobId}" title="Edit job"></i>
-                        <i class="fas fa-trash action-icon delete" data-id="${jobId}" title="Delete job"></i>
+                            <button class="row-action edit" data-id="${jobId}" title="Edit">
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-8 8H3v-3z"></path></svg>
+                            </button>
+                            <button class="row-action danger delete" data-id="${jobId}" title="Delete">
+                                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"></path></svg>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -2078,6 +2220,55 @@ class SupabaseJobTracker {
                         setTimeout(() => {
                             statusDateElement.style.color = ''; // Reset to default after 2s
                         }, 2000);
+                    }
+                }
+            });
+        });
+
+        // Custom status dropdown — open/close
+        document.querySelectorAll('.status-dd-trigger').forEach(trigger => {
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const menu = trigger.nextElementSibling;
+                const isOpen = menu.classList.contains('open');
+                document.querySelectorAll('.status-dd-menu.open').forEach(m => {
+                    m.classList.remove('open');
+                    m.style.top = '';
+                    m.style.left = '';
+                });
+                if (!isOpen) {
+                    const rect = trigger.getBoundingClientRect();
+                    menu.style.top = (rect.bottom + 6) + 'px';
+                    menu.style.left = rect.left + 'px';
+                    menu.classList.add('open');
+                }
+            });
+        });
+
+        // Custom status dropdown — option selected
+        document.querySelectorAll('.status-dd-option').forEach(opt => {
+            opt.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const id = opt.dataset.id;
+                const newStatus = opt.dataset.value;
+                const menu = opt.closest('.status-dd-menu');
+                const trigger = menu?.previousElementSibling;
+                const job = this.jobs.find(j => this.idsMatch(j.id, id));
+                if (!job) return;
+                menu.classList.remove('open');
+                menu.style.top = '';
+                menu.style.left = '';
+
+                const success = await this.updateJobStatus(id, newStatus);
+                if (success && trigger) {
+                    trigger.querySelector('.status-badge').className = `status-badge ${newStatus}`;
+                    trigger.querySelector('.status-badge').textContent = this.formatStatus(newStatus);
+                    const statusDateEl = document.querySelector(`.status-date[data-id="${id}"]`);
+                    if (statusDateEl) {
+                        const now = new Date();
+                        statusDateEl.textContent = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                        statusDateEl.style.color = '#10b981';
+                        setTimeout(() => { statusDateEl.style.color = ''; }, 2000);
                     }
                 }
             });
@@ -3063,7 +3254,7 @@ class SupabaseJobTracker {
         });
         
         // Update the "This Week" card with this week's data
-        document.getElementById('week-total').textContent = `${weekTotal} application${weekTotal !== 1 ? 's' : ''}`;
+        document.getElementById('week-total').textContent = weekTotal;
         
         // Update week range
         const formatWeekDate = (date) => {
@@ -3252,7 +3443,7 @@ class SupabaseJobTracker {
         }
         
         // Update week display
-        document.getElementById('week-total').textContent = `${weekTotal} application${weekTotal !== 1 ? 's' : ''}`;
+        document.getElementById('week-total').textContent = weekTotal;
         Object.keys(dayCounts).forEach(day => {
             const element = document.getElementById(`day-${day}`);
             if (element) {
@@ -3336,7 +3527,7 @@ class SupabaseJobTracker {
         });
         
         // Update month display
-        document.getElementById('month-total').textContent = `${monthTotal} application${monthTotal !== 1 ? 's' : ''}`;
+        document.getElementById('month-total').textContent = monthTotal;
         
         // Hide extra week cards if less than 5 weeks
         for (let i = 1; i <= 5; i++) {
@@ -3780,10 +3971,6 @@ class SupabaseJobTracker {
                 <div class="filter-options-scroll">
                     ${statusOptionsHtml}
                 </div>
-                <div class="filter-actions">
-                    <button type="button" class="filter-action-btn apply" data-filter="status">Apply</button>
-                    <button type="button" class="filter-action-btn clear" data-filter="status">Clear</button>
-                </div>
             `;
             statusFilter.classList.remove('show');
         }
@@ -4215,13 +4402,14 @@ function toggleInsights() {
     const insightsSection = document.getElementById('insights-section');
     const insightsBtn = document.getElementById('insights-toggle-btn');
     
+    const svgInsights = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><path d="M2 13V3M2 13h12M5 10V7M8 10V5M11 10V8"/></svg>';
     if (insightsSection.style.display === 'none') {
         insightsSection.style.display = 'block';
-        insightsBtn.innerHTML = '<i class="fas fa-chart-bar"></i><span>Hide Insights</span>';
+        insightsBtn.innerHTML = svgInsights + ' Hide Insights';
         console.log('✅ Insights shown');
     } else {
         insightsSection.style.display = 'none';
-        insightsBtn.innerHTML = '<i class="fas fa-chart-bar"></i><span>Show Insights</span>';
+        insightsBtn.innerHTML = svgInsights + ' Insights';
         console.log('✅ Insights hidden');
     }
 }
@@ -4816,6 +5004,21 @@ function updateThemeIcon(isDark) {
 }
 
 // Role tag helper — shared by dashboard and popup
+const COMPANY_LOGOS = {
+    'amazon':    'images/amazon.png',
+    'microsoft': 'images/microsoft.png',
+    'tiktok':    'images/tiktok.png',
+};
+
+function getCompanyLogoHTML(company, fallbackLetter) {
+    const key = (company || '').toLowerCase().trim();
+    const src = COMPANY_LOGOS[key];
+    if (src) {
+        return `<img src="${src}" alt="${fallbackLetter}" style="width:100%;height:100%;object-fit:contain;border-radius:6px;">`;
+    }
+    return fallbackLetter;
+}
+
 function getJobTag(title) {
     const t = (title || '').toLowerCase();
     if (/product|program|operations|project|manager/.test(t)) return 'pm';
@@ -5151,10 +5354,26 @@ function setupEventListeners() {
         jobTracker?.clearAllRanks();
     });
 
-    // View sub-tabs
-    document.querySelectorAll('.view-tab').forEach(tab => {
+    // View sub-tabs (both old .view-tab and new .f-tab)
+    document.querySelectorAll('.f-tab, .view-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             jobTracker?.setActiveView(tab.dataset.view);
+        });
+    });
+
+    // Table / Cards view toggle
+    document.querySelectorAll('#view-toggle button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#view-toggle button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const isCards = btn.dataset.view === 'cards';
+            const tableWrap = document.getElementById('jobs-table-wrap');
+            const cardsWrap = document.getElementById('jobs-cards');
+            if (tableWrap) tableWrap.style.display = isCards ? 'none' : '';
+            if (cardsWrap) {
+                cardsWrap.style.display = isCards ? '' : 'none';
+                if (isCards) jobTracker?.renderCards();
+            }
         });
     });
 
@@ -5162,7 +5381,7 @@ function setupEventListeners() {
     document.getElementById('jobs-container')?.addEventListener('click', (e) => {
         if (!jobTracker?.isNumberingMode) return;
         // Ignore clicks on interactive elements
-        if (e.target.closest('button, select, input, a, .action-icon')) return;
+        if (e.target.closest('button, select, input, a, .action-icon, .row-action')) return;
         const row = e.target.closest('tr[data-id]');
         if (row) jobTracker.handleRankClick(row.dataset.id);
     });
@@ -5316,7 +5535,7 @@ function setupEventListeners() {
                 }
                 
                 // Reset all filter button displays
-                const filterBtns = document.querySelectorAll('.filter-btn');
+                const filterBtns = document.querySelectorAll('.filter-btn, .chip[data-filter]');
                 filterBtns.forEach(btn => {
                     const filterType = btn.dataset.filter;
                     const filterValueSpan = btn.querySelector('.filter-value');

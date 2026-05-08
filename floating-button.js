@@ -12,89 +12,40 @@
   const floatingBtn = document.createElement('div');
   floatingBtn.id = 'job-tracker-floating-btn';
   floatingBtn.innerHTML = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19Z" fill="white"/>
-      <path d="M7 7H17V9H7V7Z" fill="white"/>
-      <path d="M7 11H17V13H7V11Z" fill="white"/>
-      <path d="M7 15H14V17H7V15Z" fill="white"/>
-    </svg>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M8 3v10M3 8h10"/></svg>
   `;
 
   // Styles for floating button
   const styles = `
     #job-tracker-floating-btn {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 56px;
-      height: 56px;
+      bottom: 28px;
+      right: 28px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      z-index: 999998;
-      display: flex;
+      background: #FF5C2C;
+      color: #0E0E10;
+      border: 2.5px solid #0E0E10;
+      box-shadow: 5px 5px 0 #0E0E10;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: fadeInUp 0.4s ease-out;
+      transition: all .15s ease;
+      cursor: pointer;
+      z-index: 999998;
     }
 
-    #job-tracker-floating-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    #job-tracker-floating-btn:active {
-      transform: scale(0.95);
-    }
+    #job-tracker-floating-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #0E0E10; }
+    #job-tracker-floating-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #0E0E10; }
+    #job-tracker-floating-btn svg { width: 22px; height: 22px; stroke-width: 2.5; }
 
     #job-tracker-floating-btn.active {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    #job-tracker-floating-btn.loading {
-      pointer-events: none;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    #job-tracker-floating-btn.loading::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: 50%;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      animation: spin 0.8s linear infinite;
+      background: #FFD93D;
     }
 
     #job-tracker-floating-btn.saving {
       animation: shrinkPulse 0.6s ease-in-out;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-      }
     }
 
     @keyframes spin {
@@ -118,17 +69,17 @@
     /* Popup container */
     #job-tracker-popup-container {
       position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: 450px;
-      height: 420px;
+      bottom: 96px;
+      right: 24px;
+      width: 440px;
+      height: 440px;
       max-height: 90vh;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 10px 30px rgba(0, 0, 0, 0.15);
+      background: #F2EFE8;
+      border: 2px solid #0E0E10;
+      border-radius: 18px;
+      box-shadow: 8px 8px 0 #0E0E10;
       z-index: 999999;
       overflow: hidden;
-      animation: slideInUp 0.3s ease-out;
       display: none;
     }
 
@@ -156,8 +107,9 @@
     /* Drag handle */
     #job-tracker-drag-handle {
       width: 100%;
-      height: 40px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 36px;
+      background: #FF5C2C;
+      border-bottom: 1.5px solid #0E0E10;
       cursor: grab;
       display: flex;
       align-items: center;
@@ -192,32 +144,6 @@
       opacity: 0.8;
     }
   `;
-
-  let sharedScraperLoaded = false;
-  let sharedScraperLoading = null;
-
-  async function ensureSharedScraper() {
-    if (sharedScraperLoaded && typeof window.__scrapeJob === 'function') return;
-    if (sharedScraperLoading) {
-      await sharedScraperLoading;
-      return;
-    }
-    sharedScraperLoading = (async () => {
-      try {
-        const res = await fetch(chrome.runtime.getURL('scrape.js'));
-        const code = await res.text();
-        // Execute the shared scraper in this context so __scrapeJob matches Redo flow
-        (0, eval)(code);
-        sharedScraperLoaded = true;
-        console.log('✅ Shared scraper (scrape.js) loaded in floating button context');
-      } catch (e) {
-        console.warn('⚠️ Failed to load shared scraper:', e);
-      } finally {
-        sharedScraperLoading = null;
-      }
-    })();
-    await sharedScraperLoading;
-  }
 
   // Add styles to page
   const styleSheet = document.createElement('style');
@@ -264,9 +190,6 @@
   async function togglePopup() {
     isPopupOpen = !isPopupOpen;
     if (isPopupOpen) {
-      // Show loading animation
-      floatingBtn.classList.add('loading');
-      
       // Load iframe first
       iframe.src = chrome.runtime.getURL('popup.html?standalone=1&scraped=true&ts=' + Date.now());
       console.log('🎉 Popup loading with iframe src:', iframe.src);
@@ -318,9 +241,6 @@
         console.log('Title:', scrapedData.title);
         console.log('Company:', scrapedData.company);
         
-        // Remove loading animation
-        floatingBtn.classList.remove('loading');
-        
         // Send scraped data to popup
         console.log('📤 Sending scraped data to popup iframe...');
         try {
@@ -337,51 +257,32 @@
     }
   }
 
-  // Scrape job data from current page
+  // Scrape job data — routed through background.js to bypass page CSP (no eval needed)
   async function scrapeCurrentPage() {
+    const pageUrl = window.location.href;
     try {
-      const pageUrl = window.location.href;
-
-      // Always rely on the shared scrape.js logic for consistency
-      await ensureSharedScraper();
-      if (typeof window.__scrapeJob === 'function') {
-        try {
-          const r = window.__scrapeJob();
-          if (r && (r.title || r.company || r.location || r.description)) {
-            console.log('🔁 Shared scraper result:', r);
-            return {
-              url: pageUrl,
-              title: r.title || '',
-              company: r.company || '',
-              location: r.location || '',
-              description: r.description || '',
-              jobId: r.job_id || r.jobId || ''
-            };
+      const response = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: 'SCRAPE_TAB' }, (res) => {
+          if (chrome.runtime.lastError) {
+            console.warn('SCRAPE_TAB error:', chrome.runtime.lastError.message);
+            resolve({ data: {} });
+          } else {
+            resolve(res || { data: {} });
           }
-        } catch (err) {
-          console.warn('⚠️ Shared scraper execution failed:', err);
-        }
-      }
-
-      console.warn('⚠️ Shared scraper unavailable or returned empty data. Falling back to empty result.');
+        });
+      });
+      const d = response?.data || {};
       return {
-        url: pageUrl,
-        title: '',
-        company: '',
-        location: '',
-        description: '',
-        jobId: ''
+        url: d.url || pageUrl,
+        title: d.title || '',
+        company: d.company || '',
+        location: d.location || '',
+        description: d.description || '',
+        jobId: d.job_id || d.jobId || ''
       };
     } catch (e) {
-      console.error('❌ scrapeCurrentPage failed:', e);
-      return {
-        url: window.location.href,
-        title: '',
-        company: '',
-        location: '',
-        description: '',
-        jobId: ''
-      };
+      console.error('scrapeCurrentPage failed:', e);
+      return { url: pageUrl, title: '', company: '', location: '', description: '', jobId: '' };
     }
   }
 
@@ -533,6 +434,18 @@
   function setTranslate(xPos, yPos, el) {
     el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
   }
+
+  // Some SPA pages (e.g. Greenhouse React app) re-render the body after
+  // document_idle, wiping out extension-injected elements. This observer
+  // watches for the button being removed and re-injects it immediately.
+  const observer = new MutationObserver(() => {
+    if (!document.getElementById('job-tracker-floating-btn')) {
+      document.body.appendChild(floatingBtn);
+      document.body.appendChild(popupContainer);
+      console.log('🔄 Job Tracker button re-injected after page mutation');
+    }
+  });
+  observer.observe(document.body, { childList: true });
 
   console.log('✅ Job Tracker floating button loaded');
 })();

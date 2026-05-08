@@ -10,7 +10,7 @@ function getJobTag(title) {
 }
 
 function getDefaultStatusForUrl(url) {
-  return /linkedin\.com|joinhandshake\.com/i.test(url || '') ? 'applied' : 'saved';
+  return 'saved';
 }
 // Buffer incoming messages until DOM + listeners are ready
 let popupReady = false;
@@ -70,15 +70,16 @@ async function restoreDraft() {
         chrome.storage?.local?.get?.(DRAFT_KEY, (res) => resolve(res?.[DRAFT_KEY]));
       } catch { resolve(null); }
     });
+    // Only fill fields that are still empty — never let draft overwrite freshly scraped data
     if (data) {
-      $('company').value = data.company || $('company').value;
-      $('title').value = data.title || $('title').value;
-      $('location').value = data.location || $('location').value;
-      $('jobId').value = data.jobId || $('jobId').value;
-      setStatusValue(data.status || $('status').value);
-      $('source').value = data.source || $('source').value;
-      $('url').value = data.url || $('url').value;
-      $('description').value = data.description || $('description').value;
+      if (!$('company').value)     $('company').value = data.company || '';
+      if (!$('title').value)       $('title').value = data.title || '';
+      if (!$('location').value)    $('location').value = data.location || '';
+      if (!$('jobId').value)       $('jobId').value = data.jobId || '';
+      if (!$('url').value)         $('url').value = data.url || '';
+      if (!$('description').value) $('description').value = data.description || '';
+      if (data.status)             setStatusValue(data.status);
+      if (data.source && !$('source').value) $('source').value = data.source;
     }
   } catch {}
 }
@@ -579,11 +580,7 @@ function clearFields() {
 
 // Main popup init
 document.addEventListener('DOMContentLoaded', async () => {
-  console.log('🚀 Popup DOMContentLoaded - Initializing...');
-  console.log('📍 Save button exists?', !!$('save'));
-  console.log('📍 Clear button exists?', !!$('clearTop'));
-  console.log('📍 Redo button exists?', !!$('redoTop'));
-  console.log('📍 Close button exists?', !!$('close'));
+  startLoading();
 
   // Location tabs wiring
   const locationTabButtons = $$('#locationTabs .location-tab');
@@ -613,6 +610,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Will be populated by postMessage from floating button
   let scrapedData = null;
+  let userCleared = false;
   
   // Skeleton loading helpers
   function showSkeletonLoading() {
@@ -699,8 +697,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // ignore
       }
 
-      // Populate form with scraped data
-      if (scrapedData && scrapedData.title) {
+      // Populate form with scraped data (skip if user already clicked Clear)
+      if (!userCleared && scrapedData && scrapedData.title) {
         console.log('✅ Populating form with scraped data');
         $('company').value = sanitizeCommas(scrapedData.company || '');
         $('title').value = sanitizeCommas(scrapedData.title || '');
@@ -723,7 +721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   const tab = await getTab();
-  if (!scrapedData) {
+  if (!scrapedData && tab) {
     const currentUrl = tab.url || '';
     $('url').value = currentUrl;
     $('source').value = detectSource(currentUrl);
@@ -809,41 +807,50 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Auto-scrape on open (same logic as redo button)
-  console.log('ℹ️ Auto-scraping on popup open...');
-  try {
-    const autoScraped = await scrapeFromPage(tab.id);
-    if (autoScraped && autoScraped.title) {
-      $('company').value     = sanitizeCommas(autoScraped.company || '');
-      $('title').value       = sanitizeCommas(autoScraped.title || '');
-      $('location').value    = sanitizeCommas(autoScraped.location || '');
-      setLocationTabActive(autoScraped.location || '');
-      $('jobId').value       = sanitizeCommas(autoScraped.job_id || autoScraped.jobId || '');
-      $('url').value         = sanitizeCommas(autoScraped.url || tab.url || '');
-      $('description').value = autoScraped.description || '';
-      $('source').value      = detectSource(autoScraped.url);
-      setStatusValue(getDefaultStatusForUrl(tab.url));
+  if (tab) {
+    console.log('ℹ️ Auto-scraping on popup open...');
+    try {
+      const autoScraped = await scrapeFromPage(tab.id);
+      if (autoScraped && autoScraped.title) {
+        $('company').value     = sanitizeCommas(autoScraped.company || '');
+        $('title').value       = sanitizeCommas(autoScraped.title || '');
+        $('location').value    = sanitizeCommas(autoScraped.location || '');
+        setLocationTabActive(autoScraped.location || '');
+        $('jobId').value       = sanitizeCommas(autoScraped.job_id || autoScraped.jobId || '');
+        $('url').value         = sanitizeCommas(autoScraped.url || tab.url || '');
+        $('description').value = autoScraped.description || '';
+        $('source').value      = detectSource(autoScraped.url);
+        setStatusValue(getDefaultStatusForUrl(tab.url));
+        try { chrome.storage?.local?.remove?.(DRAFT_KEY); } catch {}
+      }
+    } catch (e) {
+      console.warn('Auto-scrape on open failed:', e);
     }
-  } catch (e) {
-    console.warn('Auto-scrape on open failed:', e);
   }
-  // Auto-select role tag from title
-  if ($('title').value) setRoleTag(getJobTag($('title').value));
+  stopLoading();
+  // role tag auto-detect moved to after roleTagBtns is initialized below
 
   // Secondary guesses — only fill still-empty fields
-  const meta = await getMetaGuess(tab.id);
-  if (!$('company').value) {
-    $('company').value = sanitizeCommas(
-      meta.ogSite ||
-      meta.twitterSite ||
-      companyFromHost(new URL(tab.url).hostname) ||
-      (meta.title.match(/\b(?:City|County|State|University|College) of [A-Za-z ]+/i)?.[0] || '')
-    );
-  }
-  if (!$('location').value) {
-    $('location').value = sanitizeCommas(
-      guessLocationFromText($('description').value || meta.ogTitle || meta.title) ||
-      (/auburnwa\.gov|neogov|governmentjobs\.com/i.test(tab.url) ? 'Auburn, WA' : '')
-    );
+  if (tab) {
+    try {
+      const meta = await getMetaGuess(tab.id);
+      if (!$('company').value) {
+        $('company').value = sanitizeCommas(
+          meta.ogSite ||
+          meta.twitterSite ||
+          (tab.url ? companyFromHost(new URL(tab.url).hostname) : '') ||
+          (meta.title.match(/\b(?:City|County|State|University|College) of [A-Za-z ]+/i)?.[0] || '')
+        );
+      }
+      if (!$('location').value) {
+        $('location').value = sanitizeCommas(
+          guessLocationFromText($('description').value || meta.ogTitle || meta.title) ||
+          (/auburnwa\.gov|neogov|governmentjobs\.com/i.test(tab.url || '') ? 'Auburn, WA' : '')
+        );
+      }
+    } catch (e) {
+      console.warn('Meta guess failed:', e);
+    }
   }
 
   await restoreDraft();
@@ -933,7 +940,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const progress = $('progress');
     const setStatus = (type, msg) => {
       const statusEl = $('statusMessage');
-      if (statusEl) statusEl.textContent = msg || '';
+      if (statusEl) {
+        statusEl.textContent = msg || '';
+        statusEl.className = type ? `visible ${type}` : '';
+      }
       btn.classList.remove('saving','success','error');
       if (type) btn.classList.add(type);
     };
@@ -983,19 +993,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.parent.postMessage({ type: 'JOB_SAVED' }, '*');
       }
 
+      btn.innerHTML = '✓ Saved!';
+      setStatus('success', '✅ Job saved successfully!');
+      btn.disabled = false;
+      btn.classList.remove('saving','error');
+      btn.classList.add('success');
+      progress.style.width = '0%';
+      clearFields();
       setTimeout(() => {
-        btn.innerHTML = 'Saved ✓';
-        setStatus('success', 'Saved!');
-        clearFields();
-      }, 150);
-
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.classList.remove('saving','error');
-        btn.classList.add('success');
-        progress.style.width = '0%';
-        setTimeout(() => { btn.classList.remove('success'); btn.textContent = 'Save Job'; }, 1200);
-      }, 600);
+        btn.classList.remove('success');
+        btn.textContent = 'Save Job';
+        setStatus('', '');
+      }, 3000);
 
     } catch (e) {
       console.error('Save error:', e);
@@ -1028,25 +1037,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const roleTagBtns = $$('#roleTagTabs .role-tag-tab');
   function setRoleTag(tag) {
     roleTagBtns.forEach(b => {
-      const active = b.dataset.tag === tag;
-      b.style.opacity = active ? '1' : '0.45';
-      b.style.fontWeight = active ? '700' : '500';
-      b.style.boxShadow = active ? '0 0 0 2px currentColor' : 'none';
+      const isActive = b.dataset.tag === tag;
+      b.classList.toggle('active', isActive);
+      b.style.opacity = isActive ? '1' : '0.5';
     });
   }
   function getActiveRoleTag() {
-    const active = roleTagBtns.find(b => b.style.opacity === '1' || b.style.fontWeight === '700');
+    const active = roleTagBtns.find(b => b.classList.contains('active'));
     return active ? active.dataset.tag : 'sde';
   }
   roleTagBtns.forEach(b => b.addEventListener('click', () => setRoleTag(b.dataset.tag)));
-  // Default: sde
-  setRoleTag('sde');
+  // Default: sde, or auto-detect from scraped title if available
+  setRoleTag($('title').value ? getJobTag($('title').value) : 'sde');
 
   const clearBtn = $('clearTop');
   if (clearBtn) {
     console.log('✅ Clear button found, attaching event listener');
     clearBtn.addEventListener('click', () => {
-      console.log('🧹 Clear button clicked!');
+      userCleared = true;
       isStarred = false;
       if (starBtn) { starBtn.textContent = '☆'; starBtn.style.color = '#aaa'; starBtn.setAttribute('aria-pressed', false); }
       setRoleTag('sde');
@@ -1061,8 +1069,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (redoBtn) {
     console.log('✅ Redo button found, attaching event listener');
     redoBtn.addEventListener('click', async () => {
-      console.log('🔄 Redo button clicked!');
       try {
+        userCleared = false;
         clearFields();
         const statusMsg = $('statusMessage');
         if (statusMsg) statusMsg.textContent = 'Refetching job data...';
