@@ -518,7 +518,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
     <div class="filter-bar">
       <div class="search-input">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="7" r="4.5"/><path d="M11 11l3 3"/></svg>
-        <input type="text" id="search-input" placeholder="Search company, role, notes…" />
+        <input type="text" id="search-input" placeholder="Search company, role, job ID, notes…" />
       </div>
       <button class="chip" id="clear-filters-btn" title="Clear all filters" style="display:none">✕</button>
       <div class="filter-group">
@@ -647,6 +647,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           <option value="Manual Entry">Manual Entry</option>
         </select>
       </div>
+      <div class="mfg"><label>Job Description</label><textarea id="edit-description" rows="6" style="resize:vertical;font-size:12px;line-height:1.5"></textarea></div>
       <div class="mfg"><label>Notes</label><textarea id="edit-notes" rows="3"></textarea></div>
       <div class="modal-actions">
         <button type="button" class="mbtn mbtn-secondary" id="edit-cancel">Cancel</button>
@@ -708,7 +709,7 @@ const TAG_OVERRIDES_KEY='dashy_tag_overrides';
 let tagOverrides=JSON.parse(localStorage.getItem(TAG_OVERRIDES_KEY)||'{}');
 
 const STATUS_LABELS = { saved:'Saved', applied:'Applied', resume_screening:'Resume Screening', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn', ended:'Ended' };
-const ALL_STATUSES = ['saved','applied','resume_screening','interview','offer','rejected','withdrawn','ended'];
+const ALL_STATUSES = ['saved','applied','rejected','resume_screening','interview','offer','withdrawn','ended'];
 
 // ===== INIT =====
 async function init() {
@@ -810,7 +811,7 @@ function applyFilters(){
   else if(currentTabView==='starred') jobs=jobs.filter(j=>j.favorite);
   else if(currentTabView==='active') jobs=jobs.filter(j=>['applied','resume_screening','interview'].includes(j.status));
 
-  if(currentSearch){const q=currentSearch.toLowerCase();jobs=jobs.filter(j=>(j.company||'').toLowerCase().includes(q)||(j.title||'').toLowerCase().includes(q)||(j.location||'').toLowerCase().includes(q)||(j.notes||'').toLowerCase().includes(q));}
+  if(currentSearch){const q=currentSearch.toLowerCase();jobs=jobs.filter(j=>(j.company||'').toLowerCase().includes(q)||(j.title||'').toLowerCase().includes(q)||(j.location||'').toLowerCase().includes(q)||(j.notes||'').toLowerCase().includes(q)||String(j.job_id||'').toLowerCase().includes(q));}
 
   if(currentFilters.date!=='all'){
     const now=new Date();now.setHours(0,0,0,0);
@@ -974,7 +975,7 @@ function setupModals(){
   document.getElementById('edit-form').addEventListener('submit',async e=>{
     e.preventDefault();
     if(!editingJobId)return;
-    const updates={title:document.getElementById('edit-title').value.trim(),company:document.getElementById('edit-company').value.trim(),location:document.getElementById('edit-location').value.trim(),url:document.getElementById('edit-url').value.trim(),job_id:document.getElementById('edit-job-id').value.trim(),status:document.getElementById('edit-status').value,source:document.getElementById('edit-source').value,notes:document.getElementById('edit-notes').value.trim()};
+    const updates={title:document.getElementById('edit-title').value.trim(),company:document.getElementById('edit-company').value.trim(),location:document.getElementById('edit-location').value.trim(),url:document.getElementById('edit-url').value.trim(),job_id:document.getElementById('edit-job-id').value.trim(),status:document.getElementById('edit-status').value,source:document.getElementById('edit-source').value,description:document.getElementById('edit-description').value.trim(),notes:document.getElementById('edit-notes').value.trim()};
     const{error}=await _sb.from('jobs').update(updates).eq('id',editingJobId);
     if(!error){const idx=ALL_JOBS.findIndex(j=>String(j.id)===String(editingJobId));if(idx!==-1)ALL_JOBS[idx]={...ALL_JOBS[idx],...updates};populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();}
     closeEditModal();
@@ -1014,6 +1015,7 @@ function openEditModal(jobId){
   document.getElementById('edit-job-id').value=job.job_id||'';
   document.getElementById('edit-status').value=job.status||'applied';
   document.getElementById('edit-source').value=job.source||'';
+  document.getElementById('edit-description').value=job.description||'';
   document.getElementById('edit-notes').value=job.notes||'';
   document.getElementById('edit-modal').classList.add('show');
 }
@@ -1651,6 +1653,8 @@ function showChipDD(trigger,options,activeVal,onSelect){
   const left=Math.min(r.left,window.innerWidth-145);
   dd.style.cssText=`top:${r.bottom+4}px;left:${left}px`;
   document.body.appendChild(dd);
+  const ddH=dd.offsetHeight;
+  if(r.bottom+4+ddH>window.innerHeight) dd.style.top=`${r.top-ddH-4}px`;
   setTimeout(()=>document.addEventListener('click',()=>dd.remove(),{once:true}),0);
 }
 function wireTableEvents(tbody){

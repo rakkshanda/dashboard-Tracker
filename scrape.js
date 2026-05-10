@@ -796,14 +796,51 @@
       };
 
       const findJobDescription = () => {
+        // Try DOM selectors first (more reliable than text markers)
+        const descSelectors = [
+          '[data-testid="job-description"]',
+          '[data-testid*="description"]',
+          'div[class*="style__JobDetails"]',
+          'div[class*="job-details"]',
+          'div[class*="job_details"]',
+          'section[class*="description"]',
+        ];
+        for (const sel of descSelectors) {
+          try {
+            const el = document.querySelector(sel);
+            if (el) {
+              const t = norm(el.textContent || "");
+              if (t.length > 100) return t;
+            }
+          } catch {}
+        }
+
+        // Text-slicing fallback with multiple possible start markers
         const text = bodyText();
-        const jd = sliceBetween(text, "The Role", [
+        const endMarkers = [
           "What they're looking for",
           "About the employer",
           "Similar Jobs",
-          "Alumni in similar roles"
-        ]);
-        return jd ? jd : "";
+          "Alumni in similar roles",
+          "Apply Now",
+          "Easy Apply",
+        ];
+        const startMarkers = [
+          "The Role",
+          "Job Description",
+          "About the Role",
+          "Position Description",
+          "About this Role",
+          "Role Description",
+          "What You'll Do",
+          "Responsibilities",
+          "Overview",
+        ];
+        for (const marker of startMarkers) {
+          const jd = sliceBetween(text, marker, endMarkers);
+          if (jd && jd.length > 100) return jd;
+        }
+        return "";
       };
 
       return {
@@ -946,14 +983,49 @@
       };
 
       const findJobDescription = () => {
+        const descSelectors = [
+          '[data-testid="job-description"]',
+          '[data-testid*="description"]',
+          'div[class*="style__JobDetails"]',
+          'div[class*="job-details"]',
+          'div[class*="job_details"]',
+          'section[class*="description"]',
+        ];
+        for (const sel of descSelectors) {
+          try {
+            const el = document.querySelector(sel);
+            if (el) {
+              const t = norm(el.textContent || "");
+              if (t.length > 100) return t;
+            }
+          } catch {}
+        }
+
         const text = bodyText();
-        const jd = sliceBetween(text, "The Role", [
+        const endMarkers = [
           "What they're looking for",
           "About the employer",
           "Similar Jobs",
-          "Alumni in similar roles"
-        ]);
-        return jd ? jd : "";
+          "Alumni in similar roles",
+          "Apply Now",
+          "Easy Apply",
+        ];
+        const startMarkers = [
+          "The Role",
+          "Job Description",
+          "About the Role",
+          "Position Description",
+          "About this Role",
+          "Role Description",
+          "What You'll Do",
+          "Responsibilities",
+          "Overview",
+        ];
+        for (const marker of startMarkers) {
+          const jd = sliceBetween(text, marker, endMarkers);
+          if (jd && jd.length > 100) return jd;
+        }
+        return "";
       };
 
       return {
@@ -1139,6 +1211,19 @@
         tiktokData.url = clean(tiktokData.url || '');
         return tiktokData;
       }
+    }
+
+    // Handshake override — bypass JSON-LD, always use site-specific scraper
+    if (hrefLower.includes('joinhandshake.com')) {
+      const hsKey = hrefLower.includes('app.joinhandshake.com') ? 'app.joinhandshake.com' : 'joinhandshake.com';
+      let hsData = strategies[hsKey]?.() || {};
+      hsData.url = location.href;
+      hsData.company = clean(hsData.company || '');
+      hsData.title = clean(hsData.title || '');
+      hsData.location = clean(hsData.location || '');
+      hsData.description = truncateDescription(hsData.description || '');
+      console.log('[scrape.js] Handshake scraped data:', { title: hsData.title, company: hsData.company, hasDesc: !!hsData.description });
+      return hsData;
     }
 
     // Apple Jobs override — skip JSON-LD and generic, use Apple scraper only
