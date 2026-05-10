@@ -1,0 +1,22 @@
+{
+  "name": "save-jobs-extension",
+  "version": "1.0.0",
+  "description": "Step‑by‑step guide to set up Supabase, configure the app, and run the dashboard (locally and on Vercel).",
+  "main": "background.js",
+  "scripts": {
+    "latex": "node latex-batch/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rakkshanda/Job-Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rakkshanda/Job-Tracker/issues"
+  },
+  "homepage": "https://github.com/rakkshanda/Job-Tracker#readme",
+  "devDependencies": {}
+}

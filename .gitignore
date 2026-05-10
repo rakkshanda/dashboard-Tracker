@@ -25,6 +25,13 @@ config.js
 **/api-keys.txt
 **/*_secret.js
 
+# Overleaf cloned repo
+latex-batch/overleaf-repo/
+
+# Puppeteer chrome user data
+latex-batch/chrome-data/
+latex-batch/node_modules/
+
 # Temporary files
 *.tmp
 *.temp

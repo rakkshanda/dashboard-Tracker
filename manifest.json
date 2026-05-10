@@ -3,8 +3,8 @@
     "name": "Job Tracker",
     "version": "2.0.0",
     "description": "Save and track job applications with AI-powered scraping and Supabase integration.",
-    "permissions": ["activeTab", "scripting", "storage"],
-    "host_permissions": ["<all_urls>", "https://api.openai.com/*", "https://*.supabase.co/*"],
+    "permissions": ["activeTab", "scripting", "storage", "cookies"],
+    "host_permissions": ["<all_urls>", "https://api.openai.com/*", "https://*.supabase.co/*", "http://localhost:3737/*"],
     "background": {
       "service_worker": "background.js"
     },

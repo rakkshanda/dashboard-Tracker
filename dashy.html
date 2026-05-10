@@ -114,7 +114,7 @@
 .tag-pill.pm{background:#ec4899;color:#fff}
 .tag-pill.data{background:#22c55e;color:#fff}
 /* ===== RANK BEFORE STAR ===== */
-.star-rank-cell{display:flex;align-items:center;gap:8px}
+.star-rank-cell{display:flex;align-items:center;gap:28px}
 /* ===== ROW SELECTION ===== */
 tr.row-selected td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 /* ===== WEEK CELL SELECTED ===== */
@@ -178,25 +178,77 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .inline-chip-dd .idd-opt:hover{background:var(--bg-2);}
 .inline-chip-dd .idd-opt.active{color:var(--acc);font-weight:700;}
 /* ===== TIMER PANEL ===== */
-.timer-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:22px 24px;}
+/* ===== FOCUS TIMER ===== */
+.timer-panel{display:none;margin:0 18px 14px;}
 .timer-panel.show{display:block;}
-.timer-panel h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:16px;}
-.timer-config{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:20px;}
-.timer-config-group{display:flex;flex-direction:column;gap:4px;}
-.timer-config-group label{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);}
-.timer-config-group select{padding:7px 10px;border:1.5px solid var(--line-soft);border-radius:var(--radius-sm);font-size:13px;font-family:var(--sans);background:var(--card);color:var(--ink);outline:none;transition:border-color .15s;cursor:pointer;}
-.timer-config-group select:focus{border-color:var(--acc);}
-.timer-display{text-align:center;margin-bottom:16px;}
-.timer-clock{font-family:var(--mono);font-size:60px;font-weight:700;color:var(--ink);letter-spacing:.04em;line-height:1;}
-.timer-round-lbl{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-top:8px;}
-.timer-bar-wrap{height:6px;background:var(--bg-2);border-radius:999px;margin-bottom:18px;overflow:hidden;}
-.timer-bar{height:100%;width:0%;background:var(--acc);border-radius:999px;transition:width 1s linear;}
-.timer-actions{display:flex;gap:8px;justify-content:center;}
-.timer-btn{padding:9px 22px;border:2px solid var(--line);border-radius:999px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;}
-.timer-btn.primary{background:var(--acc);color:var(--ink);box-shadow:3px 3px 0 var(--line);}
-.timer-btn.primary:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--line);}
-.timer-btn.secondary{background:transparent;color:var(--ink-2);border-color:var(--line-soft);}
-.timer-btn.secondary:hover{background:var(--bg-2);border-color:var(--line);}
+.t-card{border:2px solid var(--ink);border-radius:28px;background:var(--card);padding:32px;position:relative;}
+.t-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;position:relative;z-index:1;}
+.t-field{position:relative;border:2px solid var(--ink);border-radius:14px;padding:10px 14px;background:var(--card);box-shadow:4px 4px 0 0 var(--ink);}
+.t-field .t-lbl{position:absolute;top:-12px;left:12px;padding:2px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;border:2px solid var(--ink);border-radius:6px;}
+.t-lbl.pink{background:oklch(0.78 0.19 0);}
+.t-lbl.lime{background:oklch(0.88 0.21 130);}
+.t-lbl.cyan{background:oklch(0.82 0.14 215);}
+.t-dd{position:relative;}
+.t-dd-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;padding:4px 0;font:inherit;cursor:pointer;font-size:1.4rem;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;}
+.t-dd-btn .t-chev{width:22px;height:22px;border:2px solid var(--ink);border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;transition:transform .2s;}
+.t-dd-btn:hover .t-chev{transform:rotate(180deg);}
+.t-dd.pink .t-chev{background:oklch(0.78 0.19 0);}
+.t-dd.lime .t-chev{background:oklch(0.88 0.21 130);}
+.t-dd-menu{position:absolute;left:0;right:0;top:calc(100% + 10px);z-index:30;border:2px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:6px 6px 0 var(--ink);padding:8px;max-height:260px;overflow:auto;display:none;}
+.t-dd.open .t-dd-menu{display:block;}
+.t-dd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.t-dd-grid button{padding:8px 0;border:2px solid var(--ink);border-radius:10px;background:var(--card);font-weight:900;font-size:1rem;cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .15s;}
+.t-dd-grid button:hover{transform:translateY(-2px);}
+.t-dd-grid button.active{background:var(--t-accent,oklch(0.78 0.19 0));}
+.t-total-val{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;padding-top:4px;}
+.t-timer{position:relative;display:flex;flex-direction:column;align-items:center;padding:56px 0;z-index:1;}
+.t-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.t-ring>div{width:min(320px,70vw);height:min(320px,70vw);border-radius:9999px;opacity:.2;background:conic-gradient(oklch(0.74 0.19 45) var(--t-rp,0%),transparent var(--t-rp,0%));}
+.t-time{position:relative;font-weight:900;line-height:1;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;font-size:clamp(4rem,14vw,10rem);text-shadow:6px 6px 0 var(--ink);}
+.t-time.running{text-shadow:6px 6px 0 oklch(0.78 0.19 0);}
+.t-round-lbl{position:relative;margin-top:12px;font-size:.8rem;letter-spacing:.4em;text-transform:uppercase;opacity:.8;}
+.t-bar{margin-top:24px;position:relative;z-index:1;}
+.t-bar .t-track{height:14px;border:2px solid var(--ink);border-radius:9999px;overflow:hidden;}
+.t-bar .t-fill{height:100%;width:0%;background:linear-gradient(90deg,oklch(0.78 0.19 0),oklch(0.74 0.19 45),oklch(0.88 0.21 130),oklch(0.82 0.14 215));transition:width .5s;}
+.t-bar .t-legend{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;margin-top:6px;}
+.t-actions{margin-top:36px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;position:relative;z-index:1;}
+.t-btn{padding:12px 28px;border-radius:9999px;border:2px solid var(--ink);font-weight:900;text-transform:uppercase;letter-spacing:.15em;font-size:.85rem;background:var(--card);color:var(--ink);cursor:pointer;box-shadow:6px 6px 0 var(--ink);transition:transform .12s,box-shadow .12s;}
+.t-btn:hover{transform:translateY(-2px);}
+.t-btn:active{transform:translate(4px,4px);box-shadow:none;}
+.t-btn.t-start{background:oklch(0.88 0.21 130);}
+.t-btn.t-start.running{background:oklch(0.78 0.19 0);}
+.t-btn.t-skip{background:oklch(0.82 0.14 215);}
+.t-btn.t-fs{background:var(--card);padding:12px 16px;}
+/* Fullscreen mode */
+.timer-panel.t-fullscreen{position:fixed!important;inset:0!important;margin:0!important;z-index:99999!important;overflow:auto;background:var(--bg);display:block!important;}
+.timer-panel.t-fullscreen .t-card{border-radius:0;box-shadow:none;border:none;min-height:100vh;display:flex;flex-direction:column;justify-content:center;max-width:100%;padding:40px 60px;}
+.timer-panel.t-fullscreen .t-controls{display:none;}
+.timer-panel.t-fullscreen .t-bar,.timer-panel.t-fullscreen .t-actions{position:fixed;bottom:0;left:0;right:0;margin:0;}
+.timer-panel.t-fullscreen .t-bar{bottom:72px;padding:0 40px;}
+.timer-panel.t-fullscreen .t-actions{bottom:0;padding:16px 40px;background:transparent;border-top:none;}
+/* Timer dark mode */
+.t-card.t-dark{background:#0f0f13;color:#f0ede6;--t-ink:#f0ede6;}
+.t-card.t-dark .t-field{background:#1a1a22;border-color:#f0ede6;box-shadow:4px 4px 0 0 #f0ede6;}
+.t-card.t-dark .t-lbl{border-color:#f0ede6;}
+.t-card.t-dark .t-dd-btn{color:#f0ede6;}
+.t-card.t-dark .t-chev{border-color:#f0ede6;}
+.t-card.t-dark .t-total-val{color:#f0ede6;}
+.t-card.t-dark .t-dd-menu{background:#1a1a22;border-color:#f0ede6;box-shadow:6px 6px 0 #f0ede6;}
+.t-card.t-dark .t-dd-grid button{background:#1a1a22;border-color:#f0ede6;color:#f0ede6;}
+.t-card.t-dark .t-time{color:#f0ede6;text-shadow:6px 6px 0 #f0ede6;}
+.t-card.t-dark .t-time.running{text-shadow:6px 6px 0 oklch(0.78 0.19 0);}
+.t-card.t-dark .t-round-lbl{color:#f0ede6;}
+.t-card.t-dark .t-track{border-color:#f0ede6;}
+.t-card.t-dark .t-legend{color:#f0ede6;}
+.t-card.t-dark .t-btn{background:#1a1a22;color:#f0ede6;border-color:#f0ede6;box-shadow:6px 6px 0 #000;}
+.timer-panel.t-fullscreen .t-card.t-dark .t-btn{border-color:transparent;}
+.t-card.t-dark .t-btn.t-start{background:oklch(0.88 0.21 130);color:#0f0f13;}
+.t-card.t-dark .t-btn.t-start.running{background:oklch(0.78 0.19 0);color:#0f0f13;}
+.t-card.t-dark .t-btn.t-skip{background:oklch(0.82 0.14 215);color:#0f0f13;}
+/* Fullscreen overlay buttons */
+.t-fs-controls{display:none;position:fixed;top:20px;right:24px;z-index:100000;gap:10px;align-items:center;}
+.timer-panel.t-fullscreen .t-fs-controls{display:flex;}
+.t-fs-ctl-btn{padding:8px 14px;border-radius:999px;border:2px solid currentColor;font-weight:700;font-size:.8rem;cursor:pointer;background:transparent;letter-spacing:.05em;transition:all .15s;}
 </style>
 </head>
 <template id="__bundler_thumbnail" data-bg-color="#F2EFE8">
@@ -291,35 +343,49 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- TIMER PANEL -->
   <div class="timer-panel" id="timer-panel">
-    <h2>Focus Timer</h2>
-    <div class="timer-config">
-      <div class="timer-config-group">
-        <label for="timer-rounds">Rounds</label>
-        <select id="timer-rounds">
-          <option>1</option><option>2</option><option>3</option><option>4</option><option value="5" selected>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option><option>21</option><option>22</option><option>23</option><option>24</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option>
-        </select>
-      </div>
-      <div class="timer-config-group">
-        <label for="timer-mins">Minutes / round</label>
-        <select id="timer-mins">
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option value="6" selected>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>12</option><option>15</option><option>20</option><option>25</option><option>30</option><option>45</option><option>60</option>
-        </select>
-      </div>
-      <div class="timer-config-group">
-        <label for="timer-total">Total (min)</label>
-        <input type="number" id="timer-total" min="1" max="600" step="1" value="30" style="padding:7px 10px;border:1.5px solid var(--line-soft);border-radius:var(--radius-sm);font-size:13px;font-family:var(--sans);background:var(--card);color:var(--ink);outline:none;width:80px;transition:border-color .15s;" />
-      </div>
+    <div class="t-fs-controls">
+      <button class="t-fs-ctl-btn" id="t-btnDark" title="Toggle dark mode">☾ Dark</button>
+      <button class="t-fs-ctl-btn" id="t-btnFsExit" title="Exit fullscreen">✕ Exit</button>
     </div>
-    <div class="timer-display">
-      <div class="timer-clock" id="timer-clock">06:00</div>
-      <div class="timer-round-lbl" id="timer-round-lbl">Round 1 / 5</div>
-    </div>
-    <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar"></div></div>
-    <div class="timer-actions">
-      <button class="timer-btn primary" id="timer-start-btn">Start</button>
-      <button class="timer-btn secondary" id="timer-reset-btn">Reset</button>
+    <div class="t-card" id="t-card">
+      <div class="t-controls">
+        <div class="t-field">
+          <div class="t-lbl pink">Rounds</div>
+          <div class="t-dd pink" id="t-ddRounds" style="--t-accent:oklch(0.78 0.19 0)">
+            <button class="t-dd-btn" type="button"><span class="t-dd-value">5</span><span class="t-chev">▾</span></button>
+            <div class="t-dd-menu"><div class="t-dd-grid"></div></div>
+          </div>
+        </div>
+        <div class="t-field">
+          <div class="t-lbl lime">Minutes / Round</div>
+          <div class="t-dd lime" id="t-ddMinutes" style="--t-accent:oklch(0.88 0.21 130)">
+            <button class="t-dd-btn" type="button"><span class="t-dd-value">6</span><span class="t-chev">▾</span></button>
+            <div class="t-dd-menu"><div class="t-dd-grid"></div></div>
+          </div>
+        </div>
+        <div class="t-field">
+          <div class="t-lbl cyan">Total (min)</div>
+          <div class="t-total-val" id="t-totalMin">30</div>
+        </div>
+      </div>
+      <div class="t-timer">
+        <div class="t-ring"><div id="t-ring"></div></div>
+        <div class="t-time" id="t-time">06<span style="opacity:.6">:</span>00</div>
+        <div class="t-round-lbl">Round <b id="t-curRound">1</b> / <span id="t-totRound">5</span></div>
+      </div>
+      <div class="t-bar">
+        <div class="t-track"><div class="t-fill" id="t-fill"></div></div>
+        <div class="t-legend"><span>Start</span><span id="t-pct">0%</span><span>Finish</span></div>
+      </div>
+      <div class="t-actions">
+        <button class="t-btn t-start" id="t-btnStart">Start</button>
+        <button class="t-btn" id="t-btnReset">Reset</button>
+        <button class="t-btn t-skip" id="t-btnSkip">Skip Round →</button>
+        <button class="t-btn t-fs" id="t-btnFs" title="Fullscreen">⛶</button>
+      </div>
     </div>
   </div>
+
 
   <!-- HERO -->
   <section class="hero" id="hero-section">
@@ -437,6 +503,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <span id="bulk-count-label">0 selected</span>
       <div style="display:flex;gap:6px;">
         <button class="bulk-bar-cancel" id="bulk-cancel">Cancel</button>
+        <button class="bulk-bar-del" id="bulk-latex-btn">📋 Add to LaTeX</button>
         <button class="bulk-bar-del" id="bulk-delete-btn">🗑 Delete Selected</button>
       </div>
     </div>
@@ -515,16 +582,16 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <table class="jobs-table">
         <thead>
           <tr>
-            <th style="width:24px;"><div class="check"></div></th>
+            <th style="width:24px;"><input type="checkbox" id="select-all-check" style="cursor:pointer;accent-color:var(--acc);width:14px;height:14px;" title="Select all"/></th>
             <th>Date</th>
             <th></th>
             <th class="col-rank" id="rank-col-header" style="display:none;">#</th>
-            <th style="padding-left:10px;">Company</th>
-            <th>Title</th>
+            <th style="padding-left:80px;width:180px;">Company</th>
+            <th style="width:220px;">Title</th>
             <th style="width:120px;">Location</th>
             <th>Status</th>
             <th>Source</th>
-            <th>URL</th>
+            <th style="width:90px;">URL</th>
             <th>Resume</th>
             <th style="text-align:right;">Actions</th>
           </tr>
@@ -996,103 +1063,131 @@ function setupTimer(){
   document.getElementById('timer-toggle-btn')?.addEventListener('click',()=>{
     document.getElementById('timer-panel').classList.toggle('show');
   });
-  const startBtn=document.getElementById('timer-start-btn');
-  const resetBtn=document.getElementById('timer-reset-btn');
-  const clockEl=document.getElementById('timer-clock');
-  const roundLbl=document.getElementById('timer-round-lbl');
-  const barEl=document.getElementById('timer-bar');
-  const roundsSel=document.getElementById('timer-rounds');
-  const minsSel=document.getElementById('timer-mins');
-  let interval=null,currentRound=1,totalSeconds=0,remaining=0,running=false;
 
-  function playBeep(freq=880,dur=0.6){
-    try{
-      const ctx=new(window.AudioContext||window.webkitAudioContext)();
-      const osc=ctx.createOscillator();const gain=ctx.createGain();
-      osc.connect(gain);gain.connect(ctx.destination);
-      osc.frequency.value=freq;
-      gain.gain.setValueAtTime(0.3,ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
-      osc.start(ctx.currentTime);osc.stop(ctx.currentTime+dur);
-    }catch(e){}
+  const ROUND_OPTS = [1,2,3,4,5,6,7,8,10,12,15,20,25,30,40];
+  const MIN_OPTS   = [1,2,3,5,6,10,15,20,25,30,45,60];
+  let rounds=5, minutes=6, currentRound=1, secondsLeft=minutes*60, running=false, timer=null;
+
+  function buildDD(id, options, getVal, setVal){
+    const root=document.getElementById(id);
+    const grid=root.querySelector('.t-dd-grid');
+    const valEl=root.querySelector('.t-dd-value');
+    function render(){
+      valEl.textContent=getVal();
+      grid.innerHTML='';
+      options.forEach(n=>{
+        const b=document.createElement('button');
+        b.type='button'; b.textContent=n;
+        if(n===getVal()) b.classList.add('active');
+        b.onclick=()=>{ setVal(n); root.classList.remove('open'); render(); syncTotal(); if(!running) resetTimer(); };
+        grid.appendChild(b);
+      });
+    }
+    root.querySelector('.t-dd-btn').onclick=(e)=>{ e.stopPropagation(); root.classList.toggle('open'); };
+    render();
   }
 
-  function fmt(s){return`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;}
+  buildDD('t-ddRounds', ROUND_OPTS, ()=>rounds, n=>{ rounds=n; });
+  buildDD('t-ddMinutes', MIN_OPTS,  ()=>minutes, n=>{ minutes=n; });
 
-  function updateDisplay(){
-    clockEl.textContent=fmt(remaining);
-    roundLbl.textContent=`Round ${currentRound} / ${roundsSel.value}`;
-    const pct=totalSeconds>0?((totalSeconds-remaining)/totalSeconds)*100:0;
-    barEl.style.width=pct+'%';
+  document.addEventListener('click',()=>{
+    document.querySelectorAll('.t-dd.open').forEach(d=>d.classList.remove('open'));
+  });
+
+  function syncTotal(){ document.getElementById('t-totalMin').textContent = rounds*minutes; }
+
+  function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+
+  function update(){
+    const totalSecs=rounds*minutes*60;
+    const elapsed=(currentRound-1)*minutes*60+(minutes*60-secondsLeft);
+    const progress=Math.min(100,(elapsed/totalSecs)*100);
+    const roundPct=((minutes*60-secondsLeft)/(minutes*60))*100;
+    const mm=String(Math.floor(secondsLeft/60)).padStart(2,'0');
+    const ss=String(secondsLeft%60).padStart(2,'0');
+    document.getElementById('t-time').innerHTML=mm+'<span style="opacity:.6">:</span>'+ss;
+    document.getElementById('t-time').classList.toggle('running',running);
+    document.getElementById('t-curRound').textContent=currentRound;
+    document.getElementById('t-totRound').textContent=rounds;
+    document.getElementById('t-fill').style.width=progress+'%';
+    document.getElementById('t-pct').textContent=Math.round(progress)+'%';
+    document.getElementById('t-ring').style.setProperty('--t-rp',roundPct+'%');
+    const btn=document.getElementById('t-btnStart');
+    btn.classList.toggle('running',running);
+    btn.textContent=running?'Pause':(currentRound===1&&secondsLeft===minutes*60?'Start':'Resume');
   }
 
   function resetTimer(){
-    clearInterval(interval);interval=null;running=false;
-    currentRound=1;
-    totalSeconds=Number(minsSel.value)*60;
-    remaining=totalSeconds;
-    barEl.style.transition='none';barEl.style.width='0%';
-    updateDisplay();startBtn.textContent='Start';
+    clearInterval(timer); timer=null; running=false;
+    currentRound=1; secondsLeft=minutes*60;
+    document.getElementById('t-fill').style.width='0%';
+    update();
+  }
+
+  function beep(freq=880,dur=0.6){
+    try{
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      const osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value=freq;
+      gain.gain.setValueAtTime(0.3,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime+dur);
+    }catch(e){}
   }
 
   function tick(){
-    if(remaining>0){remaining--;updateDisplay();}
-    else{
-      playBeep(880,0.4);
-      setTimeout(()=>playBeep(1100,0.4),500);
-      const totalRounds=Number(roundsSel.value);
-      if(currentRound<totalRounds){
-        currentRound++;remaining=totalSeconds;
-        barEl.style.transition='none';barEl.style.width='0%';
-        setTimeout(()=>barEl.style.transition='width 1s linear',50);
-        updateDisplay();
-      }else{
-        clearInterval(interval);interval=null;running=false;
-        startBtn.textContent='Start';
-        roundLbl.textContent='All rounds done!';
-        setTimeout(()=>playBeep(660,1.2),200);
-        setTimeout(resetTimer,4000);
-      }
+    if(secondsLeft>1){ secondsLeft--; update(); return; }
+    if(currentRound>=rounds){
+      running=false; clearInterval(timer); timer=null; secondsLeft=0; update();
+      beep(660,1.2); return;
     }
+    beep(880,0.4); setTimeout(()=>beep(1100,0.4),500);
+    currentRound++; secondsLeft=minutes*60; update();
   }
 
-  startBtn.addEventListener('click',()=>{
-    if(running){
-      clearInterval(interval);interval=null;running=false;startBtn.textContent='Resume';
-    }else{
-      running=true;startBtn.textContent='Pause';
-      barEl.style.transition='width 1s linear';
-      interval=setInterval(tick,1000);
-    }
-  });
+  document.getElementById('t-btnStart').onclick=()=>{
+    running=!running;
+    if(running){ timer=setInterval(tick,1000); } else { clearInterval(timer); timer=null; }
+    update();
+  };
+  document.getElementById('t-btnReset').onclick=resetTimer;
+  document.getElementById('t-btnSkip').onclick=()=>{
+    clearInterval(timer); timer=null; running=false;
+    if(currentRound<rounds){ currentRound++; secondsLeft=minutes*60; }
+    update();
+  };
+  const fsBtn=document.getElementById('t-btnFs');
+  const timerPanel=document.getElementById('timer-panel');
+  const tCard=document.getElementById('t-card');
+  const darkBtn=document.getElementById('t-btnDark');
+  const fsExitBtn=document.getElementById('t-btnFsExit');
 
-  resetBtn.addEventListener('click',resetTimer);
-
-  const totalInput=document.getElementById('timer-total');
-  const MIN_OPTS=[1,2,3,4,5,6,7,8,9,10,12,15,20,25,30,45,60];
-
-  function syncTotal(){
-    totalInput.value=Number(roundsSel.value)*Number(minsSel.value);
+  function enterFs(){
+    timerPanel.classList.add('t-fullscreen');
+    document.body.style.overflow='hidden';
   }
-
-  function applyTotal(){
-    const total=Number(totalInput.value);
-    if(!total||total<1)return;
-    const r=Number(roundsSel.value);
-    const raw=total/r;
-    const closest=MIN_OPTS.reduce((a,b)=>Math.abs(b-raw)<Math.abs(a-raw)?b:a);
-    minsSel.value=String(closest);
-    syncTotal();
-    resetTimer();
+  function exitFs(){
+    timerPanel.classList.remove('t-fullscreen');
+    document.body.style.overflow='';
   }
+  fsBtn.onclick=()=>{ timerPanel.classList.contains('t-fullscreen')?exitFs():enterFs(); };
+  fsExitBtn.onclick=exitFs;
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&timerPanel.classList.contains('t-fullscreen')) exitFs(); });
 
-  totalInput.addEventListener('change',applyTotal);
-  totalInput.addEventListener('keydown',e=>{if(e.key==='Enter')applyTotal();});
+  let timerDark=false;
+  function applyDarkStyles(){
+    darkBtn.style.color=timerDark?'oklch(0.88 0.21 130)':'#f0ede6';
+    darkBtn.textContent=timerDark?'☀ Light':'☾ Dark';
+  }
+  darkBtn.onclick=()=>{
+    timerDark=!timerDark;
+    tCard.classList.toggle('t-dark',timerDark);
+    timerPanel.style.background=timerDark?'#0f0f13':'';
+    applyDarkStyles();
+  };
 
-  [roundsSel,minsSel].forEach(sel=>sel.addEventListener('change',()=>{syncTotal();resetTimer();}));
-
-  resetTimer();
-  syncTotal();
+  syncTotal(); update();
 }
 
 // ===== STATS TOGGLE =====
@@ -1211,7 +1306,9 @@ function renderSankey(){
   chart.draw(data,{width:'100%',height:400,sankey:{node:{label:{fontName:'Space Grotesk',fontSize:13,color:isDark?'#F4F0E6':'#0E0E10',bold:true},nodePadding:20,width:8},link:{colorMode:'gradient'}}});
 }
 
-// ===== BULK DELETE =====
+// ===== BULK DELETE / LATEX =====
+let latexData = [];
+
 function setupBulkDelete(){
   document.getElementById('bulk-cancel')?.addEventListener('click',()=>{selectedJobIds.clear();updateBulkBar();renderJobsView();});
   document.getElementById('bulk-delete-btn')?.addEventListener('click',async()=>{
@@ -1223,6 +1320,45 @@ function setupBulkDelete(){
     selectedJobIds.clear();
     updateBulkBar();populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();
   });
+  document.getElementById('bulk-latex-btn')?.addEventListener('click',async()=>{
+    if(!selectedJobIds.size)return;
+    const ids=[...selectedJobIds];
+    latexData=ids.map(id=>{
+      const j=ALL_JOBS.find(j=>String(j.id)===id);
+      if(!j)return null;
+      return{tag:getTag(j.title,j.id),company:j.company||'',title:j.title||''};
+    }).filter(Boolean);
+    if(!latexData.length)return;
+
+    const btn=document.getElementById('bulk-latex-btn');
+    const orig=btn.textContent;
+    btn.textContent='⏳ Uploading...';
+    btn.disabled=true;
+
+    try{
+      const res=await fetch('http://localhost:3737/create-latex',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({jobs:latexData})
+      });
+      const data=await res.json();
+      if(data.ok){
+        btn.textContent='✅ Done!';
+        setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2500);
+        console.log('LaTeX result:',data);
+        const status=data.overleaf?'✅ Uploaded to Overleaf':'⚠️  Saved locally only — Overleaf upload failed (check server logs)';
+        alert(`${data.count} files in: ${data.outputDir}\nFolder: ${data.folders[0]}\n\n${status}`);
+      }else{
+        throw new Error(data.error||'Unknown error');
+      }
+    }catch(err){
+      btn.textContent='❌ Failed';
+      btn.disabled=false;
+      setTimeout(()=>{btn.textContent=orig;},3000);
+      console.error('LaTeX server error:',err.message);
+      alert(`LaTeX server error: ${err.message}\n\nMake sure the server is running:\ncd latex-batch && node server.js`);
+    }
+  });
 }
 function updateBulkBar(){
   const bar=document.getElementById('bulk-bar');
@@ -1230,6 +1366,15 @@ function updateBulkBar(){
   const n=selectedJobIds.size;
   if(bar)bar.classList.toggle('visible',n>0);
   if(lbl)lbl.textContent=`${n} selected`;
+}
+function syncSelectAllCheckbox(){
+  const selectAllCb=document.getElementById('select-all-check');
+  if(!selectAllCb)return;
+  const allCbs=[...document.querySelectorAll('#jobs-tbody .row-check')];
+  if(!allCbs.length){selectAllCb.checked=false;selectAllCb.indeterminate=false;return;}
+  const checkedCount=allCbs.filter(cb=>cb.checked).length;
+  selectAllCb.indeterminate=checkedCount>0&&checkedCount<allCbs.length;
+  selectAllCb.checked=checkedCount===allCbs.length;
 }
 
 // ===== MONTH NAVIGATION =====
@@ -1478,7 +1623,7 @@ function renderTable(){
       <td><div class="cell-date"><strong>${fmtDate(j.applied_date)}</strong></div></td>
       <td style="padding-right:10px;"><div class="star-rank-cell">${rankBadge}<button class="star-btn ${star?'on':''} star-toggle" data-id="${id}"><svg viewBox="0 0 16 16" fill="${star?'currentColor':'none'}" stroke="currentColor" stroke-width="1.4"><path d="M8 1.5l2 4.5 5 .5-3.7 3.4 1.1 4.9L8 12.4 3.6 14.8l1.1-4.9L1 6.5l5-.5z"/></svg></button></div></td>
       <td class="col-rank" style="display:${isNumberingMode?'':'none'}"></td>
-      <td style="padding-left:10px;"><div class="company-cell"><div class="logo ${logoImgKey?'':lc}" style="${logoImgKey?'background:#fff;border:1.5px solid var(--line);':''}">${logo}</div><div style="display:flex;flex-direction:column;align-items:flex-start;"><span class="name">${company}</span><span class="tag-pill ${getTag(j.title,j.id)}" style="margin-top:3px;cursor:pointer;" data-jobid="${id}">${tag}</span></div></div></td>
+      <td style="padding-left:50px;"><div class="company-cell"><div class="logo ${logoImgKey?'':lc}" style="${logoImgKey?'background:#fff;border:1.5px solid var(--line);':''}">${logo}</div><div style="display:flex;flex-direction:column;align-items:flex-start;"><span class="name">${company}</span><span class="tag-pill ${getTag(j.title,j.id)}" style="margin-top:3px;cursor:pointer;" data-jobid="${id}">${tag}</span></div></div></td>
       <td><div class="title-cell"><span class="role">${title}</span>${j.job_id?`<span class="id">ID #${san(j.job_id)}</span>`:''}</div></td>
       <td style="width:120px;max-width:120px;white-space:normal;"><span style="font-size:12px;color:var(--ink-2);font-weight:500;">${city}</span>${country?`<br/><span style="font-family:var(--mono);font-size:9px;letter-spacing:0.1em;color:var(--ink-4);text-transform:uppercase;">${country}</span>`:''}</td>
       <td><span class="badge ${status} status-chip-btn" data-id="${id}" data-status="${status}">${sl}<span class="dd-caret">▾</span></span></td>
@@ -1543,7 +1688,24 @@ function wireTableEvents(tbody){
     if(cb.checked)selectedJobIds.add(id);else selectedJobIds.delete(id);
     const row=cb.closest('tr');if(row)row.classList.toggle('row-selected',cb.checked);
     updateBulkBar();
+    syncSelectAllCheckbox();
   }));
+
+  // Select-all checkbox
+  const selectAllCb=document.getElementById('select-all-check');
+  if(selectAllCb){
+    selectAllCb.addEventListener('change',e=>{
+      e.stopPropagation();
+      tbody.querySelectorAll('.row-check').forEach(cb=>{
+        const id=String(cb.dataset.id);
+        cb.checked=selectAllCb.checked;
+        if(selectAllCb.checked)selectedJobIds.add(id);else selectedJobIds.delete(id);
+        const row=cb.closest('tr');if(row)row.classList.toggle('row-selected',selectAllCb.checked);
+      });
+      updateBulkBar();
+    });
+    syncSelectAllCheckbox();
+  }
 
   // Inline status chip dropdown
   tbody.querySelectorAll('.status-chip-btn').forEach(chip=>chip.addEventListener('click',e=>{
