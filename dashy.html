@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>JobTracker - Supabase Dashboard</title>
-<link rel="icon" type="image/png" href="icon16.png" />
+<link rel="icon" type="image/png" href="images/icon16.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="stylesheet" href="dashy.css" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -952,6 +952,13 @@ function setupNumbering(){
   });
 }
 function updateNC(){const el=document.getElementById('numbering-counter');if(el)el.textContent=`#${numberingCounter}`;}
+async function compactPriorityRanks(){
+  const ranked=ALL_JOBS.filter(j=>j.priority_rank!=null).sort((a,b)=>a.priority_rank-b.priority_rank);
+  ranked.forEach((j,i)=>j.priority_rank=i+1);
+  numberingCounter=ranked.length+1;
+  updateNC();
+  if(ranked.length)await Promise.all(ranked.map(j=>_sb.from('jobs').update({priority_rank:j.priority_rank}).eq('id',j.id)));
+}
 async function assignRank(jobId){
   const job=ALL_JOBS.find(j=>String(j.id)===String(jobId));if(!job)return;
   if(job.priority_rank!=null){
@@ -977,7 +984,19 @@ function setupModals(){
     if(!editingJobId)return;
     const updates={title:document.getElementById('edit-title').value.trim(),company:document.getElementById('edit-company').value.trim(),location:document.getElementById('edit-location').value.trim(),url:document.getElementById('edit-url').value.trim(),job_id:document.getElementById('edit-job-id').value.trim(),status:document.getElementById('edit-status').value,source:document.getElementById('edit-source').value,description:document.getElementById('edit-description').value.trim(),notes:document.getElementById('edit-notes').value.trim()};
     const{error}=await _sb.from('jobs').update(updates).eq('id',editingJobId);
-    if(!error){const idx=ALL_JOBS.findIndex(j=>String(j.id)===String(editingJobId));if(idx!==-1)ALL_JOBS[idx]={...ALL_JOBS[idx],...updates};populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();}
+    if(!error){
+      const idx=ALL_JOBS.findIndex(j=>String(j.id)===String(editingJobId));
+      if(idx!==-1){
+        const oldStatus=ALL_JOBS[idx].status;
+        ALL_JOBS[idx]={...ALL_JOBS[idx],...updates};
+        if(oldStatus==='saved'&&updates.status!=='saved'&&ALL_JOBS[idx].priority_rank!=null){
+          ALL_JOBS[idx].priority_rank=null;
+          await _sb.from('jobs').update({priority_rank:null}).eq('id',editingJobId);
+          await compactPriorityRanks();
+        }
+      }
+      populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();
+    }
     closeEditModal();
   });
   document.getElementById('edit-modal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEditModal();});
@@ -989,6 +1008,7 @@ function setupModals(){
     if(!deletingJobId)return;
     await _sb.from('jobs').delete().eq('id',deletingJobId);
     ALL_JOBS=ALL_JOBS.filter(j=>String(j.id)!==String(deletingJobId));
+    await compactPriorityRanks();
     document.getElementById('delete-modal').classList.remove('show');
     populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();
   });
@@ -1309,8 +1329,6 @@ function renderSankey(){
 }
 
 // ===== BULK DELETE / LATEX =====
-let latexData = [];
-
 function setupBulkDelete(){
   document.getElementById('bulk-cancel')?.addEventListener('click',()=>{selectedJobIds.clear();updateBulkBar();renderJobsView();});
   document.getElementById('bulk-delete-btn')?.addEventListener('click',async()=>{
@@ -1319,46 +1337,41 @@ function setupBulkDelete(){
     if(!confirm(`Delete ${ids.length} job${ids.length>1?'s':''}? This cannot be undone.`))return;
     await Promise.all(ids.map(id=>_sb.from('jobs').delete().eq('id',id)));
     ALL_JOBS=ALL_JOBS.filter(j=>!ids.includes(String(j.id)));
+    await compactPriorityRanks();
     selectedJobIds.clear();
     updateBulkBar();populateDropdownOptions();applyFilters();updateHeroPanels();updateStatStrip();
   });
   document.getElementById('bulk-latex-btn')?.addEventListener('click',async()=>{
     if(!selectedJobIds.size)return;
     const ids=[...selectedJobIds];
-    latexData=ids.map(id=>{
+    const jobs=ids.map(id=>{
       const j=ALL_JOBS.find(j=>String(j.id)===id);
       if(!j)return null;
       return{tag:getTag(j.title,j.id),company:j.company||'',title:j.title||''};
     }).filter(Boolean);
-    if(!latexData.length)return;
+    if(!jobs.length)return;
 
     const btn=document.getElementById('bulk-latex-btn');
     const orig=btn.textContent;
-    btn.textContent='⏳ Uploading...';
+    btn.textContent='⏳ Saving...';
     btn.disabled=true;
 
     try{
       const res=await fetch('http://localhost:3737/create-latex',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({jobs:latexData})
+        body:JSON.stringify({jobs})
       });
       const data=await res.json();
-      if(data.ok){
-        btn.textContent='✅ Done!';
-        setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2500);
-        console.log('LaTeX result:',data);
-        const status=data.overleaf?'✅ Uploaded to Overleaf':'⚠️  Saved locally only — Overleaf upload failed (check server logs)';
-        alert(`${data.count} files in: ${data.outputDir}\nFolder: ${data.folders[0]}\n\n${status}`);
-      }else{
-        throw new Error(data.error||'Unknown error');
-      }
+      if(!data.ok)throw new Error(data.error||'Unknown error');
+      btn.textContent='✅ Saved!';
+      setTimeout(()=>{btn.textContent=orig;btn.disabled=false;},2500);
+      alert(`${data.count} .tex file${data.count>1?'s':''} saved to:\n${data.outputDir}`);
     }catch(err){
       btn.textContent='❌ Failed';
       btn.disabled=false;
       setTimeout(()=>{btn.textContent=orig;},3000);
-      console.error('LaTeX server error:',err.message);
-      alert(`LaTeX server error: ${err.message}\n\nMake sure the server is running:\ncd latex-batch && node server.js`);
+      alert(`LaTeX server error: ${err.message}\n\nStart the server with:\ncd latex-batch && node server.js`);
     }
   });
 }
