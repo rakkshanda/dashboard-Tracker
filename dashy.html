@@ -182,7 +182,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .timer-panel{display:none;margin:0 18px 14px;}
 .timer-panel.show{display:block;}
 .t-card{border:2px solid var(--ink);border-radius:28px;background:var(--card);padding:32px;position:relative;}
-.t-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;position:relative;z-index:1;}
+.t-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;position:relative;z-index:10;}
 .t-field{position:relative;border:2px solid var(--ink);border-radius:14px;padding:10px 14px;background:var(--card);box-shadow:4px 4px 0 0 var(--ink);}
 .t-field .t-lbl{position:absolute;top:-12px;left:12px;padding:2px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.2em;font-weight:700;border:2px solid var(--ink);border-radius:6px;}
 .t-lbl.pink{background:oklch(0.78 0.19 0);}
@@ -364,8 +364,8 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           </div>
         </div>
         <div class="t-field">
-          <div class="t-lbl cyan">Total (min)</div>
-          <div class="t-total-val" id="t-totalMin">30</div>
+          <div class="t-lbl cyan">Total Time</div>
+          <div class="t-total-val" id="t-totalMin">30m</div>
         </div>
       </div>
       <div class="t-timer">
@@ -807,7 +807,7 @@ function parseLD(s){if(!s)return new Date(0);const[y,m,d]=s.split('-').map(Numbe
 // ===== FILTERS =====
 function applyFilters(){
   let jobs=[...ALL_JOBS];
-  if(currentTabView==='priority') jobs=jobs.filter(j=>j.priority_rank!=null).sort((a,b)=>a.priority_rank-b.priority_rank);
+  if(currentTabView==='priority') jobs=jobs.filter(j=>j.priority_rank!=null&&j.status==='saved').sort((a,b)=>a.priority_rank-b.priority_rank);
   else if(currentTabView==='starred') jobs=jobs.filter(j=>j.favorite);
   else if(currentTabView==='active') jobs=jobs.filter(j=>['applied','resume_screening','interview'].includes(j.status));
 
@@ -836,7 +836,7 @@ function applyFilters(){
 
 
 function updateTabCounts(){
-  const pri=ALL_JOBS.filter(j=>j.priority_rank!=null).length;
+  const pri=ALL_JOBS.filter(j=>j.priority_rank!=null&&j.status==='saved').length;
   const star=ALL_JOBS.filter(j=>j.favorite).length;
   const act=ALL_JOBS.filter(j=>['applied','resume_screening','interview'].includes(j.status)).length;
   const badge=document.getElementById('jobs-badge-num');if(badge)badge.textContent=ALL_JOBS.length;
@@ -1116,7 +1116,7 @@ function setupTimer(){
     document.querySelectorAll('.t-dd.open').forEach(d=>d.classList.remove('open'));
   });
 
-  function syncTotal(){ document.getElementById('t-totalMin').textContent = rounds*minutes; }
+  function syncTotal(){const t=rounds*minutes;const h=Math.floor(t/60);const m=t%60;document.getElementById('t-totalMin').textContent=h>0?(m>0?`${h}h ${m}m`:`${h}h`):`${m}m`;}
 
   function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 
@@ -1732,7 +1732,17 @@ function wireTableEvents(tbody){
       const{error}=await _sb.from('jobs').update({status:newStatus}).eq('id',jobId);
       if(!error){
         const job=ALL_JOBS.find(j=>String(j.id)===String(jobId));
-        if(job)job.status=newStatus;
+        if(job){
+          const oldStatus=job.status;
+          job.status=newStatus;
+          if(oldStatus==='saved'&&newStatus!=='saved'&&job.priority_rank!=null){
+            job.priority_rank=null;
+            await _sb.from('jobs').update({priority_rank:null}).eq('id',jobId);
+            await compactPriorityRanks();
+            applyFilters();
+            return;
+          }
+        }
         chip.className=`badge ${newStatus} status-chip-btn`;
         chip.dataset.status=newStatus;
         chip.innerHTML=`${STATUS_LABELS[newStatus]||newStatus}<span class="dd-caret">▾</span>`;
