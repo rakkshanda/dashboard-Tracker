@@ -1,66 +1,66 @@
 // Job scraper with TikTok override + selected boards only
 (function () {
   // === TikTok job scraper (internal helper) ===
+  // Uses stable data-test attrs + structural selectors — avoids CSS Module hashes that change each deploy.
   function __scrapeTikTokJob_internal() {
-    const container = document.querySelector('.jobDetail.positionDetail__1AqfZ, .jobDetail__1UFk5');
-    if (!container) {
-      // Return a consistent shape even if not found
-      return {
-        company: 'TikTok',
-        title: '',
-        location: '',
-        url: document.location.href,
-        description: '',
-        jobId: ''
-      };
-    }
+    // Title: data-test first, then first h1 on the page
+    const titleEl = document.querySelector('[data-test="jobTitle"], [data-testid="jobTitle"], h1');
+    const jobTitle = (titleEl?.textContent || '').trim();
 
-    const titleEl = container.querySelector('[data-test="jobTitle"]');
-    const jobTitle = titleEl ? titleEl.textContent.trim() : '';
-
+    // Location: data-test, then any element whose class contains "location" (case-insensitive)
     let location = '';
-    const locEl = container.querySelector('.job-info .content__3ZUKJ.clamp-content');
-    if (locEl) location = locEl.textContent.trim();
+    const locCandidates = [
+      '[data-test="jobLocation"]',
+      '[data-testid="jobLocation"]',
+      '[class*="ocation"]',  // matches "location", "Location", "jobLocation" etc.
+    ];
+    for (const sel of locCandidates) {
+      try {
+        const els = document.querySelectorAll(sel);
+        for (const el of els) {
+          const t = (el.textContent || '').trim();
+          // location strings are short; skip elements that contain the whole page
+          if (t && t.length > 1 && t.length < 120 && !/responsibilities|qualifications|about tiktok/i.test(t)) {
+            location = t; break;
+          }
+        }
+        if (location) break;
+      } catch {}
+    }
 
-    // Robust jobId extraction – mandatory field in the result
+    // Job ID: scan page text for "Job ID:" pattern (doesn't rely on DOM structure)
     let jobId = '';
-    const jobInfoRoot = container.querySelector('.job-info') || container;
+    const bodyText = document.body?.innerText || '';
+    const jobIdMatch = bodyText.match(/Job\s*ID[:\s]+([A-Za-z0-9\-]+)/i);
+    if (jobIdMatch) jobId = jobIdMatch[1];
 
-    // Pass 1: scan all descendants of .job-info (or container) for "Job ID:"
-    const infoNodes = jobInfoRoot.querySelectorAll('*');
-    for (const node of infoNodes) {
-      const text = (node.textContent || '').trim();
-      const match = text.match(/Job ID[:\s]*([A-Za-z0-9\-]+)/i);
-      if (match && match[1]) {
-        jobId = match[1];
-        break;
-      }
+    // Description: prefer data-test attr, then large text blocks under main/article
+    let description = '';
+    const descCandidates = [
+      '[data-test="jobDescription"]',
+      '[data-testid="jobDescription"]',
+      '[class*="escription"]',  // matches "description", "Description", "jobDescription"
+      'main article',
+      'article',
+      'main',
+    ];
+    for (const sel of descCandidates) {
+      try {
+        const el = document.querySelector(sel);
+        if (el) {
+          const t = (el.innerText || el.textContent || '').trim();
+          if (t.length > 150) { description = t; break; }
+        }
+      } catch {}
     }
-
-    // Pass 2: fallback to full text of jobInfoRoot if still missing
-    if (!jobId) {
-      const fullText = (jobInfoRoot.textContent || '').trim();
-      const match = fullText.match(/Job ID[:\s]*([A-Za-z0-9\-]+)/i);
-      if (match && match[1]) {
-        jobId = match[1];
-      }
-    }
-
-    const descParts = [];
-    const blocks = container.querySelectorAll('.block-title, .block-content');
-    blocks.forEach(el => {
-      const t = (el.textContent || '').trim();
-      if (t) descParts.push(t);
-    });
-    const jobDescription = descParts.join('\n\n');
 
     return {
       company: 'TikTok',
       title: jobTitle,
       location,
       url: document.location.href,
-      description: jobDescription,
-      jobId: jobId || '' // key always present
+      description,
+      jobId,
     };
   }
 
@@ -631,59 +631,79 @@
       description: clean(txt(first("[data-testid='JobDescription'], .description"))),
     }),
 
-    // Amazon (amazon.jobs)
+    // Amazon (amazon.jobs) — stable-selector rewrite (2025+)
     "amazon.jobs": () => {
       const company = "Amazon";
 
-      // Title: h1.title inside the apply-header info block
+      // Title
       const title = clean(txt(first(
         "h1.title",
-        "h1.job-title",
-        "[data-test-id='job-title']",
+        "[class*='job-title']",
+        "[data-test='job-title']",
+        "[data-testid='job-title']",
         "h1"
       )));
 
-      // Job ID: from "Job ID: XXXXX | ..." meta line, or URL path, or data-react-props JSON
+      // Job ID: URL path is most reliable (/en/jobs/3169056/...), then page text
       const jobId = (() => {
-        const metaEl = document.querySelector("p.meta, .details-line p.meta");
-        if (metaEl) {
-          const m = (metaEl.textContent || "").match(/Job\s+ID[:\s]+(\d+)/i);
-          if (m) return m[1];
-        }
-        // URL: /en/jobs/3169056/...
         const urlMatch = location.pathname.match(/\/jobs\/(\d+)/);
         if (urlMatch) return urlMatch[1];
+        const bodyText = document.body?.innerText || "";
+        const m = bodyText.match(/Job\s*ID[:\s#]+([A-Za-z0-9\-]+)/i);
+        if (m) return m[1];
         // data-react-props JSON fallback
         const reactEl = document.querySelector("[data-react-props*='job_id']");
         if (reactEl) {
           try {
             const props = JSON.parse(reactEl.getAttribute("data-react-props") || "{}");
-            if (props.currentJob && props.currentJob.job_id) return String(props.currentJob.job_id);
+            if (props.currentJob?.job_id) return String(props.currentJob.job_id);
           } catch {}
         }
         return "";
       })();
 
-      // Location: sidebar associations location item
+      // Location: sidebar association list is the authoritative source
       const locationVal = (() => {
-        const locItem = document.querySelector(
-          ".associations .association.location-icon .association-content li, " +
+        // Most reliable: the sidebar location-icon association list
+        const li = document.querySelector(
+          ".associations .association.location-icon .association-content li," +
           ".associations .location-icon .association-content li"
         );
-        if (locItem) return clean(txt(locItem));
-        // fallback
-        return clean(txt(first(".job-location", ".location")));
+        if (li) return clean(li.textContent || "");
+
+        // Fallback: any short element with class containing "location" that isn't a label or recommended-job location
+        const locEls = document.querySelectorAll("[class*='location']");
+        for (const el of locEls) {
+          if (el.querySelector("b, strong")) continue; // skip "Location: X" label wrappers
+          if (el.closest(".recommended-job, .related-jobs")) continue;
+          const t = clean(el.textContent || "");
+          if (t && t.length > 1 && t.length < 100 &&
+              !/responsibilities|qualifications|description|amazon|benefits|location/i.test(t)) {
+            return t;
+          }
+        }
+        return "";
       })();
 
-      // Description: only the job content sections (not sidebar/related jobs)
+      // Description: prefer named content containers, fall back broadly
       const description = (() => {
-        const contentCol = document.querySelector(
-          "#job-detail-body .col-md-7 .content, " +
-          "#job-detail-body .col-lg-8 .content, " +
-          "#job-detail-body .col-xl-9 .content"
-        );
-        if (contentCol) return clean(txt(contentCol));
-        return clean(txt(first("#job-detail-body", "#job-detail", ".job-description", "main")));
+        const descSels = [
+          "#job-detail-body",
+          "[class*='job-detail-body']",
+          "[class*='jobDescription']",
+          "[class*='job-description']",
+          "[class*='description']",
+          "main",
+          "article",
+        ];
+        for (const sel of descSels) {
+          const el = document.querySelector(sel);
+          if (el) {
+            const t = clean(txt(el));
+            if (t.length > 150) return t;
+          }
+        }
+        return "";
       })();
 
       return { company, title, location: locationVal, description, job_id: jobId };
@@ -719,6 +739,94 @@
       const firstText = (selector) => {
         const el = document.querySelector(selector);
         return norm(el?.textContent || "");
+      };
+
+      // Shared description extractor for both Handshake variants
+      const findJobDescriptionHS = () => {
+        // 1. Find h3/h2 heading whose text is "Job description" (Handshake's actual heading)
+        //    then grab the next sibling div — works regardless of CSS Module class names
+        const headings = Array.from(document.querySelectorAll('h2, h3'));
+        for (const h of headings) {
+          if (/^job description$/i.test((h.textContent || '').trim())) {
+            const headingWrapper = h.parentElement;
+            const contentDiv = headingWrapper?.nextElementSibling;
+            if (contentDiv) {
+              const t = norm(contentDiv.textContent || '');
+              if (t.length > 100) return t;
+            }
+            // fallback: parent's parent next sibling
+            const upper = headingWrapper?.parentElement?.nextElementSibling;
+            if (upper) {
+              const t = norm(upper.textContent || '');
+              if (t.length > 100) return t;
+            }
+          }
+        }
+
+        // 2. Stable data-testid / aria / id selectors
+        const domSels = [
+          '[data-testid="job-description"]',
+          '[data-testid*="description"]',
+          '[aria-label*="description" i]',
+          '[id*="description" i]',
+          'div[class*="JobDescription"]',
+          'div[class*="job-description"]',
+          'div[class*="description-content"]',
+          'div[class*="DescriptionText"]',
+          'div[class*="style__JobDetails"]',
+          'div[class*="job-details"]',
+          'div[class*="job_details"]',
+          'section[class*="description"]',
+        ];
+        for (const sel of domSels) {
+          try {
+            const el = document.querySelector(sel);
+            if (el) {
+              const t = norm(el.textContent || "");
+              if (t.length > 100) return t;
+            }
+          } catch {}
+        }
+
+        // 3. Text-slicing with case-insensitive indexOf for the start marker
+        const sliceCI = (full, startMark, endMarks) => {
+          const idx = full.toLowerCase().indexOf(startMark.toLowerCase());
+          if (idx === -1) return "";
+          const after = full.slice(idx);
+          let end = after.length;
+          for (const m of endMarks) {
+            const i = after.toLowerCase().indexOf(m.toLowerCase());
+            if (i !== -1 && i < end) end = i;
+          }
+          return after.slice(0, end).trim();
+        };
+        const endMarkers = [
+          "What they're looking for", "About the employer",
+          "Similar Jobs", "Alumni in similar roles",
+          "Apply Now", "Easy Apply", "Qualifications", "Requirements",
+        ];
+        const startMarkers = [
+          "Job description", "Job Description",
+          "The Role", "About the Role", "About this Role",
+          "Position Description", "Role Description",
+          "Role Overview", "Position Overview",
+          "What You'll Do", "Responsibilities", "Overview",
+          "About the Position", "Position Summary", "Job Summary",
+        ];
+        const text = bodyText();
+        for (const marker of startMarkers) {
+          const jd = sliceCI(text, marker, endMarkers);
+          if (jd && jd.length > 100) return jd;
+        }
+
+        // 4. Collect all substantial paragraphs from main/article as last resort
+        const container = document.querySelector('main, article, [role="main"]') || document.body;
+        const paras = Array.from(container.querySelectorAll('p, li'))
+          .map(el => norm(el.textContent || ""))
+          .filter(t => t.length > 60);
+        if (paras.length > 2) return paras.join(" ");
+
+        return "";
       };
 
       const findCompany = () => {
@@ -795,53 +903,7 @@
         return "";
       };
 
-      const findJobDescription = () => {
-        // Try DOM selectors first (more reliable than text markers)
-        const descSelectors = [
-          '[data-testid="job-description"]',
-          '[data-testid*="description"]',
-          'div[class*="style__JobDetails"]',
-          'div[class*="job-details"]',
-          'div[class*="job_details"]',
-          'section[class*="description"]',
-        ];
-        for (const sel of descSelectors) {
-          try {
-            const el = document.querySelector(sel);
-            if (el) {
-              const t = norm(el.textContent || "");
-              if (t.length > 100) return t;
-            }
-          } catch {}
-        }
-
-        // Text-slicing fallback with multiple possible start markers
-        const text = bodyText();
-        const endMarkers = [
-          "What they're looking for",
-          "About the employer",
-          "Similar Jobs",
-          "Alumni in similar roles",
-          "Apply Now",
-          "Easy Apply",
-        ];
-        const startMarkers = [
-          "The Role",
-          "Job Description",
-          "About the Role",
-          "Position Description",
-          "About this Role",
-          "Role Description",
-          "What You'll Do",
-          "Responsibilities",
-          "Overview",
-        ];
-        for (const marker of startMarkers) {
-          const jd = sliceBetween(text, marker, endMarkers);
-          if (jd && jd.length > 100) return jd;
-        }
-        return "";
-      };
+      const findJobDescription = findJobDescriptionHS;
 
       return {
         company: findCompany(),
@@ -983,48 +1045,41 @@
       };
 
       const findJobDescription = () => {
-        const descSelectors = [
-          '[data-testid="job-description"]',
-          '[data-testid*="description"]',
-          'div[class*="style__JobDetails"]',
-          'div[class*="job-details"]',
-          'div[class*="job_details"]',
-          'section[class*="description"]',
+        // h3/h2 "Job description" heading → next sibling div (matches Handshake's DOM structure)
+        const headings = Array.from(document.querySelectorAll('h2, h3'));
+        for (const h of headings) {
+          if (/^job description$/i.test((h.textContent || '').trim())) {
+            const hw = h.parentElement;
+            const sib = hw?.nextElementSibling;
+            if (sib) { const t = norm(sib.textContent || ''); if (t.length > 100) return t; }
+            const upper = hw?.parentElement?.nextElementSibling;
+            if (upper) { const t = norm(upper.textContent || ''); if (t.length > 100) return t; }
+          }
+        }
+        const domSels = [
+          '[data-testid="job-description"]', '[data-testid*="description"]',
+          'div[class*="JobDescription"]', 'div[class*="job-description"]',
+          'div[class*="style__JobDetails"]', 'div[class*="job-details"]',
         ];
-        for (const sel of descSelectors) {
+        for (const sel of domSels) {
           try {
             const el = document.querySelector(sel);
-            if (el) {
-              const t = norm(el.textContent || "");
-              if (t.length > 100) return t;
-            }
+            if (el) { const t = norm(el.textContent || ""); if (t.length > 100) return t; }
           } catch {}
         }
-
+        const sliceCI = (full, sm, ems) => {
+          const i = full.toLowerCase().indexOf(sm.toLowerCase()); if (i === -1) return "";
+          const after = full.slice(i); let end = after.length;
+          for (const m of ems) { const j = after.toLowerCase().indexOf(m.toLowerCase()); if (j !== -1 && j < end) end = j; }
+          return after.slice(0, end).trim();
+        };
+        const ems = ["What they're looking for","About the employer","Similar Jobs","Alumni in similar roles","Apply Now","Easy Apply","Qualifications","Requirements"];
+        const sms = ["Job description","Job Description","The Role","About the Role","About this Role","Position Description","Role Description","What You'll Do","Responsibilities","Overview","Position Summary","Job Summary"];
         const text = bodyText();
-        const endMarkers = [
-          "What they're looking for",
-          "About the employer",
-          "Similar Jobs",
-          "Alumni in similar roles",
-          "Apply Now",
-          "Easy Apply",
-        ];
-        const startMarkers = [
-          "The Role",
-          "Job Description",
-          "About the Role",
-          "Position Description",
-          "About this Role",
-          "Role Description",
-          "What You'll Do",
-          "Responsibilities",
-          "Overview",
-        ];
-        for (const marker of startMarkers) {
-          const jd = sliceBetween(text, marker, endMarkers);
-          if (jd && jd.length > 100) return jd;
-        }
+        for (const sm of sms) { const jd = sliceCI(text, sm, ems); if (jd && jd.length > 100) return jd; }
+        const container = document.querySelector('main, article, [role="main"]') || document.body;
+        const paras = Array.from(container.querySelectorAll('p, li')).map(el => norm(el.textContent || "")).filter(t => t.length > 60);
+        if (paras.length > 2) return paras.join(" ");
         return "";
       };
 
@@ -1224,6 +1279,21 @@
       hsData.description = truncateDescription(hsData.description || '');
       console.log('[scrape.js] Handshake scraped data:', { title: hsData.title, company: hsData.company, hasDesc: !!hsData.description });
       return hsData;
+    }
+
+    // Amazon Jobs override — skip JSON-LD, use Amazon scraper directly
+    if (hrefLower.includes('amazon.jobs')) {
+      console.log('[scrape.js] Amazon Jobs detected — using Amazon scraper');
+      let amzData = strategies['amazon.jobs']();
+      amzData = amzData || {};
+      amzData.url = location.href;
+      amzData.company = 'Amazon';
+      amzData.title = clean(amzData.title || '');
+      amzData.location = clean(amzData.location || '');
+      amzData.description = truncateDescription(amzData.description || '');
+      amzData.job_id = amzData.job_id || '';
+      console.log('[scrape.js] Amazon scraped data:', { title: amzData.title, location: amzData.location, job_id: amzData.job_id });
+      return amzData;
     }
 
     // Apple Jobs override — skip JSON-LD and generic, use Apple scraper only

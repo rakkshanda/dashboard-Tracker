@@ -190,6 +190,9 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-lbl.cyan{background:oklch(0.82 0.14 215);}
 .t-dd{position:relative;}
 .t-dd-btn{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;padding:4px 0;font:inherit;cursor:pointer;font-size:1.4rem;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;}
+.t-dd-value{width:3ch;border:none;background:transparent;font:inherit;font-size:1.4rem;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;outline:none;cursor:text;-moz-appearance:textfield;appearance:textfield;}
+.t-dd-value::-webkit-outer-spin-button,.t-dd-value::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.t-card.t-dark .t-dd-value{color:#f0ede6;}
 .t-dd-btn .t-chev{width:22px;height:22px;border:2px solid var(--ink);border-radius:9999px;display:inline-flex;align-items:center;justify-content:center;font-size:.75rem;transition:transform .2s;}
 .t-dd-btn:hover .t-chev{transform:rotate(180deg);}
 .t-dd.pink .t-chev{background:oklch(0.78 0.19 0);}
@@ -202,6 +205,9 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-dd-grid button.active{background:var(--t-accent,oklch(0.78 0.19 0));}
 .t-total-val{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;padding-top:4px;}
 .t-timer{position:relative;display:flex;flex-direction:column;align-items:center;padding:56px 0;z-index:1;}
+.t-countdown{position:absolute;font-size:clamp(4rem,14vw,10rem);font-weight:900;line-height:1;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;text-shadow:6px 6px 0 oklch(0.78 0.19 0);opacity:0;transform:scale(1.4);pointer-events:none;transition:opacity .15s,transform .15s;background:rgba(255,255,255,0.75);border-radius:16px;padding:8px 24px;}
+.t-countdown.show{opacity:1;transform:scale(1);}
+.t-card.t-dark .t-countdown{color:#f0ede6;text-shadow:6px 6px 0 oklch(0.78 0.19 0);background:rgba(255,255,255,0.15);}
 .t-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
 .t-ring>div{width:min(320px,70vw);height:min(320px,70vw);border-radius:9999px;opacity:.2;background:conic-gradient(oklch(0.74 0.19 45) var(--t-rp,0%),transparent var(--t-rp,0%));}
 .t-time{position:relative;font-weight:900;line-height:1;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;font-size:clamp(4rem,14vw,10rem);text-shadow:6px 6px 0 var(--ink);}
@@ -218,6 +224,8 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-btn.t-start{background:oklch(0.88 0.21 130);}
 .t-btn.t-start.running{background:oklch(0.78 0.19 0);}
 .t-btn.t-skip{background:oklch(0.82 0.14 215);}
+.t-btn.t-cdtoggle{background:var(--card);opacity:.5;}
+.t-btn.t-cdtoggle.active{background:oklch(0.78 0.19 0);opacity:1;}
 .t-btn.t-fs{background:var(--card);padding:12px 16px;}
 /* Fullscreen mode */
 .timer-panel.t-fullscreen{position:fixed!important;inset:0!important;margin:0!important;z-index:99999!important;overflow:auto;background:var(--bg);display:block!important;}
@@ -352,14 +360,14 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
         <div class="t-field">
           <div class="t-lbl pink">Rounds</div>
           <div class="t-dd pink" id="t-ddRounds" style="--t-accent:oklch(0.78 0.19 0)">
-            <button class="t-dd-btn" type="button"><span class="t-dd-value">5</span><span class="t-chev">▾</span></button>
+            <div class="t-dd-btn" type="button"><input class="t-dd-value" type="number" min="1" max="99" value="5"><span class="t-chev">▾</span></div>
             <div class="t-dd-menu"><div class="t-dd-grid"></div></div>
           </div>
         </div>
         <div class="t-field">
           <div class="t-lbl lime">Minutes / Round</div>
           <div class="t-dd lime" id="t-ddMinutes" style="--t-accent:oklch(0.88 0.21 130)">
-            <button class="t-dd-btn" type="button"><span class="t-dd-value">6</span><span class="t-chev">▾</span></button>
+            <div class="t-dd-btn" type="button"><input class="t-dd-value" type="number" min="1" max="99" value="6"><span class="t-chev">▾</span></div>
             <div class="t-dd-menu"><div class="t-dd-grid"></div></div>
           </div>
         </div>
@@ -370,6 +378,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       </div>
       <div class="t-timer">
         <div class="t-ring"><div id="t-ring"></div></div>
+        <div class="t-countdown" id="t-countdown"></div>
         <div class="t-time" id="t-time">06<span style="opacity:.6">:</span>00</div>
         <div class="t-round-lbl">Round <b id="t-curRound">1</b> / <span id="t-totRound">5</span></div>
       </div>
@@ -381,6 +390,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
         <button class="t-btn t-start" id="t-btnStart">Start</button>
         <button class="t-btn" id="t-btnReset">Reset</button>
         <button class="t-btn t-skip" id="t-btnSkip">Skip Round →</button>
+        <button class="t-btn t-cdtoggle active" id="t-btnCd" title="Toggle countdown / count-up">Countdown</button>
         <button class="t-btn t-fs" id="t-btnFs" title="Fullscreen">⛶</button>
       </div>
     </div>
@@ -1087,26 +1097,35 @@ function setupTimer(){
   });
 
   const ROUND_OPTS = [1,2,3,4,5,6,7,8,10,12,15,20,25,30,40];
-  const MIN_OPTS   = [1,2,3,5,6,10,15,20,25,30,45,60];
+  const MIN_OPTS   = [4,5,6,7,8,9,10,12,15];
   let rounds=5, minutes=6, currentRound=1, secondsLeft=minutes*60, running=false, timer=null;
 
   function buildDD(id, options, getVal, setVal){
     const root=document.getElementById(id);
     const grid=root.querySelector('.t-dd-grid');
-    const valEl=root.querySelector('.t-dd-value');
-    function render(){
-      valEl.textContent=getVal();
+    const inp=root.querySelector('.t-dd-value');
+    function apply(n){
+      n=Math.max(1,Math.min(99,parseInt(n)||1));
+      setVal(n); inp.value=n;
+      grid.querySelectorAll('button').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===n));
+      syncTotal(); if(!running) resetTimer();
+    }
+    function renderGrid(){
       grid.innerHTML='';
       options.forEach(n=>{
         const b=document.createElement('button');
         b.type='button'; b.textContent=n;
         if(n===getVal()) b.classList.add('active');
-        b.onclick=()=>{ setVal(n); root.classList.remove('open'); render(); syncTotal(); if(!running) resetTimer(); };
+        b.onclick=()=>{ apply(n); root.classList.remove('open'); };
         grid.appendChild(b);
       });
     }
-    root.querySelector('.t-dd-btn').onclick=(e)=>{ e.stopPropagation(); root.classList.toggle('open'); };
-    render();
+    // chevron toggles dropdown; clicking the input just focuses it
+    root.querySelector('.t-chev').onclick=(e)=>{ e.stopPropagation(); renderGrid(); root.classList.toggle('open'); };
+    inp.addEventListener('click',e=>e.stopPropagation());
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ apply(inp.value); root.classList.remove('open'); inp.blur(); } });
+    inp.addEventListener('blur',()=>apply(inp.value));
+    renderGrid();
   }
 
   buildDD('t-ddRounds', ROUND_OPTS, ()=>rounds, n=>{ rounds=n; });
@@ -1121,10 +1140,12 @@ function setupTimer(){
   function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
 
   function update(){
-    const totalSecs=rounds*minutes*60;
-    const elapsed=(currentRound-1)*minutes*60+(minutes*60-secondsLeft);
-    const progress=Math.min(100,(elapsed/totalSecs)*100);
-    const roundPct=((minutes*60-secondsLeft)/(minutes*60))*100;
+    // In countdown: secondsLeft counts minutes*60 → 0. In count-up: 0 → minutes*60.
+    const roundElapsed = countdownMode ? (minutes*60 - secondsLeft) : secondsLeft;
+    const totalSecs    = rounds*minutes*60;
+    const elapsed      = (currentRound-1)*minutes*60 + roundElapsed;
+    const progress     = Math.min(100,(elapsed/totalSecs)*100);
+    const roundPct     = (roundElapsed/(minutes*60))*100;
     const mm=String(Math.floor(secondsLeft/60)).padStart(2,'0');
     const ss=String(secondsLeft%60).padStart(2,'0');
     document.getElementById('t-time').innerHTML=mm+'<span style="opacity:.6">:</span>'+ss;
@@ -1136,12 +1157,12 @@ function setupTimer(){
     document.getElementById('t-ring').style.setProperty('--t-rp',roundPct+'%');
     const btn=document.getElementById('t-btnStart');
     btn.classList.toggle('running',running);
-    btn.textContent=running?'Pause':(currentRound===1&&secondsLeft===minutes*60?'Start':'Resume');
+    btn.textContent=running?'Pause':(roundElapsed===0&&currentRound===1?'Start':'Resume');
   }
 
   function resetTimer(){
     clearInterval(timer); timer=null; running=false;
-    currentRound=1; secondsLeft=minutes*60;
+    currentRound=1; secondsLeft=countdownMode?minutes*60:0;
     document.getElementById('t-fill').style.width='0%';
     update();
   }
@@ -1159,19 +1180,36 @@ function setupTimer(){
   }
 
   function tick(){
-    if(secondsLeft>1){ secondsLeft--; update(); return; }
-    if(currentRound>=rounds){
-      running=false; clearInterval(timer); timer=null; secondsLeft=0; update();
-      beep(660,1.2); return;
+    if(countdownMode){
+      if(secondsLeft>1){ secondsLeft--; update(); return; }
+      if(currentRound>=rounds){ running=false; clearInterval(timer); timer=null; secondsLeft=0; update(); beep(660,1.2); return; }
+      beep(880,0.4); setTimeout(()=>beep(1100,0.4),500);
+      currentRound++; secondsLeft=minutes*60; update();
+    } else {
+      if(secondsLeft<minutes*60-1){ secondsLeft++; update(); return; }
+      if(currentRound>=rounds){ running=false; clearInterval(timer); timer=null; secondsLeft=minutes*60; update(); beep(660,1.2); return; }
+      beep(880,0.4); setTimeout(()=>beep(1100,0.4),500);
+      currentRound++; secondsLeft=0; update();
     }
-    beep(880,0.4); setTimeout(()=>beep(1100,0.4),500);
-    currentRound++; secondsLeft=minutes*60; update();
   }
 
+  let countdownMode=true;
+  const cdToggleBtn=document.getElementById('t-btnCd');
+  cdToggleBtn.onclick=()=>{
+    countdownMode=!countdownMode;
+    cdToggleBtn.classList.toggle('active',countdownMode);
+    cdToggleBtn.textContent=countdownMode?'Countdown':'Count-up';
+    if(!running) resetTimer();
+  };
+
   document.getElementById('t-btnStart').onclick=()=>{
-    running=!running;
-    if(running){ timer=setInterval(tick,1000); } else { clearInterval(timer); timer=null; }
-    update();
+    if(running){ running=false; clearInterval(timer); timer=null; update(); return; }
+    const cd=document.getElementById('t-countdown');
+    const ttime=document.getElementById('t-time');
+    ttime.style.visibility='hidden';
+    const seq=countdownMode?[3,2,1]:[1,2,3];
+    seq.forEach((n,i)=>{ setTimeout(()=>{ beep(880,0.15); cd.textContent=n; cd.classList.add('show'); setTimeout(()=>cd.classList.remove('show'),700); },i*1000); });
+    setTimeout(()=>{ cd.textContent=''; ttime.style.visibility=''; running=true; timer=setInterval(tick,1000); update(); },3000);
   };
   document.getElementById('t-btnReset').onclick=resetTimer;
   document.getElementById('t-btnSkip').onclick=()=>{

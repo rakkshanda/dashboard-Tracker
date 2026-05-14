@@ -294,11 +294,35 @@
   });
 
   // Listen for messages from the popup (like close button clicks)
-  window.addEventListener('message', (e) => {
+  window.addEventListener('message', async (e) => {
     if (e.data && e.data.type === 'CLOSE_POPUP') {
       if (isPopupOpen) {
         togglePopup();
       }
+    }
+
+    if (e.data && e.data.type === 'REDO_SCRAPE') {
+      try {
+        iframe.contentWindow.postMessage({ type: 'SCRAPING_STARTED' }, '*');
+      } catch (_) {}
+
+      const isComplete = (d) => {
+        if (!d) return false;
+        return !!(d.title?.trim() && d.company?.trim() && d.location?.trim() && d.description?.trim());
+      };
+      const delay = (ms) => new Promise(r => setTimeout(r, ms));
+      let last = null;
+      for (let i = 0; i < 10; i++) {
+        try {
+          last = await scrapeCurrentPage();
+          if (isComplete(last)) break;
+        } catch (_) {}
+        await delay(200);
+      }
+      scrapedData = last || {};
+      try {
+        iframe.contentWindow.postMessage({ type: 'SCRAPED_DATA', data: scrapedData }, '*');
+      } catch (_) {}
     }
   });
 

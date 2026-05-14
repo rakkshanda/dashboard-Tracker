@@ -226,6 +226,7 @@ function handleParentMessage(event) {
     return;
   } else if (msg.type === 'SCRAPED_DATA' && msg.data) {
     if (loadingTimer) { clearTimeout(loadingTimer); loadingTimer = null; }
+    if (window.__loadingSafetyTimer) { clearTimeout(window.__loadingSafetyTimer); window.__loadingSafetyTimer = null; }
     stopLoading();
     const d = msg.data || {};
     // Only populate when data is complete enough
@@ -806,8 +807,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     await restorePosition();
   }
 
-  // Auto-scrape on open (same logic as redo button)
-  if (tab) {
+  // In standalone (iframe) mode, floating-button.js owns scraping and will send SCRAPED_DATA.
+  // Keep the loading mask active until SCRAPED_DATA arrives; add a safety timeout.
+  if (isStandalone) {
+    const safetyTimer = setTimeout(() => stopLoading(), 8000);
+    // Store so handleParentMessage can cancel it
+    window.__loadingSafetyTimer = safetyTimer;
+  } else if (tab) {
     console.log('ℹ️ Auto-scraping on popup open...');
     try {
       const autoScraped = await scrapeFromPage(tab.id);
@@ -826,8 +832,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
       console.warn('Auto-scrape on open failed:', e);
     }
+    stopLoading();
   }
-  stopLoading();
   // role tag auto-detect moved to after roleTagBtns is initialized below
 
   // Secondary guesses — only fill still-empty fields
@@ -1069,15 +1075,21 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (redoBtn) {
     console.log('✅ Redo button found, attaching event listener');
     redoBtn.addEventListener('click', async () => {
+      const statusMsg = $('statusMessage');
       try {
         userCleared = false;
         clearFields();
-        const statusMsg = $('statusMessage');
-        if (statusMsg) statusMsg.textContent = 'Refetching job data...';
-      
+        if (statusMsg) { statusMsg.textContent = 'Refetching job data...'; statusMsg.className = 'visible saving'; }
+
+        if (isStandalone) {
+          // In iframe mode scraping must go through the parent (floating-button.js)
+          window.parent.postMessage({ type: 'REDO_SCRAPE' }, '*');
+          return;
+        }
+
         const tab = await getTab();
         const scrapedData = await scrapeFromPage(tab.id);
-      
+
         if (scrapedData) {
           $('company').value = sanitizeCommas(scrapedData.company || '');
           $('title').value = sanitizeCommas(scrapedData.title || '');
@@ -1086,25 +1098,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           $('url').value = sanitizeCommas(scrapedData.url || tab.url || '');
           $('description').value = cleanWhitespace(scrapedData.description || '');
           $('jobId').value = sanitizeCommas(scrapedData.job_id || scrapedData.jobId || '');
-        
           updateCount();
-        
-          if (statusMsg) {
-            statusMsg.textContent = 'Job data refetched successfully!';
-            setTimeout(() => { statusMsg.textContent = ''; }, 2000);
-          }
+          if (statusMsg) { statusMsg.textContent = 'Refetched!'; statusMsg.className = 'visible success'; setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = ''; }, 2000); }
         } else {
-          if (statusMsg) {
-            statusMsg.textContent = 'No job data found on this page';
-            setTimeout(() => { statusMsg.textContent = ''; }, 2000);
-          }
+          if (statusMsg) { statusMsg.textContent = 'No job data found on this page'; statusMsg.className = 'visible error'; setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = ''; }, 2500); }
         }
       } catch (error) {
         console.error('Error refetching job data:', error);
-        if (statusMsg) {
-          statusMsg.textContent = 'Error refetching data';
-          setTimeout(() => { statusMsg.textContent = ''; }, 2000);
-        }
+        if (statusMsg) { statusMsg.textContent = 'Error refetching data'; statusMsg.className = 'visible error'; setTimeout(() => { statusMsg.textContent = ''; statusMsg.className = ''; }, 2500); }
       }
     });
   } else {
