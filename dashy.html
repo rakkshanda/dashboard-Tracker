@@ -73,6 +73,16 @@
 .mbtn-danger:hover{opacity:.85}
 .modal-close{position:absolute;top:16px;right:18px;background:none;border:none;cursor:pointer;font-size:22px;color:var(--ink-3);line-height:1}
 .modal-close:hover{color:var(--ink)}
+/* ===== COMMIT NUDGE ===== */
+.commit-nudge{display:none;margin:14px 18px 0;padding:14px 18px;background:oklch(0.88 0.13 350);border:2px solid #0E0E10;border-radius:var(--radius);box-shadow:5px 5px 0 #0E0E10;align-items:center;gap:14px;animation:nudgeIn .25s ease}
+.commit-nudge.show{display:flex}
+@keyframes nudgeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.commit-nudge-icon{font-size:22px;flex-shrink:0;line-height:1}
+.commit-nudge-text{flex:1;min-width:0}
+.commit-nudge-text strong{display:block;font-family:var(--display);font-size:15px;font-weight:900;color:#0E0E10;line-height:1.2}
+.commit-nudge-text span{font-size:12px;font-weight:500;color:#0E0E10;opacity:.7;font-family:var(--sans)}
+.commit-nudge-close{background:transparent;border:2px solid #0E0E10;border-radius:50%;width:28px;height:28px;flex-shrink:0;cursor:pointer;font-size:14px;font-weight:900;color:#0E0E10;display:flex;align-items:center;justify-content:center;transition:background .12s,transform .12s}
+.commit-nudge-close:hover{background:#0E0E10;color:oklch(0.88 0.13 350);transform:rotate(90deg)}
 /* ===== INSIGHTS PANEL ===== */
 .insights-panel{display:none;padding:24px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px}
 .insights-panel.show{display:block}
@@ -86,6 +96,84 @@
 .sankey-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px}
 .sankey-panel.show{display:block}
 .sankey-panel h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:16px}
+.github-panel{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px}
+.github-panel h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:14px}
+.github-panel img{width:100%;height:auto;border-radius:8px;display:block}
+/* ===== SCHEDULE PANEL ===== */
+/* ===== NAV MOBILE ===== */
+@media(max-width:820px){
+  header.top{grid-template-columns:auto auto;grid-template-rows:auto auto;gap:10px;border-radius:16px;padding:12px 14px;margin-bottom:14px}
+  .date-strip{display:none}
+  .top-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}
+  .pill{padding:7px 10px;font-size:11.5px;gap:4px}
+  .pill svg{width:12px;height:12px}
+  .pill.icon-only{padding:7px;width:30px;height:30px}
+}
+.schedule-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;overflow:hidden}
+.schedule-panel.show{display:flex;flex-direction:column}
+.schedule-inner{display:grid;grid-template-columns:60% 40%}
+@media(max-width:680px){.schedule-inner{grid-template-columns:1fr;}}
+/* left pane */
+.sched-left{padding:16px 18px;border-right:1.5px solid var(--line);max-height:520px;display:flex;flex-direction:column}
+#sched-body{overflow-y:auto;flex:1}
+@media(max-width:680px){.sched-left{border-right:none;border-bottom:1.5px solid var(--line);max-height:360px}}
+.schedule-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.schedule-panel-head h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin:0}
+/* right pane — goals */
+.goals-pane{padding:22px 24px;background:oklch(0.97 0.03 330 / .6);position:relative;overflow:hidden}
+[data-theme="dark"] .goals-pane{background:oklch(0.20 0.03 330 / .5)}
+.goals-pane::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:oklch(0.88 0.10 330 / .35);pointer-events:none}
+.goals-pane::after{content:'';position:absolute;bottom:-30px;left:-20px;width:110px;height:110px;border-radius:50%;background:oklch(0.90 0.08 280 / .25);pointer-events:none}
+.goals-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;position:relative;z-index:1}
+.goals-head h3{font-family:var(--display);font-size:18px;font-weight:900;color:var(--ink);margin:0;letter-spacing:-.02em}
+.goals-head h3 span{display:block;font-size:11px;font-weight:500;font-family:var(--sans);color:var(--ink);opacity:.45;letter-spacing:0;margin-top:2px}
+.goals-clear-btn{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--ink);opacity:.35;background:transparent;border:1.5px solid var(--line);border-radius:6px;padding:3px 9px;cursor:pointer;transition:opacity .15s}
+.goals-clear-btn:hover{opacity:.8}
+.goals-list{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1}
+.goal-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border-radius:14px;border:1.5px solid var(--line);transition:border-color .2s,box-shadow .2s;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.goal-row:focus-within{border-color:oklch(0.72 0.16 330);box-shadow:0 2px 8px oklch(0.72 0.16 330 / .15)}
+.goal-row.done{background:oklch(0.95 0.02 330 / .5);border-color:oklch(0.85 0.06 330)}
+[data-theme="dark"] .goal-row.done{background:oklch(0.22 0.03 330 / .5)}
+/* custom checkbox */
+.goal-cb-wrap{flex-shrink:0}
+.goal-cb{display:none}
+.goal-cb-label{width:20px;height:20px;border-radius:50%;border:2px solid oklch(0.72 0.16 330);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,border-color .2s;flex-shrink:0}
+.goal-cb:checked+.goal-cb-label{background:oklch(0.72 0.16 330);border-color:oklch(0.72 0.16 330)}
+.goal-cb:checked+.goal-cb-label::after{content:'✓';color:#fff;font-size:11px;font-weight:900;line-height:1}
+.goal-input{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--ink);outline:none;min-width:0;transition:opacity .2s}
+.goal-input::placeholder{color:var(--ink);opacity:.25}
+.goal-row.done .goal-input{text-decoration:line-through;opacity:.45}
+.sched-clear-all{font-size:11px;font-weight:700;font-family:var(--mono);color:var(--ink);opacity:.45;background:transparent;border:1.5px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer;transition:opacity .15s}
+.sched-clear-all:hover{opacity:.9}
+/* pill bank */
+.sched-pill-bank{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 14px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.sched-pill{display:inline-flex;align-items:center;padding:5px 14px;border-radius:999px;font-size:12px;font-weight:800;font-family:var(--mono);letter-spacing:.04em;cursor:grab;user-select:none;border:2px solid;transition:transform .12s,box-shadow .12s;white-space:nowrap}
+.sched-pill:active{cursor:grabbing;transform:scale(.95)}
+.sched-pill.dragging-pill{opacity:.4;transform:scale(.9)}
+.sched-pill[data-color="green"]{background:oklch(0.93 0.08 145);border-color:oklch(0.55 0.20 145);color:oklch(0.35 0.18 145)}
+.sched-pill[data-color="blue"]{background:oklch(0.93 0.07 240);border-color:oklch(0.52 0.20 240);color:oklch(0.35 0.18 240)}
+.sched-pill[data-color="pink"]{background:oklch(0.94 0.07 350);border-color:oklch(0.62 0.20 350);color:oklch(0.42 0.18 350)}
+.sched-pill[data-color="sky"]{background:oklch(0.93 0.07 210);border-color:oklch(0.55 0.18 210);color:oklch(0.35 0.16 210)}
+.sched-row{display:grid;grid-template-columns:130px 1fr;align-items:start;border-bottom:1px solid var(--line);border-left:3px solid transparent;transition:background .12s,border-color .12s}
+.sched-row:last-child{border-bottom:none}
+.sched-row.sched-active{background:oklch(0.96 0.06 85 / .55);border-left-color:oklch(0.78 0.19 0)}
+[data-theme="dark"] .sched-row.sched-active{background:oklch(0.30 0.06 85 / .4)}
+.sched-row.sched-drop-target{outline:2px dashed #FF5C2C;outline-offset:-2px;background:oklch(0.96 0.05 50 / .6)}
+.sched-time{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.55;white-space:nowrap;user-select:none;padding:10px 10px 10px 4px;align-self:center}
+.sched-row.sched-active .sched-time{opacity:1;color:oklch(0.50 0.19 0)}
+/* task pill area */
+.sched-task-pills{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:7px 4px;min-height:40px}
+.sched-task-pill{display:inline-flex;align-items:center;gap:3px;padding:3px 6px 3px 10px;border-radius:999px;font-size:11.5px;font-weight:800;font-family:var(--mono);border:1.5px solid;white-space:nowrap;letter-spacing:.02em}
+.sched-task-pill[data-color="green"]{background:oklch(0.93 0.08 145);border-color:oklch(0.55 0.20 145);color:oklch(0.35 0.18 145)}
+.sched-task-pill[data-color="blue"]{background:oklch(0.93 0.07 240);border-color:oklch(0.52 0.20 240);color:oklch(0.35 0.18 240)}
+.sched-task-pill[data-color="pink"]{background:oklch(0.94 0.07 350);border-color:oklch(0.62 0.20 350);color:oklch(0.42 0.18 350)}
+.sched-task-pill[data-color="sky"]{background:oklch(0.93 0.07 210);border-color:oklch(0.55 0.18 210);color:oklch(0.35 0.16 210)}
+.sched-task-pill[data-color="default"]{background:var(--bg-2);border-color:var(--line);color:var(--ink)}
+.pill-rm{background:transparent;border:none;cursor:pointer;font-size:12px;line-height:1;padding:0 1px;opacity:.5;transition:opacity .12s;color:inherit}
+.pill-rm:hover{opacity:1}
+.sched-pill-add{border:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--ink);opacity:.35;outline:none;flex:1;min-width:100px;padding:2px 4px;cursor:text}
+.sched-pill-add:focus{opacity:.9}
+.sched-pill-add::placeholder{font-style:italic}
 #sankey-chart svg{border-radius:var(--radius-sm)}
 /* ===== PIE CHARTS ===== */
 .pie-charts-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:20px}
@@ -279,6 +367,10 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
     <div class="brand"><span class="heart">♥</span>job<span class="slash">/</span>tracker</div>
     <div class="date-strip"><span class="pip"></span><span id="live-datetime">Loading…</span></div>
     <div class="top-actions">
+      <button class="pill outline" id="schedule-toggle-btn">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 2v3M11 2v3M2 7h12"/><path d="M5 10h.5M8 10h.5M11 10h.5M5 13h.5M8 13h.5"/></svg>
+        Schedule
+      </button>
       <button class="pill outline has-filter" id="stats-toggle-btn">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="8" width="3" height="6" rx="1"/><rect x="6.5" y="5" width="3" height="9" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/></svg>
         Stats
@@ -304,6 +396,16 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       </button>
     </div>
   </header>
+
+  <!-- COMMIT NUDGE -->
+  <div class="commit-nudge" id="commit-nudge">
+    <div class="commit-nudge-icon">💻</div>
+    <div class="commit-nudge-text">
+      <strong>No commits yet today!</strong>
+      <span>Your GitHub is looking a little quiet — go push something ✨</span>
+    </div>
+    <button class="commit-nudge-close" id="commit-nudge-close" title="Dismiss">✕</button>
+  </div>
 
   <!-- INSIGHTS PANEL -->
   <div class="insights-panel" id="insights-panel">
@@ -436,6 +538,37 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       </div>
     </div>
   </section>
+
+  <!-- SCHEDULE PANEL -->
+  <div class="schedule-panel" id="schedule-panel">
+    <div class="schedule-inner">
+      <!-- LEFT: schedule -->
+      <div class="sched-left">
+        <div class="schedule-panel-head">
+          <div style="display:flex;align-items:baseline;gap:10px">
+            <h2>Schedule</h2>
+            <span id="sched-today-date" style="font-family:var(--mono);font-size:11px;font-weight:600;opacity:.45;color:var(--ink)"></span>
+          </div>
+          <button class="sched-clear-all" id="sched-clear-all-btn">Clear All</button>
+        </div>
+        <div class="sched-pill-bank" id="sched-pill-bank">
+          <div class="sched-pill" data-color="green" data-label="HAI" draggable="true">HAI</div>
+          <div class="sched-pill" data-color="blue"  data-label="JA"  draggable="true">JA</div>
+          <div class="sched-pill" data-color="pink"  data-label="Meal" draggable="true">Meal</div>
+          <div class="sched-pill" data-color="sky"   data-label="Shower" draggable="true">Shower</div>
+        </div>
+        <div id="sched-body"></div>
+      </div>
+      <!-- RIGHT: goals -->
+      <div class="goals-pane">
+        <div class="goals-head">
+          <h3>Goals for Today <span>Check off as you go ✨</span></h3>
+          <button class="goals-clear-btn" id="goals-clear-btn">Reset</button>
+        </div>
+        <div class="goals-list" id="goals-list"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- STAT STRIP -->
   <section class="stat-strip" id="stat-strip">
@@ -615,6 +748,12 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <div class="pager" id="pager"></div>
     </div>
   </section>
+
+  <!-- GITHUB CONTRIBUTIONS -->
+  <div class="github-panel" id="github-panel">
+    <h2>GitHub Contributions</h2>
+    <img src="https://ghchart.rshah.org/rakkshanda" alt="GitHub contribution graph" />
+  </div>
 </div>
 
 <button class="fab" title="Quick add" id="fab-add">
@@ -2004,6 +2143,315 @@ function initTasksUI(){
   });
 }
 initTasksUI();
+
+// ===== GITHUB COMMIT NUDGE =====
+(function(){
+  const USER='rakkshanda';
+  const CK='gh_nudge_v1';
+  const TTL=15*60*1000; // 15 min cache
+
+  async function committedToday(){
+    try{
+      const cached=JSON.parse(localStorage.getItem(CK)||'null');
+      if(cached&&Date.now()-cached.ts<TTL)return cached.val;
+    }catch{}
+    try{
+      const res=await fetch(`https://api.github.com/users/${USER}/events?per_page=100`);
+      if(!res.ok)return null;
+      const events=await res.json();
+      const today=new Date().toDateString();
+      const val=events.some(e=>e.type==='PushEvent'&&new Date(e.created_at).toDateString()===today);
+      localStorage.setItem(CK,JSON.stringify({ts:Date.now(),val}));
+      return val;
+    }catch{return null;}
+  }
+
+  document.getElementById('commit-nudge-close')?.addEventListener('click',()=>{
+    document.getElementById('commit-nudge')?.classList.remove('show');
+  });
+
+  committedToday().then(committed=>{
+    if(committed===false) document.getElementById('commit-nudge')?.classList.add('show');
+  });
+})();
+
+// ===== KV SYNC (Supabase app_kv table) =====
+async function kvGet(key){
+  try{
+    const{data}=await _sb.from('app_kv').select('value').eq('key',key).maybeSingle();
+    return data?.value??null;
+  }catch{return null;}
+}
+async function kvSet(key,value){
+  try{
+    await _sb.from('app_kv').upsert({key,value,updated_at:new Date().toISOString()},{onConflict:'key'});
+  }catch(e){console.warn('kvSet failed',e);}
+}
+
+// ===== SCHEDULE =====
+(function(){
+  const SK='sched_v2';
+
+  function defaultSlots(){
+    const s=[];
+    for(let h=8;h<24;h++) s.push({hour:h,items:[]});
+    return s;
+  }
+
+  function validSlots(d){
+    return Array.isArray(d)&&d.length===16&&d.every(r=>typeof r.hour==='number'&&Array.isArray(r.items));
+  }
+
+  function loadLocal(){
+    try{
+      const d=JSON.parse(localStorage.getItem(SK));
+      if(validSlots(d)) return d;
+    }catch{}
+    return defaultSlots();
+  }
+
+  function save(s){
+    localStorage.setItem(SK,JSON.stringify(s));
+    kvSet('schedule',s);
+  }
+
+  async function syncFromSupabase(){
+    const remote=await kvGet('schedule');
+    if(validSlots(remote)){
+      slots=remote;
+      localStorage.setItem(SK,JSON.stringify(slots));
+      if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
+    }
+  }
+
+  function fmtHour(h){
+    const f=n=>{if(n===0||n===24)return'12 AM';if(n===12)return'12 PM';return n<12?`${n} AM`:`${n-12} PM`;};
+    return `${f(h)} – ${f(h+1)}`;
+  }
+
+  let slots=loadLocal();
+  let dragPillData=null;
+
+  function clearDropTargets(){
+    document.querySelectorAll('.sched-drop-target').forEach(r=>r.classList.remove('sched-drop-target'));
+  }
+
+  function setupPills(){
+    document.querySelectorAll('.sched-pill').forEach(pill=>{
+      pill.addEventListener('dragstart',e=>{
+        dragPillData={label:pill.dataset.label,color:pill.dataset.color};
+        e.dataTransfer.effectAllowed='copy';
+        e.dataTransfer.setData('text/plain',pill.dataset.label);
+        setTimeout(()=>pill.classList.add('dragging-pill'),0);
+      });
+      pill.addEventListener('dragend',()=>{
+        pill.classList.remove('dragging-pill');
+        dragPillData=null;
+        clearDropTargets();
+      });
+    });
+  }
+
+  function render(){
+    const body=document.getElementById('sched-body');
+    if(!body)return;
+    body.innerHTML='';
+    const curH=new Date().getHours();
+
+    slots.forEach((slot,i)=>{
+      const row=document.createElement('div');
+      row.className='sched-row'+(slot.hour===curH?' sched-active':'');
+
+      const time=document.createElement('div');
+      time.className='sched-time';
+      time.textContent=fmtHour(slot.hour);
+
+      const pillsWrap=document.createElement('div');
+      pillsWrap.className='sched-task-pills';
+
+      slot.items.forEach((item,j)=>{
+        const p=document.createElement('span');
+        p.className='sched-task-pill';
+        p.dataset.color=item.color||'default';
+        p.appendChild(document.createTextNode(item.label));
+        const rm=document.createElement('button');
+        rm.className='pill-rm';
+        rm.textContent='×';
+        rm.title='Remove';
+        rm.addEventListener('click',e=>{
+          e.stopPropagation();
+          slots[i].items.splice(j,1);
+          save(slots);
+          render();
+        });
+        p.appendChild(rm);
+        pillsWrap.appendChild(p);
+      });
+
+      const addInp=document.createElement('input');
+      addInp.className='sched-pill-add';
+      addInp.placeholder='+ type…';
+      function commitInput(){
+        if(addInp.value.trim()){
+          slots[i].items.push({label:addInp.value.trim(),color:'default'});
+          addInp.value='';
+          save(slots);
+          render();
+        }
+      }
+      addInp.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){e.preventDefault();commitInput();}
+      });
+      addInp.addEventListener('blur',()=>commitInput());
+      pillsWrap.appendChild(addInp);
+
+      row.addEventListener('dragover',e=>{
+        if(!dragPillData)return;
+        e.preventDefault();
+        clearDropTargets();
+        row.classList.add('sched-drop-target');
+      });
+      row.addEventListener('dragleave',e=>{
+        if(!row.contains(e.relatedTarget))row.classList.remove('sched-drop-target');
+      });
+      row.addEventListener('drop',e=>{
+        e.preventDefault();
+        clearDropTargets();
+        if(!dragPillData)return;
+        slots[i].items.push({...dragPillData});
+        dragPillData=null;
+        save(slots);
+        render();
+      });
+
+      row.appendChild(time);
+      row.appendChild(pillsWrap);
+      body.appendChild(row);
+    });
+  }
+
+  document.getElementById('schedule-toggle-btn')?.addEventListener('click',()=>{
+    const panel=document.getElementById('schedule-panel');
+    const btn=document.getElementById('schedule-toggle-btn');
+    panel.classList.toggle('show');
+    btn.classList.toggle('active',panel.classList.contains('show'));
+    if(panel.classList.contains('show')){
+      render(); setupPills();
+      const d=new Date();
+      const el=document.getElementById('sched-today-date');
+      if(el) el.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    }
+  });
+
+  document.getElementById('sched-clear-all-btn')?.addEventListener('click',()=>{
+    slots=defaultSlots();
+    save(slots);
+    render();
+  });
+
+  setInterval(()=>{
+    if(document.getElementById('schedule-panel')?.classList.contains('show'))render();
+  },60000);
+
+  syncFromSupabase();
+})();
+
+// ===== GOALS =====
+(function(){
+  const GK='goals_v1';
+  const COUNT=5;
+
+  function defaultGoals(){ return Array.from({length:COUNT},()=>({text:'',done:false})); }
+
+  function validGoals(d){ return Array.isArray(d)&&d.length===COUNT; }
+
+  function loadLocal(){
+    try{
+      const d=JSON.parse(localStorage.getItem(GK));
+      if(validGoals(d)) return d;
+    }catch{}
+    return defaultGoals();
+  }
+
+  function save(g){
+    localStorage.setItem(GK,JSON.stringify(g));
+    kvSet('goals',g);
+  }
+
+  async function syncFromSupabase(){
+    const remote=await kvGet('goals');
+    if(validGoals(remote)){
+      goals=remote;
+      localStorage.setItem(GK,JSON.stringify(goals));
+      render();
+    }
+  }
+
+  let goals=loadLocal();
+  let saveTimer=null;
+
+  function render(){
+    const list=document.getElementById('goals-list');
+    if(!list)return;
+    list.innerHTML='';
+    goals.forEach((g,i)=>{
+      const uid=`goal-cb-${i}`;
+      const row=document.createElement('div');
+      row.className='goal-row'+(g.done?' done':'');
+
+      const cbWrap=document.createElement('div');
+      cbWrap.className='goal-cb-wrap';
+
+      const cb=document.createElement('input');
+      cb.type='checkbox';
+      cb.className='goal-cb';
+      cb.id=uid;
+      cb.checked=g.done;
+      cb.addEventListener('change',()=>{
+        goals[i].done=cb.checked;
+        row.classList.toggle('done',cb.checked);
+        inp.style.textDecoration=cb.checked?'line-through':'';
+        save(goals);
+      });
+
+      const lbl=document.createElement('label');
+      lbl.className='goal-cb-label';
+      lbl.htmlFor=uid;
+
+      cbWrap.appendChild(cb);
+      cbWrap.appendChild(lbl);
+
+      const inp=document.createElement('input');
+      inp.type='text';
+      inp.className='goal-input';
+      inp.placeholder=`Goal ${i+1}…`;
+      inp.value=g.text;
+      if(g.done) inp.style.textDecoration='line-through';
+      inp.addEventListener('input',()=>{
+        goals[i].text=inp.value;
+        clearTimeout(saveTimer);
+        saveTimer=setTimeout(()=>save(goals),350);
+      });
+
+      row.appendChild(cbWrap);
+      row.appendChild(inp);
+      list.appendChild(row);
+    });
+  }
+
+  document.getElementById('goals-clear-btn')?.addEventListener('click',()=>{
+    goals=defaultGoals();
+    save(goals);
+    render();
+  });
+
+  document.getElementById('schedule-toggle-btn')?.addEventListener('click',()=>{
+    setTimeout(render,0);
+  });
+
+  render();
+  syncFromSupabase();
+})();
 </script>
 </body>
 </html>
