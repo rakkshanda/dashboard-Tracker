@@ -87,6 +87,9 @@
     color: var(--bg);
     border-radius: 999px;
     margin-bottom: 22px;
+    position: sticky;
+    top: 10px;
+    z-index: 200;
   }
   [data-theme="dark"] header.top { background: var(--card); border: 1px solid var(--line-soft); }
 
@@ -122,6 +125,19 @@
 
   .top-actions {
     display: flex; align-items: center; gap: 6px;
+  }
+  .nav-pills-wrap {
+    display: flex; align-items: center; gap: 6px;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    white-space: nowrap;
+    transition: max-width .35s cubic-bezier(0.4,0,0.2,1), opacity .2s ease;
+  }
+  header.top:hover .nav-pills-wrap,
+  .nav-pills-wrap:focus-within {
+    max-width: 900px;
+    opacity: 1;
   }
   .pill {
     padding: 9px 16px;
