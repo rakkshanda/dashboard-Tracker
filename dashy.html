@@ -73,6 +73,18 @@
 .mbtn-danger{background:#ef4444;color:#fff}
 .mbtn-danger:hover{opacity:.85}
 .modal-close{position:absolute;top:14px;right:16px;background:none;border:none;cursor:pointer;font-size:22px;color:rgba(255,255,255,.6);line-height:1;z-index:1}
+.status-pill-group{display:flex;flex-wrap:wrap;gap:6px}
+.status-pill{padding:6px 14px;border-radius:999px;font-size:11px;font-weight:800;font-family:var(--mono);letter-spacing:.04em;cursor:pointer;border:none;opacity:.3;transition:opacity .15s,transform .1s}
+.status-pill:hover{opacity:.65;transform:scale(1.04)}
+.status-pill.active{opacity:1}
+.status-pill[data-value="saved"]{background:#d1d5db;color:#374151}
+.status-pill[data-value="applied"]{background:#4DA3FF;color:#fff}
+.status-pill[data-value="resume_screening"]{background:#B8A4FF;color:#fff}
+.status-pill[data-value="interview"]{background:#FFD93D;color:#111}
+.status-pill[data-value="offer"]{background:#6BE3B0;color:#111}
+.status-pill[data-value="rejected"]{background:#FF8FB1;color:#111}
+.status-pill[data-value="withdrawn"]{background:#6b7280;color:#fff}
+.status-pill[data-value="ended"]{background:#111;color:#fff}
 .modal-close:hover{color:#fff}
 /* ===== COMMIT NUDGE ===== */
 .commit-nudge{display:none;margin:14px 18px 0;padding:14px 18px;background:oklch(0.88 0.13 350);border:2px solid #0E0E10;border-radius:var(--radius);box-shadow:5px 5px 0 #0E0E10;align-items:center;gap:14px;animation:nudgeIn .25s ease}
@@ -942,16 +954,17 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <div class="mfg"><label>Job ID</label><input type="text" id="edit-job-id" /></div>
       <div class="mfg">
         <label>Status</label>
-        <select id="edit-status">
-          <option value="saved">Saved</option>
-          <option value="applied">Applied</option>
-          <option value="resume_screening">Resume Screening</option>
-          <option value="interview">Interview</option>
-          <option value="offer">Offer</option>
-          <option value="rejected">Rejected</option>
-          <option value="withdrawn">Withdrawn</option>
-          <option value="ended">Ended</option>
-        </select>
+        <input type="hidden" id="edit-status" value="applied">
+        <div class="status-pill-group" id="status-pill-group">
+          <button type="button" class="status-pill" data-value="saved">Saved</button>
+          <button type="button" class="status-pill" data-value="applied">Applied</button>
+          <button type="button" class="status-pill" data-value="resume_screening">Screening</button>
+          <button type="button" class="status-pill" data-value="interview">Interview</button>
+          <button type="button" class="status-pill" data-value="offer">Offer</button>
+          <button type="button" class="status-pill" data-value="rejected">Rejected</button>
+          <button type="button" class="status-pill" data-value="withdrawn">Withdrawn</button>
+          <button type="button" class="status-pill" data-value="ended">Ended</button>
+        </div>
       </div>
       <div class="mfg">
         <label>Source</label>
@@ -1343,6 +1356,17 @@ function setupModals(){
     applyFilters();
   });
 }
+function setStatusPill(val){
+  document.getElementById('edit-status').value=val;
+  document.querySelectorAll('#status-pill-group .status-pill').forEach(p=>{
+    p.classList.toggle('active',p.dataset.value===val);
+  });
+}
+document.getElementById('status-pill-group')?.addEventListener('click',e=>{
+  const pill=e.target.closest('.status-pill');
+  if(pill) setStatusPill(pill.dataset.value);
+});
+
 function openEditModal(jobId){
   const job=ALL_JOBS.find(j=>String(j.id)===String(jobId));if(!job)return;
   editingJobId=jobId;
@@ -1351,7 +1375,7 @@ function openEditModal(jobId){
   document.getElementById('edit-location').value=job.location||'';
   document.getElementById('edit-url').value=job.url||'';
   document.getElementById('edit-job-id').value=job.job_id||'';
-  document.getElementById('edit-status').value=job.status||'applied';
+  setStatusPill(job.status||'applied');
   document.getElementById('edit-source').value=job.source||'';
   document.getElementById('edit-description').value=job.description||'';
   document.getElementById('edit-notes').value=job.notes||'';
