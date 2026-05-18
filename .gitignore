@@ -32,6 +32,10 @@ latex-batch/overleaf-repo/
 latex-batch/chrome-data/
 latex-batch/node_modules/
 
+# Node modules everywhere
+node_modules/
+**/node_modules/
+
 # Temporary files
 *.tmp
 *.temp
