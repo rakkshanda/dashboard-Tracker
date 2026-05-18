@@ -1,0 +1,12 @@
+{
+  "name": "sticky-schedule",
+  "version": "1.0.0",
+  "description": "Always-on-top schedule + goals sticky",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

@@ -137,7 +137,8 @@
 .schedule-panel-head h2{font-family:var(--display);font-size:20px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
 .sched-left>.sched-pill-bank,.sched-left>.sched-add-pill-form,#sched-body{padding-left:16px;padding-right:16px}
 /* pill bank strip */
-.sched-pill-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 12px;border-bottom:2px solid #e0e0e0;margin-bottom:0;background:#f5f5f5}
+.sched-pill-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 12px;border-bottom:2px solid #e0e0e0;margin-bottom:0;background:#f5f5f5;opacity:0;max-height:0;overflow:hidden;padding-top:0;padding-bottom:0;border-bottom-width:0;transition:opacity .18s,max-height .18s,padding .18s,border-bottom-width .18s}
+.sched-left:hover .sched-pill-bank{opacity:1;max-height:200px;padding-top:12px;padding-bottom:12px;border-bottom-width:2px}
 [data-theme="dark"] .sched-pill-bank{background:#1a1a1a;border-bottom-color:#333}
 .sched-add-pill-form{display:none;align-items:center;gap:8px;padding:10px 16px 12px;flex-wrap:wrap;border-bottom:2px solid #e0e0e0;background:#f5f5f5}
 .sched-add-pill-form.show{display:flex}
@@ -169,7 +170,7 @@
 .sched-pill[data-color="gray"]{background:#4b5563}
 .sched-pill[data-color="default"]{background:#374151}
 /* schedule grid rows */
-.sched-row{display:grid;grid-template-columns:110px 1fr;align-items:start;border-bottom:none;border-left:4px solid transparent;transition:background .12s,border-color .12s}
+.sched-row{display:grid;grid-template-columns:110px 1fr auto;align-items:start;border-bottom:none;border-left:4px solid transparent;transition:background .12s,border-color .12s}
 .sched-row:nth-child(even){background:oklch(0.5 0 0 / .03)}
 .sched-row:last-child{border-bottom:none}
 .sched-row.sched-active{background:rgba(255,107,0,.15)!important;border-left-color:#ff6b00}
@@ -187,6 +188,9 @@
 .goals-head h3 span{display:block;font-size:10.5px;font-weight:600;font-family:var(--mono);color:#fff;opacity:.55;letter-spacing:.01em;margin-top:2px}
 .goals-clear-btn{font-size:11px;font-weight:800;font-family:var(--mono);color:#fff;background:#444;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;transition:opacity .12s}
 .goals-clear-btn:hover{opacity:.75}
+.goals-add-row-btn{display:block;width:100%;padding:7px;border:none;background:transparent;font-size:18px;font-weight:700;color:var(--ink-3);cursor:pointer;opacity:0;transition:opacity .15s,color .12s}
+#goals-list:hover .goals-add-row-btn{opacity:.45}
+.goals-add-row-btn:hover{opacity:1!important;color:var(--acc)}
 .goals-list{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;padding:16px 16px;background:#fff}
 .goals-stats{padding:0 16px 16px 16px;background:#fff;font-family:var(--sans);flex:1}
 .goal-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f4f4f4;border-radius:12px;border:none;transition:all .18s}
@@ -223,6 +227,14 @@
 .pill-rm{background:transparent;border:none;cursor:pointer;font-size:12px;line-height:1;padding:0 1px;opacity:0;transition:opacity .12s;color:inherit}
 .sched-task-pill:hover .pill-rm{opacity:.6}
 .pill-rm:hover{opacity:1!important}
+.sched-row-del{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;color:var(--ink-3);padding:8px 12px;align-self:center;transition:color .12s,opacity .12s;font-family:var(--mono);font-weight:400;opacity:0}
+.sched-row:hover .sched-row-del{opacity:.5}
+.sched-row-del:hover{color:#e53e3e;opacity:1!important}
+.sched-add-row{display:flex;justify-content:center;align-items:center;width:100%;padding:8px 14px;cursor:pointer;border:none;border-top:1.5px dashed var(--line);background:transparent;font-size:20px;font-weight:700;color:var(--ink-3);font-family:var(--mono);transition:color .12s,background .12s,opacity .12s;opacity:0}
+#sched-body:hover .sched-add-row{opacity:.5}
+.sched-add-row:hover{color:var(--acc);background:oklch(0.5 0 0 / .03);opacity:1!important}
+.sched-task-pill.pill-drop-before{box-shadow:-3px 0 0 2px var(--acc)}
+.sched-task-pill.pill-drop-after{box-shadow:3px 0 0 2px var(--acc)}
 /* ===== DAY TRACKER ===== */
 .dt-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;overflow:hidden}
 .dt-panel.show{display:block}
@@ -2392,7 +2404,7 @@ async function kvSet(key,value){
   }
 
   function validSlots(d){
-    return Array.isArray(d)&&d.length===16&&d.every(r=>typeof r.hour==='number'&&Array.isArray(r.items));
+    return Array.isArray(d)&&d.length>0&&d.every(r=>typeof r.hour==='number'&&Array.isArray(r.items));
   }
 
   function loadLocal(){
@@ -2424,10 +2436,12 @@ async function kvSet(key,value){
 
   let slots=loadLocal();
   let dragPillData=null;
-  let dragSlotSource=null; // {slotIdx,itemIdx} when dragging from a slot
+  let dragSlotSource=null;
+  let dragOverPill=null;
 
   function clearDropTargets(){
     document.querySelectorAll('.sched-drop-target').forEach(r=>r.classList.remove('sched-drop-target'));
+    document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
   }
 
   function setupPills(){
@@ -2490,7 +2504,43 @@ async function kvSet(key,value){
         p.addEventListener('dragend',()=>{
           p.classList.remove('dragging-slot-pill');
           dragSlotSource=null;
+          dragOverPill=null;
           clearDropTargets();
+        });
+        p.addEventListener('dragover',e=>{
+          if(!dragSlotSource)return;
+          e.preventDefault();
+          e.stopPropagation();
+          document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
+          const r=p.getBoundingClientRect();
+          const before=e.clientX<r.left+r.width/2;
+          p.classList.add(before?'pill-drop-before':'pill-drop-after');
+          dragOverPill={slotIdx:i,itemIdx:j,before};
+        });
+        p.addEventListener('dragleave',()=>{
+          p.classList.remove('pill-drop-before','pill-drop-after');
+        });
+        p.addEventListener('drop',e=>{
+          e.preventDefault();
+          e.stopPropagation();
+          p.classList.remove('pill-drop-before','pill-drop-after');
+          if(!dragSlotSource||!dragOverPill)return;
+          const src=dragSlotSource;
+          const tgt=dragOverPill;
+          if(src.slotIdx===tgt.slotIdx){
+            const items=slots[src.slotIdx].items;
+            const[moved]=items.splice(src.itemIdx,1);
+            let at=tgt.itemIdx;
+            if(src.itemIdx<tgt.itemIdx)at--;
+            if(!tgt.before)at++;
+            items.splice(Math.max(0,Math.min(at,items.length)),0,moved);
+          }else{
+            const moved=slots[src.slotIdx].items.splice(src.itemIdx,1)[0];
+            slots[tgt.slotIdx].items.splice(tgt.itemIdx+(tgt.before?0:1),0,moved);
+          }
+          dragSlotSource=null;
+          dragOverPill=null;
+          save(slots);render();
         });
         pillsWrap.appendChild(p);
       });
@@ -2527,10 +2577,11 @@ async function kvSet(key,value){
         clearDropTargets();
         if(dragSlotSource){
           const src=dragSlotSource;
-          if(src.slotIdx===i)return; // same slot, no-op
+          if(src.slotIdx===i){dragSlotSource=null;dragOverPill=null;return;}
           const moved=slots[src.slotIdx].items.splice(src.itemIdx,1)[0];
           slots[i].items.push(moved);
           dragSlotSource=null;
+          dragOverPill=null;
           save(slots); render();
         } else if(dragPillData){
           slots[i].items.push({...dragPillData});
@@ -2539,17 +2590,38 @@ async function kvSet(key,value){
         }
       });
 
+      const del=document.createElement('button');
+      del.className='sched-row-del';
+      del.textContent='−';
+      del.title='Remove slot';
+      del.addEventListener('click',()=>{slots.splice(i,1);save(slots);render();});
+
       row.appendChild(time);
       row.appendChild(pillsWrap);
+      row.appendChild(del);
       body.appendChild(row);
     });
+
+    const nextH=slots.length>0?(slots[slots.length-1].hour+1)%24:8;
+    const addRowBtn=document.createElement('button');
+    addRowBtn.className='sched-add-row';
+    addRowBtn.textContent='+';
+    addRowBtn.title='Add '+fmtHour(nextH);
+    addRowBtn.addEventListener('click',()=>{slots.push({hour:nextH,items:[]});save(slots);render();});
+    body.appendChild(addRowBtn);
+    updateHoursLeft();
   }
 
   function updateHoursLeft(){
     const el=document.getElementById('sched-hours-left');
     if(!el)return;
     const now=new Date();
-    const mins=23*60+59-(now.getHours()*60+now.getMinutes());
+    const endH=slots.length>0?(slots[slots.length-1].hour+1):24;
+    const nowMins=now.getHours()*60+now.getMinutes();
+    let endMins=endH*60;
+    if(endMins<=nowMins)endMins+=24*60;
+    const mins=endMins-nowMins;
+    if(mins<=0){el.textContent='';return;}
     const h=Math.floor(mins/60);const m=mins%60;
     el.textContent=h>0?`${h}h ${m}m left`:(m>0?`${m}m left`:'');
   }
@@ -2703,7 +2775,7 @@ async function kvSet(key,value){
 
   function defaultGoals(){ return Array.from({length:COUNT},()=>({text:'',done:false})); }
 
-  function validGoals(d){ return Array.isArray(d)&&d.length===COUNT; }
+  function validGoals(d){ return Array.isArray(d)&&d.length>0&&d.every(r=>typeof r==='object'&&'text' in r); }
 
   function loadLocal(){
     try{
@@ -2777,6 +2849,21 @@ async function kvSet(key,value){
       row.appendChild(inp);
       list.appendChild(row);
     });
+
+    // + button after last row (hover to reveal)
+    const addBtn=document.createElement('button');
+    addBtn.className='goals-add-row-btn';
+    addBtn.textContent='+';
+    addBtn.title='Add goal';
+    addBtn.addEventListener('click',()=>{
+      goals.push({text:'',done:false});
+      save(goals);
+      render();
+      // focus the new input
+      const inputs=list.querySelectorAll('.goal-input');
+      if(inputs.length) inputs[inputs.length-1].focus();
+    });
+    list.appendChild(addBtn);
   }
 
   const PILL_COLORS={green:'#16a34a',blue:'#2563eb',pink:'#db2777',sky:'#0284c7',orange:'#ea580c',yellow:'#b45309',red:'#dc2626',purple:'#7c3aed',gray:'#4b5563',default:'#374151'};

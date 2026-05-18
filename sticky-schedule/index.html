@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sticky</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #111111;
+    --card: #1c1c1c;
+    --line: #2a2a2a;
+    --ink: #f0ede6;
+    --ink-2: #888;
+    --acc: #ff6b00;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Space Grotesk', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    height: 100%;
+    /* transparent background so the rounded wrapper shows properly */
+    background: transparent;
+  }
+
+  body {
+    height: 100%;
+    background: transparent;
+    font-family: var(--sans);
+    color: var(--ink);
+    overflow: hidden;
+    /* prevents flicker before fonts load */
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* the actual rounded window card */
+  #root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 14px;
+    border: 1.5px solid #333;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,.7);
+  }
+
+  /* ── titlebar ── */
+  .titlebar {
+    -webkit-app-region: drag;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    height: 42px;
+    border-bottom: 1.5px solid var(--line);
+    flex-shrink: 0;
+    background: #161616;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 2px;
+    -webkit-app-region: no-drag;
+  }
+
+  .tab {
+    -webkit-app-region: no-drag;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: 7px;
+    padding: 4px 11px;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: var(--mono);
+    color: var(--ink-2);
+    cursor: pointer;
+    letter-spacing: .06em;
+    transition: all .12s;
+  }
+
+  .tab.active {
+    background: var(--card);
+    border-color: #333;
+    color: var(--ink);
+  }
+
+  .titlebar-btns {
+    display: flex;
+    gap: 4px;
+    -webkit-app-region: no-drag;
+  }
+
+  .tb-btn {
+    -webkit-app-region: no-drag;
+    background: transparent;
+    border: none;
+    color: var(--ink-2);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 5px;
+    line-height: 1;
+    transition: color .12s, background .12s;
+    font-family: var(--mono);
+  }
+
+  .tb-btn:hover { color: var(--ink); background: var(--card); }
+  .tb-btn.close:hover { color: #ef4444; }
+
+  /* ── panels ── */
+  .panels { flex: 1; overflow: hidden; min-height: 0; }
+
+  .panel {
+    height: 100%;
+    overflow-y: auto;
+    display: none;
+    padding: 6px 0 12px;
+  }
+
+  .panel.active { display: block; }
+
+  .panel::-webkit-scrollbar { width: 3px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+  /* ── schedule ── */
+  .slot-row {
+    display: grid;
+    grid-template-columns: 66px 1fr;
+    align-items: start;
+    padding: 5px 10px;
+    border-left: 3px solid transparent;
+    transition: background .12s, border-color .12s;
+    min-height: 30px;
+  }
+
+  .slot-row.current {
+    background: rgba(255,107,0,.1);
+    border-left-color: var(--acc);
+  }
+
+  .slot-time {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--ink-2);
+    padding-top: 4px;
+    white-space: nowrap;
+    letter-spacing: -.01em;
+  }
+
+  .slot-row.current .slot-time { color: var(--acc); }
+
+  .slot-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 2px 0;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 9.5px;
+    font-weight: 800;
+    font-family: var(--mono);
+    color: #fff;
+    letter-spacing: .03em;
+    white-space: nowrap;
+  }
+
+  /* ── goals ── */
+  .goal-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    cursor: pointer;
+    transition: background .12s;
+    user-select: none;
+  }
+
+  .goal-item:hover { background: var(--card); }
+
+  .goal-check {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    border: 2px solid #444;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    transition: all .12s;
+    color: #fff;
+  }
+
+  .goal-item.done .goal-check {
+    background: var(--acc);
+    border-color: var(--acc);
+  }
+
+  .goal-text {
+    font-size: 11.5px;
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .goal-item.done .goal-text {
+    text-decoration: line-through;
+    opacity: .35;
+  }
+
+  /* ── empty / loading ── */
+  .empty {
+    padding: 24px 14px;
+    text-align: center;
+    font-size: 10.5px;
+    font-family: var(--mono);
+    color: var(--ink-2);
+    opacity: .5;
+    line-height: 1.8;
+  }
+
+  .spin {
+    display: inline-block;
+    animation: spin .8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* last-synced footer */
+  .footer {
+    font-size: 9px;
+    font-family: var(--mono);
+    color: var(--ink-2);
+    opacity: .35;
+    text-align: center;
+    padding: 5px 0 2px;
+    flex-shrink: 0;
+    letter-spacing: .03em;
+  }
+</style>
+</head>
+<body>
+<div id="root">
+  <div class="titlebar">
+    <div class="tabs">
+      <button class="tab active" id="tab-sched">SCHEDULE</button>
+      <button class="tab" id="tab-goals">GOALS</button>
+    </div>
+    <div class="titlebar-btns">
+      <button class="tb-btn" id="btn-refresh" title="Refresh">↻</button>
+      <button class="tb-btn close" id="btn-close" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel active" id="panel-sched">
+      <div class="empty"><span class="spin">↻</span><br>loading…</div>
+    </div>
+    <div class="panel" id="panel-goals">
+      <div class="empty"><span class="spin">↻</span><br>loading…</div>
+    </div>
+  </div>
+
+  <div class="footer" id="footer">—</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://dmzonyrwdqzugsshcxgb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtem9ueXJ3ZHF6dWdzc2hjeGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNzgzNTgsImV4cCI6MjA3Njc1NDM1OH0.0MYp26X7h1JR_r4KO-p_f3aX-dsiaO6Z9ZS8rjU9e7g';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const PILL_COLORS = {
+  green:'#22c55e', blue:'#3b82f6', pink:'#ec4899', sky:'#0ea5e9',
+  orange:'#ff6b00', yellow:'#ca8a04', red:'#ef4444', purple:'#a855f7',
+  gray:'#6b7280', default:'#374151'
+};
+
+function fmtHour(h) {
+  const f = n => n===0||n===24 ? '12AM' : n===12 ? '12PM' : n<12 ? `${n}AM` : `${n-12}PM`;
+  return `${f(h)}–${f(h+1)}`;
+}
+
+async function kvGet(key) {
+  try {
+    const { data } = await sb.from('app_kv').select('value').eq('key', key).maybeSingle();
+    return data?.value ?? null;
+  } catch { return null; }
+}
+
+async function kvSet(key, value) {
+  try {
+    await sb.from('app_kv').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  } catch {}
+}
+
+// ── schedule ──
+function renderSchedule(slots) {
+  const panel = document.getElementById('panel-sched');
+  if (!Array.isArray(slots) || !slots.length) {
+    panel.innerHTML = '<div class="empty">No schedule yet.<br>Add slots in the dashboard.</div>';
+    return;
+  }
+  const curH = new Date().getHours();
+  panel.innerHTML = '';
+  slots.forEach(slot => {
+    const row = document.createElement('div');
+    row.className = 'slot-row' + (slot.hour === curH ? ' current' : '');
+
+    const time = document.createElement('div');
+    time.className = 'slot-time';
+    time.textContent = fmtHour(slot.hour);
+
+    const pillsDiv = document.createElement('div');
+    pillsDiv.className = 'slot-pills';
+
+    (slot.items || []).forEach(item => {
+      const p = document.createElement('span');
+      p.className = 'pill';
+      p.style.background = PILL_COLORS[item.color] || PILL_COLORS.default;
+      p.textContent = item.label;
+      pillsDiv.appendChild(p);
+    });
+
+    row.appendChild(time);
+    row.appendChild(pillsDiv);
+    panel.appendChild(row);
+  });
+
+  // scroll current hour into view
+  const cur = panel.querySelector('.current');
+  if (cur) cur.scrollIntoView({ block: 'center' });
+}
+
+// ── goals ──
+let goals = [];
+
+function renderGoals() {
+  const panel = document.getElementById('panel-goals');
+  const filled = goals.filter(g => g.text);
+  if (!filled.length) {
+    panel.innerHTML = '<div class="empty">No goals yet.<br>Add them in the dashboard.</div>';
+    return;
+  }
+  panel.innerHTML = '';
+  goals.forEach((g, i) => {
+    if (!g.text) return;
+    const row = document.createElement('div');
+    row.className = 'goal-item' + (g.done ? ' done' : '');
+
+    const check = document.createElement('div');
+    check.className = 'goal-check';
+    if (g.done) check.textContent = '✓';
+
+    const text = document.createElement('div');
+    text.className = 'goal-text';
+    text.textContent = g.text;
+
+    row.addEventListener('click', async () => {
+      goals[i].done = !goals[i].done;
+      await kvSet('goals', goals);
+      renderGoals();
+    });
+
+    row.appendChild(check);
+    row.appendChild(text);
+    panel.appendChild(row);
+  });
+}
+
+// ── load ──
+async function loadData() {
+  const [sched, goalsData] = await Promise.all([kvGet('schedule'), kvGet('goals')]);
+
+  renderSchedule(sched);
+
+  if (Array.isArray(goalsData)) goals = goalsData;
+  renderGoals();
+
+  const now = new Date();
+  document.getElementById('footer').textContent =
+    `synced ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+// ── tabs ──
+document.getElementById('tab-sched').addEventListener('click', () => {
+  document.getElementById('panel-sched').classList.add('active');
+  document.getElementById('panel-goals').classList.remove('active');
+  document.getElementById('tab-sched').classList.add('active');
+  document.getElementById('tab-goals').classList.remove('active');
+});
+document.getElementById('tab-goals').addEventListener('click', () => {
+  document.getElementById('panel-goals').classList.add('active');
+  document.getElementById('panel-sched').classList.remove('active');
+  document.getElementById('tab-goals').classList.add('active');
+  document.getElementById('tab-sched').classList.remove('active');
+});
+
+document.getElementById('btn-refresh').addEventListener('click', loadData);
+document.getElementById('btn-close').addEventListener('click', () => window.close());
+
+// auto-refresh every 30s, re-highlight current hour every minute
+loadData();
+setInterval(loadData, 30000);
+setInterval(() => renderSchedule(null) || loadData(), 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sticky</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:   rgba(13,13,13,0.82);
+    --card: rgba(28,28,28,0.65);
+    --line: rgba(255,255,255,0.07);
+    --ink:  #f0ede6;
+    --ink2: #777;
+    --acc:  #ff6b00;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; scrollbar-width: none; }
+  *::-webkit-scrollbar { display: none; }
+  html { height: 100%; background: transparent; }
+  body {
+    height: 100%;
+    background: transparent;
+    font-family: var(--mono);
+    color: var(--ink);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* only the titlebar strip uses native drag; JS handles everything else */
+
+  /* ── glass root ── */
+  #root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--bg);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.09);
+    box-shadow: 0 8px 48px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    overflow: hidden;
+  }
+
+  /* ── titlebar — floats above content, zero flow height ── */
+  .titlebar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    -webkit-app-region: drag;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    height: 36px;
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background .18s, border-color .18s;
+  }
+  .titlebar:hover {
+    background: rgba(15,15,15,0.72);
+    border-bottom-color: var(--line);
+  }
+  .tabs {
+    display: flex; gap: 1px; -webkit-app-region: no-drag;
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s;
+  }
+  .titlebar:hover .tabs { opacity: 1; pointer-events: auto; }
+  .tb-btns {
+    display: flex; gap: 2px; -webkit-app-region: no-drag;
+    opacity: 0; pointer-events: none;
+    transition: opacity .18s;
+  }
+  .titlebar:hover .tb-btns { opacity: 1; pointer-events: auto; }
+  .tab {
+    -webkit-app-region: no-drag;
+    background: transparent; border: none; border-radius: 6px;
+    padding: 3px 9px; font-size: 9px; font-weight: 800;
+    font-family: var(--mono); color: var(--ink2);
+    cursor: pointer; letter-spacing: .07em; transition: all .12s;
+  }
+  .tab.active { background: rgba(255,255,255,0.1); color: var(--ink); }
+  .tb-btn {
+    -webkit-app-region: no-drag;
+    background: transparent; border: none;
+    color: var(--ink2); font-size: 13px;
+    cursor: pointer; padding: 2px 6px;
+    border-radius: 4px; font-family: var(--mono);
+    transition: color .1s, background .1s;
+  }
+  .tb-btn:hover { color: var(--ink); background: rgba(255,255,255,0.08); }
+  .tb-btn.close:hover { color: #ef4444; }
+
+  /* ── panels — fill full height (titlebar is absolute, not in flow) ── */
+  .panels { flex: 1; overflow: hidden; min-height: 0; position: relative; z-index: 1; }
+  .panel { height: 100%; overflow-y: auto; display: none; }
+  .panel.active { display: flex; flex-direction: column; }
+  .panel::-webkit-scrollbar { display: none; }
+
+  /* ── scrollable area inside panel ── */
+  .scroll-area { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .scroll-area::-webkit-scrollbar { display: none; }
+
+  /* ── schedule rows ── */
+  .slot-row {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: start;
+    padding: 5px 10px;
+    border-left: 3px solid transparent;
+    min-height: 30px;
+    transition: background .1s;
+  }
+  .slot-row.current { background: rgba(255,107,0,.12); border-left-color: var(--acc); }
+  .slot-time { font-size: 9px; font-weight: 700; color: var(--ink2); padding-top: 4px; white-space: nowrap; }
+  .slot-row.current .slot-time { color: var(--acc); }
+  .slot-pills { display: flex; flex-wrap: wrap; gap: 3px; padding: 2px 0; }
+  .pill {
+    display: inline-flex; align-items: center;
+    padding: 2px 8px; border-radius: 999px;
+    font-size: 9px; font-weight: 800; color: #fff;
+    letter-spacing: .03em; white-space: nowrap;
+  }
+  .slot-divider { height: 1px; background: var(--line); }
+
+  .add-btn {
+    background: var(--acc); border: none; border-radius: 6px;
+    color: #fff; font-family: var(--mono); font-size: 12px;
+    font-weight: 800; padding: 3px 8px; cursor: pointer;
+    flex-shrink: 0; transition: opacity .1s;
+  }
+  .add-btn:hover { opacity: .8; }
+
+  /* ── goals ── */
+  .goal-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 12px; border-bottom: 1px solid var(--line);
+    cursor: pointer; transition: background .1s; user-select: none;
+  }
+  .goal-item:hover { background: rgba(255,255,255,0.04); }
+  .goal-check {
+    width: 14px; height: 14px; border-radius: 3px;
+    border: 1.5px solid rgba(255,255,255,0.2); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: #fff; transition: all .1s;
+  }
+  .goal-item.done .goal-check { background: var(--acc); border-color: var(--acc); }
+  .goal-text { font-size: 11px; font-weight: 600; color: var(--ink); line-height: 1.4; flex: 1; }
+  .goal-item.done .goal-text { opacity: .4; }
+
+  /* ── add-goal form ── */
+  .add-goal {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 10px; border-top: 1px solid var(--line);
+    background: rgba(255,255,255,0.03); flex-shrink: 0;
+  }
+  .add-goal input {
+    flex: 1; background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 6px; color: var(--ink);
+    font-family: var(--mono); font-size: 10px; font-weight: 600;
+    padding: 5px 8px; outline: none;
+  }
+  .add-goal input::placeholder { color: var(--ink2); font-weight: 400; }
+  .add-goal input:focus { border-color: rgba(255,107,0,0.5); }
+
+  /* ── timer ── */
+  .timer-panel-inner {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; flex: 1; gap: 16px; padding: 20px;
+  }
+
+  /* dropdown — collapses out of flow when hidden */
+  .timer-select {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; color: var(--ink);
+    font-family: var(--mono); font-size: 13px; font-weight: 700;
+    padding: 8px 14px; outline: none; cursor: pointer; text-align: center;
+    transition: opacity .25s;
+  }
+  .timer-select option { background: #1a1a1a; }
+  .timer-select.t-hidden { opacity: 0; pointer-events: none; position: absolute; }
+
+  /* ring container */
+  .ring-wrap {
+    position: relative;
+    width: 164px; height: 164px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #t-svg {
+    position: absolute; top: 0; left: 0;
+    width: 164px; height: 164px;
+    transform: rotate(-90deg);
+    opacity: 0; transition: opacity .35s;
+  }
+  #t-svg.show { opacity: 1; }
+
+  .ring-bg { display: none; }
+  .ring-fg { display: none; }
+  .ring-fg.done { display: none; }
+
+  /* time text inside/outside ring */
+  .timer-display {
+    position: relative; z-index: 1;
+    font-size: clamp(2.2rem, 14vw, 3.4rem);
+    font-weight: 900; letter-spacing: -.04em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink); transition: color .3s; line-height: 1;
+  }
+  .timer-display.running { color: var(--ink); }
+  .timer-display.done    { color: var(--ink); }
+
+  .timer-btns { display: flex; gap: 8px; }
+  .t-btn {
+    padding: 9px 24px; border-radius: 999px;
+    font-family: var(--mono); font-size: 11px; font-weight: 800;
+    border: none; cursor: pointer; letter-spacing: .05em;
+    transition: opacity .12s, transform .1s;
+  }
+  .t-btn:active { transform: scale(.96); }
+  .t-btn.primary   { background: var(--acc); color: #fff; }
+  .t-btn.secondary { background: rgba(255,255,255,0.1); color: var(--ink); }
+  .t-btn:hover { opacity: .85; }
+
+  /* ── empty / loading ── */
+  .empty {
+    padding: 28px; text-align: center;
+    font-size: 10px; color: var(--ink2); opacity: .5; line-height: 2;
+  }
+  .spin { display: inline-block; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+</style>
+</head>
+<body>
+<div id="root">
+
+  <div class="titlebar">
+    <div class="tabs">
+      <button class="tab active" id="tab-sched">SCHED</button>
+      <button class="tab" id="tab-goals">GOALS</button>
+      <button class="tab" id="tab-timer">TIMER</button>
+    </div>
+    <div class="tb-btns">
+      <button class="tb-btn" id="btn-refresh">↻</button>
+      <button class="tb-btn close" id="btn-close">✕</button>
+    </div>
+  </div>
+
+  <div class="panels">
+
+    <!-- ── Schedule panel ── -->
+    <div class="panel active" id="panel-sched">
+      <div class="scroll-area" id="sched-scroll">
+        <div class="empty"><span class="spin">↻</span><br>loading…</div>
+      </div>
+    </div>
+
+    <!-- ── Goals panel ── -->
+    <div class="panel" id="panel-goals">
+      <div class="scroll-area" id="goals-scroll">
+        <div class="empty"><span class="spin">↻</span><br>loading…</div>
+      </div>
+      <div class="add-goal">
+        <input id="ag-input" placeholder="add a goal…" maxlength="80">
+        <button class="add-btn" id="ag-add">+</button>
+      </div>
+    </div>
+
+    <!-- ── Timer panel ── -->
+    <div class="panel" id="panel-timer">
+      <div class="timer-panel-inner">
+        <select class="timer-select" id="t-select">
+          <option value="10">10 min</option>
+          <option value="20">20 min</option>
+          <option value="25">25 min</option>
+          <option value="30" selected>30 min</option>
+          <option value="40">40 min</option>
+          <option value="45">45 min</option>
+          <option value="50">50 min</option>
+          <option value="60">60 min</option>
+        </select>
+        <!-- ring wraps the display — SVG fades in when running -->
+        <div class="ring-wrap">
+          <svg id="t-svg" viewBox="0 0 164 164">
+            <circle class="ring-bg" cx="82" cy="82" r="68"/>
+            <circle class="ring-fg" id="t-ring" cx="82" cy="82" r="68"/>
+          </svg>
+          <div class="timer-display" id="t-display">30:00</div>
+        </div>
+        <div class="timer-btns">
+          <button class="t-btn primary" id="t-start">▶</button>
+          <button class="t-btn secondary" id="t-reset">↺</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://dmzonyrwdqzugsshcxgb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtem9ueXJ3ZHF6dWdzc2hjeGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNzgzNTgsImV4cCI6MjA3Njc1NDM1OH0.0MYp26X7h1JR_r4KO-p_f3aX-dsiaO6Z9ZS8rjU9e7g';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ── state ────────────────────────────────────────────────────────────────────
+let slots = [];
+let goals = [];
+
+const PILL_COLORS = {
+  green:'#22c55e', blue:'#3b82f6', pink:'#ec4899', sky:'#0ea5e9',
+  orange:'#ff6b00', yellow:'#ca8a04', red:'#ef4444', purple:'#a855f7',
+  gray:'#6b7280', default:'#374151'
+};
+
+function fmtHour(h) {
+  const f = n => n===0||n===24?'12AM':n===12?'12PM':n<12?`${n}AM`:`${n-12}PM`;
+  return `${f(h)}–${f(h+1)}`;
+}
+
+async function kvGet(key) {
+  try {
+    const { data } = await sb.from('app_kv').select('value').eq('key', key).maybeSingle();
+    return data?.value ?? null;
+  } catch { return null; }
+}
+async function kvSet(key, value) {
+  try {
+    await sb.from('app_kv').upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+  } catch {}
+}
+
+// ── render: schedule ─────────────────────────────────────────────────────────
+function renderSchedule() {
+  const area = document.getElementById('sched-scroll');
+  if (!slots.length) {
+    area.innerHTML = '<div class="empty">No schedule yet.</div>';
+    return;
+  }
+  const curH = new Date().getHours();
+  area.innerHTML = '';
+  let curRow = null;
+  slots.forEach(slot => {
+    const row = document.createElement('div');
+    row.className = 'slot-row' + (slot.hour === curH ? ' current' : '');
+
+    const time = document.createElement('div');
+    time.className = 'slot-time';
+    time.textContent = fmtHour(slot.hour);
+
+    const pillsDiv = document.createElement('div');
+    pillsDiv.className = 'slot-pills';
+    (slot.items || []).forEach(item => {
+      const p = document.createElement('span');
+      p.className = 'pill';
+      p.style.background = PILL_COLORS[item.color] || PILL_COLORS.default;
+      p.textContent = item.label;
+      pillsDiv.appendChild(p);
+    });
+
+    row.appendChild(time);
+    row.appendChild(pillsDiv);
+    area.appendChild(row);
+    area.appendChild(Object.assign(document.createElement('div'), { className: 'slot-divider' }));
+    if (slot.hour === curH) curRow = row;
+  });
+
+  if (curRow) setTimeout(() => curRow.scrollIntoView({ block: 'center', behavior: 'smooth' }), 60);
+}
+
+// ── render: goals ─────────────────────────────────────────────────────────────
+function renderGoals() {
+  const area = document.getElementById('goals-scroll');
+  const filled = goals.filter(g => g.text);
+  if (!filled.length) {
+    area.innerHTML = '<div class="empty">No goals yet.</div>';
+    return;
+  }
+  area.innerHTML = '';
+  goals.forEach((g, i) => {
+    if (!g.text) return;
+    const row = document.createElement('div');
+    row.className = 'goal-item' + (g.done ? ' done' : '');
+
+    const check = document.createElement('div');
+    check.className = 'goal-check';
+    if (g.done) check.textContent = '✓';
+
+    const text = document.createElement('div');
+    text.className = 'goal-text';
+    text.textContent = g.text;
+
+    row.addEventListener('click', async () => {
+      goals[i].done = !goals[i].done;
+      await kvSet('goals', goals);
+      renderGoals();
+    });
+    row.appendChild(check);
+    row.appendChild(text);
+    area.appendChild(row);
+  });
+}
+
+
+// ── add goal ──────────────────────────────────────────────────────────────────
+async function submitGoal() {
+  const inp = document.getElementById('ag-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  goals.push({ text, done: false });
+  inp.value = '';
+  await kvSet('goals', goals);
+  renderGoals();
+}
+document.getElementById('ag-add').addEventListener('click', submitGoal);
+document.getElementById('ag-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitGoal();
+});
+
+// ── timer ─────────────────────────────────────────────────────────────────────
+let timerSecs = 0, totalSecs = 0, timerInterval = null, timerState = 'idle';
+const CIRC = 2 * Math.PI * 68; // r=68
+
+function fmtTime(s) {
+  return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+}
+
+function syncTimerUI() {
+  const isIdle = timerState === 'idle';
+  const isDone = timerState === 'done';
+
+  // dropdown: visible only when idle
+  document.getElementById('t-select').classList.toggle('t-hidden', !isIdle);
+
+  // ring SVG: visible when not idle
+  const svg  = document.getElementById('t-svg');
+  const ring = document.getElementById('t-ring');
+  svg.classList.toggle('show', !isIdle);
+
+  if (!isIdle) {
+    const progress = totalSecs > 0 ? timerSecs / totalSecs : 0;
+    ring.style.strokeDasharray  = CIRC;
+    ring.style.strokeDashoffset = CIRC * (1 - progress);
+    ring.classList.toggle('done', isDone);
+  }
+
+  // display
+  const disp = document.getElementById('t-display');
+  disp.textContent = fmtTime(timerSecs);
+  disp.className   = 'timer-display' +
+    (timerState==='running'?' running':'') +
+    (timerState==='done'?' done':'');
+
+  // button label
+  document.getElementById('t-start').textContent =
+    timerState==='running'?'⏸':timerState==='paused'?'▶':'▶';
+}
+
+function runTick() {
+  timerInterval = setInterval(() => {
+    timerSecs--;
+    if (timerSecs <= 0) {
+      timerSecs = 0; timerState = 'done';
+      clearInterval(timerInterval);
+    }
+    syncTimerUI();
+  }, 1000);
+}
+
+document.getElementById('t-select').addEventListener('change', () => {
+  if (timerState !== 'idle') return;
+  timerSecs = parseInt(document.getElementById('t-select').value) * 60;
+  syncTimerUI();
+});
+
+document.getElementById('t-start').addEventListener('click', () => {
+  if (timerState === 'idle' || timerState === 'done') {
+    totalSecs = timerSecs = parseInt(document.getElementById('t-select').value) * 60;
+    timerState = 'running';
+    runTick();
+  } else if (timerState === 'running') {
+    clearInterval(timerInterval);
+    timerState = 'paused';
+  } else if (timerState === 'paused') {
+    timerState = 'running';
+    runTick();
+  }
+  syncTimerUI();
+});
+
+document.getElementById('t-reset').addEventListener('click', () => {
+  clearInterval(timerInterval);
+  timerState = 'idle';
+  timerSecs  = parseInt(document.getElementById('t-select').value) * 60;
+  totalSecs  = 0;
+  syncTimerUI();
+});
+
+timerSecs = 30 * 60;
+syncTimerUI();
+
+// ── tabs ──────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  ['sched','goals','timer'].forEach(t => {
+    document.getElementById(`panel-${t}`).classList.toggle('active', t===name);
+    document.getElementById(`tab-${t}`).classList.toggle('active', t===name);
+  });
+}
+document.getElementById('tab-sched').addEventListener('click', () => showTab('sched'));
+document.getElementById('tab-goals').addEventListener('click', () => showTab('goals'));
+document.getElementById('tab-timer').addEventListener('click', () => showTab('timer'));
+
+// ── load data ─────────────────────────────────────────────────────────────────
+async function loadData() {
+  const [sched, goalsData] = await Promise.all([kvGet('schedule'), kvGet('goals')]);
+  if (Array.isArray(sched))     slots = sched;
+  if (Array.isArray(goalsData)) goals = goalsData;
+  renderSchedule();
+  renderGoals();
+}
+
+document.getElementById('btn-refresh').addEventListener('click', loadData);
+document.getElementById('btn-close').addEventListener('click', () => {
+  if (window.pywebview?.api?.close) window.pywebview.api.close();
+  else window.close();
+});
+
+loadData();
+setInterval(loadData, 30_000);
+setInterval(() => { if (slots.length) renderSchedule(); }, 60_000);
+
+
+// ── window drag ───────────────────────────────────────────────────────────────
+// body has NO -webkit-app-region:drag so pointer events reach JS here.
+// Only skip truly interactive / scrollable targets.
+(function() {
+  const NO_DRAG = 'button, input, select, a, .scroll-area, .goal-item, .slot-pills, .pill, .slot-row';
+  let dragging = false, lastX = 0, lastY = 0;
+
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest(NO_DRAG)) return;
+    e.preventDefault();
+    try { e.target.setPointerCapture(e.pointerId); } catch(_) {}
+    dragging = true;
+    lastX = e.clientX; lastY = e.clientY;
+    window.webkit.messageHandlers.sticky.postMessage({action:'dragstart'});
+  });
+  document.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+    if (dx !== 0 || dy !== 0)
+      window.webkit.messageHandlers.sticky.postMessage({action:'move', dx:Math.round(dx), dy:Math.round(dy)});
+  });
+  document.addEventListener('pointerup',     () => { dragging = false; });
+  document.addEventListener('pointercancel', () => { dragging = false; });
+})();
+</script>
+</body>
+</html>
