@@ -233,8 +233,8 @@
 .sched-add-row{display:flex;justify-content:center;align-items:center;width:100%;padding:8px 14px;cursor:pointer;border:none;border-top:1.5px dashed var(--line);background:transparent;font-size:20px;font-weight:700;color:var(--ink-3);font-family:var(--mono);transition:color .12s,background .12s,opacity .12s;opacity:0}
 #sched-body:hover .sched-add-row{opacity:.5}
 .sched-add-row:hover{color:var(--acc);background:oklch(0.5 0 0 / .03);opacity:1!important}
-.sched-task-pill.pill-drop-before{box-shadow:-3px 0 0 2px var(--acc)}
-.sched-task-pill.pill-drop-after{box-shadow:3px 0 0 2px var(--acc)}
+.sched-task-pill.pill-drop-before{box-shadow:-5px 0 0 3px var(--acc);transform:translateX(3px)}
+.sched-task-pill.pill-drop-after{box-shadow:5px 0 0 3px var(--acc);transform:translateX(-3px)}
 /* ===== DAY TRACKER ===== */
 .dt-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;overflow:hidden}
 .dt-panel.show{display:block}
@@ -2521,8 +2521,9 @@ async function kvSet(key,value){
           p.classList.add(before?'pill-drop-before':'pill-drop-after');
           dragOverPill={slotIdx:i,itemIdx:j,before};
         });
-        p.addEventListener('dragleave',()=>{
-          p.classList.remove('pill-drop-before','pill-drop-after');
+        p.addEventListener('dragleave',e=>{
+          if(!p.contains(e.relatedTarget))
+            p.classList.remove('pill-drop-before','pill-drop-after');
         });
         p.addEventListener('drop',e=>{
           e.preventDefault();
@@ -2569,6 +2570,8 @@ async function kvSet(key,value){
 
       row.addEventListener('dragover',e=>{
         if(!dragPillData && !dragSlotSource)return;
+        // Let pill-level dragover handle its own indicators
+        if(dragSlotSource && e.target.closest('.sched-task-pill'))return;
         e.preventDefault();
         clearDropTargets();
         row.classList.add('sched-drop-target');
