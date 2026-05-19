@@ -645,12 +645,14 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <div class="insight-card"><div class="insight-label">Screening → Interview</div><div class="insight-value" id="ins-conv2">0%</div></div>
       <div class="insight-card"><div class="insight-label">Interview → Offer</div><div class="insight-value" id="ins-conv3">0%</div></div>
     </div>
+    <!-- pie charts hidden for now
     <div class="pie-charts-row" id="pie-charts-row">
       <div class="pie-chart-card-inner"><div class="pie-chart-title">Job Type</div><div class="pie-chart-wrap"><canvas id="pie-type"></canvas></div></div>
       <div class="pie-chart-card-inner"><div class="pie-chart-title">Locations</div><div class="pie-chart-wrap"><canvas id="pie-locations"></canvas></div></div>
       <div class="pie-chart-card-inner"><div class="pie-chart-title">Top Companies (3+)</div><div class="pie-chart-wrap"><canvas id="pie-companies"></canvas></div></div>
       <div class="pie-chart-card-inner"><div class="pie-chart-title">Sources</div><div class="pie-chart-wrap"><canvas id="pie-sources"></canvas></div></div>
     </div>
+    -->
   </div>
 
   <!-- SANKEY PANEL -->
@@ -1395,8 +1397,9 @@ function openEditModal(jobId){
 }
 function closeEditModal(){document.getElementById('edit-modal').classList.remove('show');editingJobId=null;}
 
-// ===== PIE CHARTS =====
+// ===== PIE CHARTS (hidden for now) =====
 function renderPieCharts(){
+  /* pie charts disabled
   const isDark=document.body.dataset.theme==='dark';
   const fg=isDark?'#F4F0E6':'#0E0E10';
   const COLORS=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#14b8a6','#f97316','#06b6d4','#84cc16'];
@@ -1432,6 +1435,7 @@ function renderPieCharts(){
   if(pieCharts.src)pieCharts.src.destroy();
   const c4=document.getElementById('pie-sources');
   if(c4&&sortedS.length)pieCharts.src=new Chart(c4,{type:'pie',data:{labels:sortedS.map(x=>x[0]),datasets:[{data:sortedS.map(x=>x[1]),backgroundColor:COLORS,borderWidth:2,borderColor:'transparent'}]},options:pOpts});
+  */
 }
 
 // ===== FOCUS TIMER =====
