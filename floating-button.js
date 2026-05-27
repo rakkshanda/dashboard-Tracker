@@ -19,12 +19,12 @@
   const styles = `
     #job-tracker-floating-btn {
       position: fixed;
-      top: 28px;
-      left: 28px;
+      bottom: 28px;
+      right: 28px;
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background: #FF8FB1;
+      background: #FF5C2C;
       color: #0E0E10;
       border: 2.5px solid #0E0E10;
       box-shadow: 5px 5px 0 #0E0E10;
@@ -41,7 +41,7 @@
     #job-tracker-floating-btn svg { width: 22px; height: 22px; stroke-width: 2.5; }
 
     #job-tracker-floating-btn.active {
-      background: #FFC1D6;
+      background: #FFD93D;
     }
 
     #job-tracker-floating-btn.saving {
@@ -69,8 +69,8 @@
     /* Popup container */
     #job-tracker-popup-container {
       position: fixed;
-      top: 96px;
-      left: 24px;
+      bottom: 96px;
+      right: 24px;
       width: 440px;
       height: 440px;
       max-height: 90vh;
@@ -108,7 +108,7 @@
     #job-tracker-drag-handle {
       width: 100%;
       height: 36px;
-      background: #FF8FB1;
+      background: #FF5C2C;
       border-bottom: 1.5px solid #0E0E10;
       cursor: grab;
       display: flex;
