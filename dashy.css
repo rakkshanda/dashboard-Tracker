@@ -91,7 +91,11 @@
     top: 10px;
     z-index: 200;
   }
-  [data-theme="dark"] header.top { background: var(--card); border: 1px solid var(--line-soft); }
+  [data-theme="dark"] header.top {
+    background: #0E0E10;
+    color: #F2EFE8;
+    border: none;
+  }
 
   .brand {
     display: flex; align-items: center; gap: 10px;
@@ -109,6 +113,7 @@
     font-size: 16px;
   }
   .brand span.slash { color: var(--acc-2); }
+  [data-theme="dark"] .brand { color: #F2EFE8; }
 
   .date-strip {
     display: flex;
@@ -120,6 +125,7 @@
     color: var(--bg);
     opacity: 0.7;
   }
+  [data-theme="dark"] .date-strip { color: #F2EFE8; }
   .date-strip .pip { width: 6px; height: 6px; background: var(--acc-3); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
@@ -162,6 +168,17 @@
   .pill.outline:hover { border-color: var(--bg); }
   .pill svg { width: 14px; height: 14px; }
   .pill.icon-only { padding: 9px; width: 36px; height: 36px; justify-content: center; }
+  [data-theme="dark"] header.top .pill { color: #F2EFE8; }
+  [data-theme="dark"] header.top .pill:hover {
+    background: rgba(255,255,255,0.08);
+  }
+  [data-theme="dark"] header.top .pill.outline {
+    border-color: rgba(255,255,255,0.2);
+  }
+  [data-theme="dark"] header.top .pill.outline:hover,
+  [data-theme="dark"] header.top .pill.outline.active {
+    border-color: #F2EFE8;
+  }
 
   /* ============ HERO ============ */
   .hero {

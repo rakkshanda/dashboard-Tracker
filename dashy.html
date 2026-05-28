@@ -123,19 +123,80 @@
   .pill.icon-only{padding:7px;width:30px;height:30px}
 }
 /* ===== SCHEDULE PANEL — FUNKY ===== */
-.schedule-panel{display:none;background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;overflow:hidden}
+.schedule-panel{display:none;background:var(--bg-2);border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:14px;overflow:hidden}
 .schedule-panel.show{display:flex;flex-direction:column}
+.planner-total-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px 16px;margin-bottom:14px;border:2px solid var(--line);border-radius:calc(var(--radius) - 6px);background:linear-gradient(135deg,#111 0%,#1c1c1f 100%);color:#fff;flex-wrap:wrap}
+.planner-total-metrics{display:flex;gap:20px;flex-wrap:wrap}
+.planner-total-copy{display:flex;flex-direction:column;gap:4px;min-width:140px}
+.planner-total-copy span{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.6}
+.planner-total-copy strong{font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-.03em}
+.planner-total-meta{font-family:var(--mono);font-size:11px;font-weight:700;color:#ffb48f;text-align:right}
+.planner-view{display:none}
+.planner-view.show{display:flex;flex-direction:column}
+.planner-cards{display:flex;flex-direction:column;gap:14px;min-width:0}
+.schedule-card{background:#111;border:2.5px solid var(--line);border-radius:calc(var(--radius) - 4px);overflow:hidden}
 .schedule-inner{display:grid;grid-template-columns:60% 40%}
 @media(max-width:680px){.schedule-inner{grid-template-columns:1fr;}}
+.planner-panel-actions{display:flex;justify-content:center;padding-top:14px}
+.planner-add-day-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:999px;border:2px dashed var(--line);background:var(--card);color:var(--ink);font-family:var(--mono);font-size:11.5px;font-weight:800;letter-spacing:.04em;cursor:pointer;transition:all .15s}
+.planner-add-day-btn:hover{border-color:var(--acc);background:var(--bg);transform:translateY(-1px)}
+.planner-remove-day-btn{font-size:11px;font-weight:800;font-family:var(--mono);color:#fff;background:#5b2333;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;transition:opacity .12s}
+.planner-remove-day-btn:hover{opacity:.75}
+.planner-day-tag{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.planner-calendar-wrap{background:#fff;border:2.5px solid var(--line);border-radius:calc(var(--radius) - 4px);overflow:auto}
+.planner-calendar-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;min-width:0}
+.planner-calendar-table th,.planner-calendar-table td{border-right:1.5px solid var(--line-soft);border-bottom:1.5px solid var(--line-soft);padding:10px 12px;vertical-align:top}
+.planner-calendar-table th:last-child,.planner-calendar-table td:last-child{border-right:none}
+.planner-calendar-table thead th{position:sticky;top:0;background:#111;color:#fff;z-index:1;text-align:left}
+.planner-calendar-table thead th:first-child,
+.planner-calendar-table tbody td:first-child{width:110px}
+.planner-calendar-table tbody td{background:#fff}
+.planner-calendar-table tbody tr:nth-child(even) td{background:rgba(14,14,16,.03)}
+.planner-calendar-time{font-family:var(--mono);font-size:11px;font-weight:800;color:var(--ink);white-space:nowrap}
+.planner-calendar-day{display:flex;flex-direction:column;gap:4px}
+.planner-calendar-day strong{font-family:var(--display);font-size:16px;font-weight:800;letter-spacing:-.02em}
+.planner-calendar-day span{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.55}
+.planner-calendar-cell{min-width:0;overflow:hidden}
+.planner-calendar-empty{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);opacity:.45}
+.planner-calendar-cell.drop-target{background:oklch(0.94 0.08 50 / .7)!important;outline:2px dashed var(--acc);outline-offset:-2px}
+.planner-calendar-task-stack{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-content:flex-start}
+.planner-calendar-task{display:inline-grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;align-self:flex-start;gap:4px;width:auto;max-width:100%;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:800;font-family:var(--mono);letter-spacing:.03em;color:#fff;line-height:1.2;cursor:grab}
+.planner-calendar-task-label{min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.planner-calendar-input{flex:1;min-width:90px;padding:6px 4px;border:1.5px dashed transparent;border-radius:10px;background:transparent;color:var(--ink);font-family:var(--mono);font-size:10.5px;font-weight:700;outline:none}
+.planner-calendar-input:focus{border-color:var(--acc);background:#fff;padding-left:9px;padding-right:9px}
+[data-theme="light"] .planner-calendar-input:hover{border-color:var(--line-soft);background:rgba(14,14,16,.03);padding-left:9px;padding-right:9px}
+[data-theme="dark"] .schedule-panel{background:oklch(0.16 0 0)}
+[data-theme="dark"] .planner-total-bar{background:linear-gradient(135deg,#0d0d0e 0%,#1a1a1c 100%);border-color:#343434}
+[data-theme="dark"] .planner-total-meta{color:#ffb48f}
+[data-theme="dark"] .planner-add-day-btn{background:oklch(0.22 0 0);color:var(--bg);border-color:#3a3a3a}
+[data-theme="dark"] .planner-add-day-btn:hover{background:oklch(0.26 0 0);border-color:var(--acc)}
+[data-theme="dark"] .planner-calendar-wrap{background:oklch(0.14 0 0);border-color:#3a3a3a}
+[data-theme="dark"] .planner-calendar-table th,
+[data-theme="dark"] .planner-calendar-table td{border-right-color:#303030;border-bottom-color:#303030}
+[data-theme="dark"] .planner-calendar-table thead th{background:#0f0f10;color:#fff !important}
+[data-theme="dark"] .planner-calendar-table thead th *,
+[data-theme="dark"] .planner-calendar-day strong,
+[data-theme="dark"] .planner-calendar-day span{color:#fff !important}
+[data-theme="dark"] .planner-calendar-table tbody td{background:oklch(0.16 0 0);color:var(--bg)}
+[data-theme="dark"] .planner-calendar-table tbody tr:nth-child(even) td{background:oklch(0.19 0 0)}
+[data-theme="dark"] .planner-calendar-time,
+[data-theme="dark"] .planner-calendar-table td.planner-calendar-time,
+[data-theme="dark"] .planner-calendar-table th.planner-calendar-time{color:#fff !important}
+[data-theme="dark"] .planner-calendar-empty{color:rgba(242,239,232,.5)}
+[data-theme="dark"] .planner-calendar-cell.drop-target{background:oklch(0.26 0.05 70 / .9)!important}
+[data-theme="dark"] .planner-calendar-input{background:transparent;border-color:transparent;color:var(--bg)}
+[data-theme="dark"] .planner-calendar-input:hover{background:rgba(255,255,255,.05);border-color:#3a3a3a;padding-left:9px;padding-right:9px}
+[data-theme="dark"] .planner-calendar-input::placeholder{color:rgba(242,239,232,.4)}
+[data-theme="dark"] .planner-calendar-input:focus{background:oklch(0.22 0 0);border-color:var(--acc);padding-left:9px;padding-right:9px}
 /* ── left pane ── */
 .sched-left{display:flex;flex-direction:column;background:#fff}
 [data-theme="dark"] .sched-left{background:oklch(0.14 0 0)}
-#sched-body{flex:1}
+.sched-body{flex:1}
 @media(max-width:680px){.sched-left{border-right:none;border-bottom:2.5px solid var(--line)}}
 /* colored header strip */
 .schedule-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#111;border-bottom:2.5px solid #333;min-height:52px;box-sizing:border-box}
 .schedule-panel-head h2{font-family:var(--display);font-size:20px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
-.sched-left>.sched-pill-bank,.sched-left>.sched-add-pill-form,#sched-body{padding-left:16px;padding-right:16px}
+.sched-left>.sched-pill-bank,.sched-left>.sched-add-pill-form,.sched-body{padding-left:16px;padding-right:16px}
 /* pill bank strip */
 .sched-pill-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 12px;border-bottom:2px solid #e0e0e0;margin-bottom:0;background:#f5f5f5;opacity:0;max-height:0;overflow:hidden;padding-top:0;padding-bottom:0;border-bottom-width:0;transition:opacity .18s,max-height .18s,padding .18s,border-bottom-width .18s}
 .sched-left:hover .sched-pill-bank{opacity:1;max-height:200px;padding-top:12px;padding-bottom:12px;border-bottom-width:2px}
@@ -189,7 +250,7 @@
 .goals-clear-btn{font-size:11px;font-weight:800;font-family:var(--mono);color:#fff;background:#444;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;transition:opacity .12s}
 .goals-clear-btn:hover{opacity:.75}
 .goals-add-row-btn{display:block;width:100%;padding:7px;border:none;background:transparent;font-size:18px;font-weight:700;color:var(--ink-3);cursor:pointer;opacity:0;transition:opacity .15s,color .12s}
-#goals-list:hover .goals-add-row-btn{opacity:.45}
+.goals-list:hover .goals-add-row-btn{opacity:.45}
 .goals-add-row-btn:hover{opacity:1!important;color:var(--acc)}
 .goals-list{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;padding:16px 16px;background:#fff}
 .goals-stats{padding:0 16px 16px 16px;background:#fff;font-family:var(--sans);flex:1}
@@ -226,15 +287,16 @@
 /* pill-rm: hidden until row hovered */
 .pill-rm{background:transparent;border:none;cursor:pointer;font-size:12px;line-height:1;padding:0 1px;opacity:0;transition:opacity .12s;color:inherit}
 .sched-task-pill:hover .pill-rm{opacity:.6}
+.planner-calendar-task:hover .pill-rm{opacity:.6}
 .pill-rm:hover{opacity:1!important}
 .sched-row-del{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;color:var(--ink-3);padding:8px 12px;align-self:center;transition:color .12s,opacity .12s;font-family:var(--mono);font-weight:400;opacity:0}
 .sched-row:hover .sched-row-del{opacity:.5}
 .sched-row-del:hover{color:#e53e3e;opacity:1!important}
 .sched-add-row{display:flex;justify-content:center;align-items:center;width:100%;padding:8px 14px;cursor:pointer;border:none;border-top:1.5px dashed var(--line);background:transparent;font-size:20px;font-weight:700;color:var(--ink-3);font-family:var(--mono);transition:color .12s,background .12s,opacity .12s;opacity:0}
-#sched-body:hover .sched-add-row{opacity:.5}
+.sched-body:hover .sched-add-row{opacity:.5}
 .sched-add-row:hover{color:var(--acc);background:oklch(0.5 0 0 / .03);opacity:1!important}
-.sched-task-pill.pill-drop-before{box-shadow:-5px 0 0 3px var(--acc);transform:translateX(3px)}
-.sched-task-pill.pill-drop-after{box-shadow:5px 0 0 3px var(--acc);transform:translateX(-3px)}
+.sched-task-pill.pill-drop-before,.planner-calendar-task.pill-drop-before{box-shadow:-5px 0 0 3px var(--acc);transform:translateX(3px)}
+.sched-task-pill.pill-drop-after,.planner-calendar-task.pill-drop-after{box-shadow:5px 0 0 3px var(--acc);transform:translateX(-3px)}
 /* ===== DAY TRACKER ===== */
 .dt-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;overflow:hidden}
 .dt-panel.show{display:block}
@@ -491,6 +553,10 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
     <div class="date-strip"><span class="pip"></span><span id="live-datetime">Loading…</span></div>
     <div class="top-actions">
       <div class="nav-pills-wrap">
+        <button class="pill outline" id="cal-toggle-btn">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><path d="M2 4h12M5 2v4M11 2v4"/><rect x="2" y="3" width="12" height="11" rx="2"/><path d="M5 8h2M9 8h2M5 11h2M9 11h2"/></svg>
+          Cal
+        </button>
         <button class="pill outline" id="schedule-toggle-btn">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 2v3M11 2v3M2 7h12"/><path d="M5 10h.5M8 10h.5M11 10h.5M5 13h.5M8 13h.5"/></svg>
           Schedule
@@ -538,50 +604,26 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- SCHEDULE PANEL (top, open by default) -->
   <div class="schedule-panel" id="schedule-panel">
-    <div class="schedule-inner">
-      <!-- LEFT: schedule -->
-      <div class="sched-left">
-        <div class="schedule-panel-head">
-          <div style="display:flex;align-items:baseline;gap:10px">
-            <h2>Schedule</h2>
-            <span id="sched-today-date" style="font-family:var(--mono);font-size:11px;font-weight:600;opacity:.5;color:#fff"></span>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span id="sched-hours-left" style="font-family:var(--mono);font-size:11px;font-weight:700;color:#ff6b00;opacity:.9"></span>
-            <button class="sched-clear-all" id="sched-clear-all-btn">Clear All</button>
-          </div>
+    <div class="planner-total-bar" id="planner-total-bar">
+      <div class="planner-total-metrics">
+        <div class="planner-total-copy">
+          <span>Overall Time Left</span>
+          <strong id="planner-total-remaining">0h 0m</strong>
         </div>
-        <div class="sched-pill-bank" id="sched-pill-bank">
-          <button class="sched-add-pill-btn" id="sched-add-pill-btn" title="Add custom pill">+ task</button>
+        <div class="planner-total-copy">
+          <span>Time Left Today</span>
+          <strong id="planner-today-remaining">0h 0m</strong>
         </div>
-        <div class="sched-add-pill-form" id="sched-add-pill-form">
-          <input class="sched-add-pill-input" id="sched-add-pill-input" placeholder="Task name…" maxlength="24" />
-          <div class="sched-color-swatches" id="sched-color-swatches">
-            <button class="swatch selected" data-color="green"   style="background:oklch(0.93 0.08 145);border-color:oklch(0.55 0.20 145)" title="Green"></button>
-            <button class="swatch"          data-color="blue"    style="background:oklch(0.93 0.07 240);border-color:oklch(0.52 0.20 240)" title="Blue"></button>
-            <button class="swatch"          data-color="pink"    style="background:oklch(0.94 0.07 350);border-color:oklch(0.62 0.20 350)" title="Pink"></button>
-            <button class="swatch"          data-color="sky"     style="background:oklch(0.93 0.07 210);border-color:oklch(0.55 0.18 210)" title="Sky"></button>
-            <button class="swatch"          data-color="orange"  style="background:oklch(0.93 0.10 60);border-color:oklch(0.62 0.22 60)"   title="Orange"></button>
-            <button class="swatch"          data-color="yellow"  style="background:oklch(0.97 0.12 95);border-color:oklch(0.75 0.16 95)"   title="Yellow"></button>
-            <button class="swatch"          data-color="red"     style="background:oklch(0.93 0.08 25);border-color:oklch(0.60 0.22 25)"   title="Red"></button>
-            <button class="swatch"          data-color="purple"  style="background:oklch(0.93 0.07 290);border-color:oklch(0.58 0.20 290)" title="Purple"></button>
-            <button class="swatch"          data-color="gray"    style="background:var(--bg-2);border-color:var(--line)"                  title="Gray"></button>
-          </div>
-          <button class="sched-add-pill-confirm" id="sched-add-pill-confirm">Add</button>
-          <button class="sched-add-pill-cancel" id="sched-add-pill-cancel">✕</button>
-        </div>
-        <div id="sched-body"></div>
       </div>
-      <!-- RIGHT: goals -->
-      <div class="goals-pane">
-        <div class="goals-head">
-          <h3>Goals for Today</h3>
-          <button class="goals-clear-btn" id="goals-clear-btn">Reset</button>
-        </div>
-        <div class="goals-list" id="goals-list"></div>
-        <div class="goals-stats" id="goals-stats"></div>
+      <div class="planner-total-meta" id="planner-total-meta">until end of last planned day</div>
+    </div>
+    <div class="planner-view show" id="planner-cards-view">
+      <div class="planner-cards" id="planner-cards"></div>
+      <div class="planner-panel-actions">
+        <button class="planner-add-day-btn" id="planner-add-day-btn">+ Add Another Day</button>
       </div>
     </div>
+    <div class="planner-view" id="planner-calendar-view"></div>
   </div>
 
   <!-- DAY TRACKER PANEL -->
@@ -2397,525 +2439,387 @@ async function kvSet(key,value){
   }catch(e){console.warn('kvSet failed',e);}
 }
 
-// ===== SCHEDULE =====
+// ===== PLANNER =====
 (function(){
-  const SK='sched_v2';
-
-  function defaultSlots(){
-    const s=[];
-    for(let h=8;h<24;h++) s.push({hour:h,items:[]});
-    return s;
-  }
-
-  function validSlots(d){
-    return Array.isArray(d)&&d.length>0&&d.every(r=>typeof r.hour==='number'&&Array.isArray(r.items));
-  }
-
-  function loadLocal(){
-    try{
-      const d=JSON.parse(localStorage.getItem(SK));
-      if(validSlots(d)) return d;
-    }catch{}
-    return defaultSlots();
-  }
-
-  function save(s){
-    localStorage.setItem(SK,JSON.stringify(s));
-    kvSet('schedule',s);
-  }
-
-  async function syncFromSupabase(){
-    const remote=await kvGet('schedule');
-    if(validSlots(remote)){
-      slots=remote;
-      localStorage.setItem(SK,JSON.stringify(slots));
-      if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
-    }
-  }
-
-  function fmtHour(h){
-    const f=n=>{if(n===0||n===24)return'12 AM';if(n===12)return'12 PM';return n<12?`${n} AM`:`${n-12} PM`;};
-    return `${f(h)} – ${f(h+1)}`;
-  }
-
-  let slots=loadLocal();
-  let dragPillData=null;
-  let dragSlotSource=null;
-  let dragOverPill=null;
-
-  function clearDropTargets(){
-    document.querySelectorAll('.sched-drop-target').forEach(r=>r.classList.remove('sched-drop-target'));
-    document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
-  }
-
-  function setupPills(){
-    document.querySelectorAll('.sched-pill').forEach(pill=>{
-      pill.addEventListener('dragstart',e=>{
-        dragPillData={label:pill.dataset.label,color:pill.dataset.color};
-        e.dataTransfer.effectAllowed='copy';
-        e.dataTransfer.setData('text/plain',pill.dataset.label);
-        setTimeout(()=>pill.classList.add('dragging-pill'),0);
-      });
-      pill.addEventListener('dragend',()=>{
-        pill.classList.remove('dragging-pill');
-        dragPillData=null;
-        clearDropTargets();
-      });
-    });
-  }
-
-  function render(){
-    const body=document.getElementById('sched-body');
-    if(!body)return;
-    body.innerHTML='';
-    const curH=new Date().getHours();
-
-    slots.forEach((slot,i)=>{
-      const row=document.createElement('div');
-      row.className='sched-row'+(slot.hour===curH?' sched-active':'');
-
-      const time=document.createElement('div');
-      time.className='sched-time';
-      time.textContent=fmtHour(slot.hour);
-
-      const pillsWrap=document.createElement('div');
-      pillsWrap.className='sched-task-pills';
-
-      slot.items.forEach((item,j)=>{
-        const p=document.createElement('span');
-        p.className='sched-task-pill';
-        p.dataset.color=item.color||'default';
-        p.draggable=true;
-        p.appendChild(document.createTextNode(item.label));
-        const rm=document.createElement('button');
-        rm.className='pill-rm';
-        rm.textContent='×';
-        rm.title='Remove';
-        rm.addEventListener('click',e=>{
-          e.stopPropagation();
-          slots[i].items.splice(j,1);
-          save(slots);
-          render();
-        });
-        p.appendChild(rm);
-        p.addEventListener('dragstart',e=>{
-          dragSlotSource={slotIdx:i,itemIdx:j};
-          dragPillData=null;
-          e.dataTransfer.effectAllowed='move';
-          e.dataTransfer.setData('text/plain',item.label);
-          setTimeout(()=>p.classList.add('dragging-slot-pill'),0);
-        });
-        p.addEventListener('dragend',()=>{
-          p.classList.remove('dragging-slot-pill');
-          dragSlotSource=null;
-          dragOverPill=null;
-          clearDropTargets();
-        });
-        p.addEventListener('dragover',e=>{
-          if(!dragSlotSource)return;
-          e.preventDefault();
-          e.stopPropagation();
-          document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
-          const r=p.getBoundingClientRect();
-          const before=e.clientX<r.left+r.width/2;
-          p.classList.add(before?'pill-drop-before':'pill-drop-after');
-          dragOverPill={slotIdx:i,itemIdx:j,before};
-        });
-        p.addEventListener('dragleave',e=>{
-          if(!p.contains(e.relatedTarget))
-            p.classList.remove('pill-drop-before','pill-drop-after');
-        });
-        p.addEventListener('drop',e=>{
-          e.preventDefault();
-          e.stopPropagation();
-          p.classList.remove('pill-drop-before','pill-drop-after');
-          if(!dragSlotSource||!dragOverPill)return;
-          const src=dragSlotSource;
-          const tgt=dragOverPill;
-          if(src.slotIdx===tgt.slotIdx){
-            const items=slots[src.slotIdx].items;
-            const[moved]=items.splice(src.itemIdx,1);
-            let at=tgt.itemIdx;
-            if(src.itemIdx<tgt.itemIdx)at--;
-            if(!tgt.before)at++;
-            items.splice(Math.max(0,Math.min(at,items.length)),0,moved);
-          }else{
-            const moved=slots[src.slotIdx].items.splice(src.itemIdx,1)[0];
-            slots[tgt.slotIdx].items.splice(tgt.itemIdx+(tgt.before?0:1),0,moved);
-          }
-          dragSlotSource=null;
-          dragOverPill=null;
-          save(slots);render();
-        });
-        pillsWrap.appendChild(p);
-      });
-
-      const addInp=document.createElement('input');
-      addInp.className='sched-pill-add';
-      addInp.placeholder='';
-      function commitInput(){
-        if(addInp.value.trim()){
-          const _rc=['green','blue','pink','sky','orange','yellow','red','purple'];
-          slots[i].items.push({label:addInp.value.trim(),color:_rc[Math.floor(Math.random()*_rc.length)]});
-          addInp.value='';
-          save(slots);
-          render();
-        }
-      }
-      addInp.addEventListener('keydown',e=>{
-        if(e.key==='Enter'){e.preventDefault();commitInput();}
-      });
-      addInp.addEventListener('blur',()=>commitInput());
-      pillsWrap.appendChild(addInp);
-
-      row.addEventListener('dragover',e=>{
-        if(!dragPillData && !dragSlotSource)return;
-        // Let pill-level dragover handle its own indicators
-        if(dragSlotSource && e.target.closest('.sched-task-pill'))return;
-        e.preventDefault();
-        clearDropTargets();
-        row.classList.add('sched-drop-target');
-      });
-      row.addEventListener('dragleave',e=>{
-        if(!row.contains(e.relatedTarget))row.classList.remove('sched-drop-target');
-      });
-      row.addEventListener('drop',e=>{
-        e.preventDefault();
-        clearDropTargets();
-        if(dragSlotSource){
-          const src=dragSlotSource;
-          if(src.slotIdx===i){dragSlotSource=null;dragOverPill=null;return;}
-          const moved=slots[src.slotIdx].items.splice(src.itemIdx,1)[0];
-          slots[i].items.push(moved);
-          dragSlotSource=null;
-          dragOverPill=null;
-          save(slots); render();
-        } else if(dragPillData){
-          slots[i].items.push({...dragPillData});
-          dragPillData=null;
-          save(slots); render();
-        }
-      });
-
-      const del=document.createElement('button');
-      del.className='sched-row-del';
-      del.textContent='−';
-      del.title='Remove slot';
-      del.addEventListener('click',()=>{slots.splice(i,1);save(slots);render();});
-
-      row.appendChild(time);
-      row.appendChild(pillsWrap);
-      row.appendChild(del);
-      body.appendChild(row);
-    });
-
-    const nextH=slots.length>0?(slots[slots.length-1].hour+1)%24:8;
-    const addRowBtn=document.createElement('button');
-    addRowBtn.className='sched-add-row';
-    addRowBtn.textContent='+';
-    addRowBtn.title='Add '+fmtHour(nextH);
-    addRowBtn.addEventListener('click',()=>{slots.push({hour:nextH,items:[]});save(slots);render();});
-    body.appendChild(addRowBtn);
-    updateHoursLeft();
-  }
-
-  function updateHoursLeft(){
-    const el=document.getElementById('sched-hours-left');
-    if(!el)return;
-    const now=new Date();
-    const endH=slots.length>0?(slots[slots.length-1].hour+1):24;
-    const nowMins=now.getHours()*60+now.getMinutes();
-    let endMins=endH*60;
-    if(endMins<=nowMins)endMins+=24*60;
-    const mins=endMins-nowMins;
-    if(mins<=0){el.textContent='';return;}
-    const h=Math.floor(mins/60);const m=mins%60;
-    el.textContent=h>0?`${h}h ${m}m left`:(m>0?`${m}m left`:'');
-  }
-
-  function openSchedule(){
-    const panel=document.getElementById('schedule-panel');
-    const btn=document.getElementById('schedule-toggle-btn');
-    panel.classList.add('show');
-    btn.classList.add('active');
-    render(); setupPills();
-    const d=new Date();
-    const el=document.getElementById('sched-today-date');
-    if(el) el.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    updateHoursLeft();
-  }
-
-  document.getElementById('schedule-toggle-btn')?.addEventListener('click',()=>{
-    const panel=document.getElementById('schedule-panel');
-    const btn=document.getElementById('schedule-toggle-btn');
-    panel.classList.toggle('show');
-    btn.classList.toggle('active',panel.classList.contains('show'));
-    if(panel.classList.contains('show')){
-      render(); setupPills();
-      const d=new Date();
-      const el=document.getElementById('sched-today-date');
-      if(el) el.textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-    }
-  });
-
-  // ---- custom pill bank ----
+  const PLANS_KEY='planner_cards_v1';
+  const LEGACY_SCHEDULE_KEY='sched_v2';
+  const LEGACY_GOALS_KEY='goals_v1';
   const BANK_KEY='sched_bank_v1';
+  const COUNT=5;
+  const BLOCKED_PILL_LABELS=new Set(['PPT']);
+  const ALL_PILL_COLORS=['green','blue','pink','sky','orange','yellow','red','purple','gray','default'];
+  const PLANNER_START_HOUR=6;
+  const PLANNER_END_HOUR=24;
   const DEFAULT_BANK=[
     {label:'HAI',color:'green'},{label:'JA',color:'blue'},
     {label:'Meal',color:'pink'},{label:'Shower',color:'sky'}
   ];
-  function loadBank(){
-    try{const d=JSON.parse(localStorage.getItem(BANK_KEY));if(Array.isArray(d)&&d.length)return d;}catch{}
-    return DEFAULT_BANK.map(x=>({...x}));
+  const RANDOM_COLORS=['green','blue','pink','sky','orange','yellow','red','purple'];
+  const PILL_COLORS={green:'#16a34a',blue:'#2563eb',pink:'#db2777',sky:'#0284c7',orange:'#ea580c',yellow:'#b45309',red:'#dc2626',purple:'#7c3aed',gray:'#4b5563',default:'#374151'};
+  const chartsByPlan=new Map();
+
+  let dragPillData=null;
+  let dragSlotSource=null;
+  let dragOverPill=null;
+  let inputSaveTimer=null;
+  let plannerMode='cards';
+
+  function uid(){
+    return `plan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
   }
-  function saveBank(b){ localStorage.setItem(BANK_KEY,JSON.stringify(b)); kvSet('pill_bank',b); }
 
-  const ALL_PILL_COLORS=['green','blue','pink','sky','orange','yellow','red','purple','gray','default'];
+  function isBlockedPillLabel(label){
+    return BLOCKED_PILL_LABELS.has(String(label || '').trim().toUpperCase());
+  }
 
-  function renderBank(){
-    const bank=document.getElementById('sched-pill-bank');
-    if(!bank)return;
-    const addBtn=document.getElementById('sched-add-pill-btn');
-    bank.querySelectorAll('.sched-pill,.sched-pill-edit-wrap').forEach(p=>p.remove());
-    bankPills.forEach((pill,i)=>{
-      const wrap=document.createElement('div');
-      wrap.className='sched-pill-edit-wrap';
-      wrap.style.cssText='position:relative;display:inline-flex;align-items:center;';
+  function defaultSlots(){
+    const slots=[];
+    for(let h=PLANNER_START_HOUR;h<PLANNER_END_HOUR;h++) slots.push({hour:h,items:[]});
+    return slots;
+  }
 
-      const el=document.createElement('div');
-      el.className='sched-pill';
-      el.dataset.color=pill.color;
-      el.dataset.label=pill.label;
-      el.draggable=true;
-      el.textContent=pill.label;
+  function defaultGoals(){
+    return Array.from({length:COUNT},()=>({text:'',done:false}));
+  }
 
-      // edit pencil (on hover)
-      const editBtn=document.createElement('button');
-      editBtn.textContent='✎';
-      editBtn.style.cssText='position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;font-size:9px;border:1px solid var(--line);background:var(--card);color:var(--ink-3);cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:2';
-      wrap.addEventListener('mouseenter',()=>{ editBtn.style.display='flex'; });
-      wrap.addEventListener('mouseleave',()=>{ editBtn.style.display='none'; });
+  function makePlan(name=''){
+    return { id:uid(), name, slots:defaultSlots(), goals:defaultGoals() };
+  }
 
-      editBtn.addEventListener('click',e=>{
-        e.stopPropagation();
-        const label=prompt('Edit pill name:',pill.label);
-        if(label===null)return;
-        const colorOpts=ALL_PILL_COLORS.join(', ');
-        const color=prompt(`Color (${colorOpts}):`,pill.color)||pill.color;
-        bankPills[i]={label:label.trim()||pill.label, color:ALL_PILL_COLORS.includes(color)?color:pill.color};
-        saveBank(bankPills);
-        renderBank();
-        setupPills();
-      });
+  function fmtHour(h){
+    const f=n=>{
+      const normalized=((n % 24) + 24) % 24;
+      if(normalized === 0) return '12 AM';
+      if(normalized === 12) return '12 PM';
+      return normalized < 12 ? `${normalized} AM` : `${normalized - 12} PM`;
+    };
+    return `${f(h)} – ${f(h+1)}`;
+  }
 
-      el.addEventListener('contextmenu',e=>{
-        e.preventDefault();
-        if(confirm(`Delete "${pill.label}"?`)){
-          bankPills.splice(i,1);
-          saveBank(bankPills);
-          renderBank();
-          setupPills();
-        }
-      });
+  function sanitizeItems(items){
+    if(!Array.isArray(items)) return [];
+    return items
+      .filter(item=>item && !isBlockedPillLabel(item.label))
+      .map(item=>({label:String(item.label || '').trim(),color:item.color || 'default'}))
+      .filter(item=>item.label);
+  }
 
-      wrap.appendChild(el);
-      wrap.appendChild(editBtn);
-      bank.insertBefore(wrap,addBtn);
+  function sanitizeSlots(data){
+    const base=new Map(defaultSlots().map(slot=>[slot.hour,{hour:slot.hour,items:[]}]));
+    if(Array.isArray(data)){
+      data
+        .filter(slot=>slot && typeof slot.hour==='number')
+        .forEach(slot=>{
+          if(slot.hour < PLANNER_START_HOUR) return;
+          base.set(slot.hour,{hour:slot.hour,items:sanitizeItems(slot.items)});
+        });
+    }
+    return Array.from(base.values()).sort((a,b)=>a.hour-b.hour);
+  }
+
+  function sanitizeGoals(data){
+    if(!Array.isArray(data) || !data.length) return defaultGoals();
+    return data.map(goal=>({
+      text: String(goal?.text || ''),
+      done: !!goal?.done
+    }));
+  }
+
+  function sanitizeBank(data){
+    if(!Array.isArray(data)) return DEFAULT_BANK.map(x=>({...x}));
+    const clean=data
+      .filter(pill=>pill && !isBlockedPillLabel(pill.label))
+      .map(pill=>({label:String(pill.label || '').trim(),color:pill.color || 'default'}))
+      .filter(pill=>pill.label);
+    return clean.length ? clean : DEFAULT_BANK.map(x=>({...x}));
+  }
+
+  function normalizePlan(plan,index=0){
+    return {
+      id: plan?.id || uid(),
+      name: typeof plan?.name === 'string' ? plan.name : (index === 0 ? 'Today' : ''),
+      slots: sanitizeSlots(plan?.slots),
+      goals: sanitizeGoals(plan?.goals)
+    };
+  }
+
+  function validSlots(data){
+    return Array.isArray(data) && data.length > 0 && data.every(slot=>typeof slot?.hour === 'number' && Array.isArray(slot?.items));
+  }
+
+  function validGoals(data){
+    return Array.isArray(data) && data.length > 0 && data.every(goal=>goal && typeof goal === 'object' && 'text' in goal);
+  }
+
+  function validPlans(data){
+    return Array.isArray(data) && data.length > 0 && data.every(plan=>plan && (validSlots(plan.slots) || validGoals(plan.goals)));
+  }
+
+  function normalizePlans(data){
+    if(!validPlans(data)) return [makePlan('Today')];
+    return data.map((plan,index)=>normalizePlan(plan,index));
+  }
+
+  function plannerDate(index){
+    const date=new Date();
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate() + index);
+    return date;
+  }
+
+  function plannerLabel(plan,index){
+    if(index === 0) return 'Today';
+    return plannerDate(index).toLocaleDateString('en-US',{
+      month:'short',
+      day:'numeric'
     });
-    setupPills();
   }
 
-  let bankPills=loadBank();
-  let selectedColor='green';
-
-  document.getElementById('sched-add-pill-btn')?.addEventListener('click',()=>{
-    document.getElementById('sched-add-pill-form')?.classList.add('show');
-    document.getElementById('sched-add-pill-input')?.focus();
-  });
-  document.getElementById('sched-add-pill-cancel')?.addEventListener('click',()=>{
-    document.getElementById('sched-add-pill-form')?.classList.remove('show');
-    if(document.getElementById('sched-add-pill-input')) document.getElementById('sched-add-pill-input').value='';
-  });
-  document.getElementById('sched-color-swatches')?.addEventListener('click',e=>{
-    const sw=e.target.closest('.swatch');
-    if(!sw)return;
-    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
-    sw.classList.add('selected');
-    selectedColor=sw.dataset.color;
-  });
-  function confirmAddPill(){
-    const inp=document.getElementById('sched-add-pill-input');
-    const label=(inp?.value||'').trim();
-    if(!label)return;
-    bankPills.push({label,color:selectedColor});
-    saveBank(bankPills);
-    renderBank();
-    inp.value='';
-    document.getElementById('sched-add-pill-form')?.classList.remove('show');
-  }
-  document.getElementById('sched-add-pill-confirm')?.addEventListener('click',confirmAddPill);
-  document.getElementById('sched-add-pill-input')?.addEventListener('keydown',e=>{
-    if(e.key==='Enter'){e.preventDefault();confirmAddPill();}
-    if(e.key==='Escape') document.getElementById('sched-add-pill-cancel')?.click();
-  });
-
-  renderBank();
-
-  document.getElementById('sched-clear-all-btn')?.addEventListener('click',()=>{
-    slots=defaultSlots();
-    save(slots);
-    render();
-  });
-
-  setInterval(()=>{
-    if(document.getElementById('schedule-panel')?.classList.contains('show')){render();updateHoursLeft();}
-  },60000);
-
-  syncFromSupabase();
-})();
-
-// ===== GOALS =====
-(function(){
-  const GK='goals_v1';
-  const COUNT=5;
-
-  function defaultGoals(){ return Array.from({length:COUNT},()=>({text:'',done:false})); }
-
-  function validGoals(d){ return Array.isArray(d)&&d.length>0&&d.every(r=>typeof r==='object'&&'text' in r); }
-
-  function loadLocal(){
-    try{
-      const d=JSON.parse(localStorage.getItem(GK));
-      if(validGoals(d)) return d;
-    }catch{}
-    return defaultGoals();
+  function planSummary(slots){
+    const planned=slots.filter(slot=>slot.items.length).length;
+    return planned ? `${planned}h planned` : 'Blank day';
   }
 
-  function save(g){
-    localStorage.setItem(GK,JSON.stringify(g));
-    kvSet('goals',g);
+  function destroyCharts(){
+    chartsByPlan.forEach(chart=>{ try{ chart.destroy(); }catch{} });
+    chartsByPlan.clear();
   }
 
-  async function syncFromSupabase(){
-    const remote=await kvGet('goals');
-    if(validGoals(remote)){
-      goals=remote;
-      localStorage.setItem(GK,JSON.stringify(goals));
-      render();
+  function persistLocal(){
+    const cleanPlans=normalizePlans(plans);
+    plans=cleanPlans;
+    localStorage.setItem(PLANS_KEY,JSON.stringify(cleanPlans));
+    if(cleanPlans[0]){
+      localStorage.setItem(LEGACY_SCHEDULE_KEY,JSON.stringify(cleanPlans[0].slots));
+      localStorage.setItem(LEGACY_GOALS_KEY,JSON.stringify(cleanPlans[0].goals));
     }
   }
 
-  let goals=loadLocal();
-  let saveTimer=null;
-
-  function render(){
-    const list=document.getElementById('goals-list');
-    if(!list)return;
-    list.innerHTML='';
-    goals.forEach((g,i)=>{
-      const uid=`goal-cb-${i}`;
-      const row=document.createElement('div');
-      row.className='goal-row'+(g.done?' done':'');
-
-      const cbWrap=document.createElement('div');
-      cbWrap.className='goal-cb-wrap';
-
-      const cb=document.createElement('input');
-      cb.type='checkbox';
-      cb.className='goal-cb';
-      cb.id=uid;
-      cb.checked=g.done;
-      cb.addEventListener('change',()=>{
-        goals[i].done=cb.checked;
-        row.classList.toggle('done',cb.checked);
-        inp.style.textDecoration=cb.checked?'line-through':'';
-        save(goals);
-      });
-
-      const lbl=document.createElement('label');
-      lbl.className='goal-cb-label';
-      lbl.htmlFor=uid;
-
-      cbWrap.appendChild(cb);
-      cbWrap.appendChild(lbl);
-
-      const inp=document.createElement('input');
-      inp.type='text';
-      inp.className='goal-input';
-      inp.placeholder='';
-      inp.value=g.text;
-      if(g.done) inp.style.textDecoration='line-through';
-      inp.addEventListener('input',()=>{
-        goals[i].text=inp.value;
-        clearTimeout(saveTimer);
-        saveTimer=setTimeout(()=>save(goals),350);
-      });
-
-      row.appendChild(cbWrap);
-      row.appendChild(inp);
-      list.appendChild(row);
-    });
-
-    // + button after last row (hover to reveal)
-    const addBtn=document.createElement('button');
-    addBtn.className='goals-add-row-btn';
-    addBtn.textContent='+';
-    addBtn.title='Add goal';
-    addBtn.addEventListener('click',()=>{
-      goals.push({text:'',done:false});
-      save(goals);
-      render();
-      // focus the new input
-      const inputs=list.querySelectorAll('.goal-input');
-      if(inputs.length) inputs[inputs.length-1].focus();
-    });
-    list.appendChild(addBtn);
+  function savePlans(){
+    persistLocal();
+    kvSet('planner_cards',plans);
+    if(plans[0]){
+      kvSet('schedule',plans[0].slots);
+      kvSet('goals',plans[0].goals);
+    }
   }
 
-  const PILL_COLORS={green:'#16a34a',blue:'#2563eb',pink:'#db2777',sky:'#0284c7',orange:'#ea580c',yellow:'#b45309',red:'#dc2626',purple:'#7c3aed',gray:'#4b5563',default:'#374151'};
-
-  let _statsChart=null;
-  function renderStats(){
-    const el=document.getElementById('goals-stats');
-    if(!el)return;
+  function loadLegacyLocal(){
+    let slots=defaultSlots();
+    let goals=defaultGoals();
     try{
-      const slotsData=JSON.parse(localStorage.getItem('sched_v2'))||[];
-      const counts={};
-      slotsData.forEach(slot=>slot.items.forEach(item=>{
-        const key=item.label;
-        if(!counts[key]) counts[key]={n:0,color:item.color||'default'};
-        counts[key].n++;
-      }));
-      const entries=Object.entries(counts).sort((a,b)=>b[1].n-a[1].n);
-      if(!entries.length){
-        if(_statsChart){_statsChart.destroy();_statsChart=null;}
-        el.innerHTML='';return;
-      }
-      el.innerHTML='<div style="display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.45;margin-bottom:8px;padding:0 2px">Tasking time<button id="stats-refresh-btn" title="Refresh" style="background:none;border:none;cursor:pointer;padding:0;line-height:1;display:inline-flex;align-items:center;color:inherit;font-size:11px;transition:transform .2s">↻</button></div>';
-      document.getElementById('stats-refresh-btn')?.addEventListener('click',()=>renderStats());
-      entries.forEach(([label,{n,color}])=>{
-        const bg=PILL_COLORS[color]||'#374151';
-        const row=document.createElement('div');
-        row.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
-        row.innerHTML=`<span style="background:${bg};color:#fff;font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px">${label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.7">${n}h</span>`;
-        el.appendChild(row);
+      const storedSlots=JSON.parse(localStorage.getItem(LEGACY_SCHEDULE_KEY));
+      if(validSlots(storedSlots)) slots=sanitizeSlots(storedSlots);
+    }catch{}
+    try{
+      const storedGoals=JSON.parse(localStorage.getItem(LEGACY_GOALS_KEY));
+      if(validGoals(storedGoals)) goals=sanitizeGoals(storedGoals);
+    }catch{}
+    return [{id:uid(),name:'Today',slots,goals}];
+  }
+
+  function loadLocalPlans(){
+    try{
+      const stored=JSON.parse(localStorage.getItem(PLANS_KEY));
+      if(validPlans(stored)) return normalizePlans(stored);
+    }catch{}
+    return loadLegacyLocal();
+  }
+
+  function loadBank(){
+    try{
+      const stored=JSON.parse(localStorage.getItem(BANK_KEY));
+      if(Array.isArray(stored) && stored.length) return sanitizeBank(stored);
+    }catch{}
+    return DEFAULT_BANK.map(x=>({...x}));
+  }
+
+  function saveBank(nextBank){
+    bankPills=sanitizeBank(nextBank);
+    localStorage.setItem(BANK_KEY,JSON.stringify(bankPills));
+    kvSet('pill_bank',bankPills);
+  }
+
+  function findPlanIndex(planId){
+    return plans.findIndex(plan=>plan.id === planId);
+  }
+
+  function getPlan(planId){
+    return plans[findPlanIndex(planId)];
+  }
+
+  function getSlotIndex(plan,hour){
+    return plan.slots.findIndex(slot=>slot.hour === hour);
+  }
+
+  function getSlot(plan,hour){
+    return plan.slots[getSlotIndex(plan,hour)];
+  }
+
+  function ensureSlot(plan,hour){
+    let idx=getSlotIndex(plan,hour);
+    if(idx >= 0) return {slot:plan.slots[idx],index:idx};
+    plan.slots.push({hour,items:[]});
+    plan.slots.sort((a,b)=>a.hour-b.hour);
+    idx=getSlotIndex(plan,hour);
+    return {slot:plan.slots[idx],index:idx};
+  }
+
+  function removeItem(planId,slotIdx,itemIdx){
+    const plan=getPlan(planId);
+    if(!plan || !plan.slots[slotIdx]) return;
+    plan.slots[slotIdx].items.splice(itemIdx,1);
+    savePlans();
+    render();
+  }
+
+  function addItemToSlot(planId,hour,item){
+    const plan=getPlan(planId);
+    if(!plan) return;
+    const {slot}=ensureSlot(plan,hour);
+    slot.items.push({label:String(item.label || '').trim(),color:item.color || randomColor()});
+    savePlans();
+    render();
+  }
+
+  function moveDraggedItem(targetPlanId,targetHour,targetItemIdx=null,before=false){
+    if(!dragSlotSource) return false;
+    const srcPlan=getPlan(dragSlotSource.planId);
+    const targetPlan=getPlan(targetPlanId);
+    if(!srcPlan || !targetPlan) return false;
+    const sourceSlot=srcPlan.slots[dragSlotSource.slotIdx];
+    if(!sourceSlot) return false;
+    const [moved]=sourceSlot.items.splice(dragSlotSource.itemIdx,1);
+    if(!moved) return false;
+    const {slot:targetSlot}=ensureSlot(targetPlan,targetHour);
+    let insertAt=targetSlot.items.length;
+    if(targetItemIdx != null){
+      insertAt=Math.max(0,Math.min(targetItemIdx + (before ? 0 : 1),targetSlot.items.length));
+      if(dragSlotSource.planId === targetPlanId && sourceSlot === targetSlot && dragSlotSource.itemIdx < insertAt) insertAt--;
+    }
+    targetSlot.items.splice(insertAt,0,moved);
+    dragSlotSource=null;
+    dragOverPill=null;
+    savePlans();
+    render();
+    return true;
+  }
+
+  function getDisplayHours(){
+    const hours=new Set();
+    for(let h=PLANNER_START_HOUR;h<PLANNER_END_HOUR;h++) hours.add(h);
+    plans.forEach(plan=>plan.slots.forEach(slot=>{ if(slot.hour >= PLANNER_START_HOUR) hours.add(slot.hour); }));
+    return Array.from(hours).sort((a,b)=>a-b);
+  }
+
+  function updatePlannerTotalBar(){
+    const totalEl=document.getElementById('planner-total-remaining');
+    const todayEl=document.getElementById('planner-today-remaining');
+    const metaEl=document.getElementById('planner-total-meta');
+    if(!totalEl || !todayEl || !metaEl) return;
+
+    const now=new Date();
+    const currentHour=now.getHours();
+    const currentMinutes=now.getMinutes();
+    const dayCount=Math.max(plans.length,1);
+
+    let remainingSlots=0;
+    plans.forEach((plan,planIndex)=>{
+      plan.slots.forEach(slot=>{
+        if(planIndex === 0){
+          // Skip slots that have fully finished today.
+          if(slot.hour < currentHour) return;
+          if(slot.hour === currentHour && currentMinutes >= 60) return;
+        }
+        remainingSlots += 1;
       });
-      // pie chart
-      const wrap=document.createElement('div');
-      wrap.style.cssText='margin-top:48px;position:relative;width:100%;max-width:160px;margin-left:auto;margin-right:auto';
-      const canvas=document.createElement('canvas');
-      canvas.id='goals-stats-pie';
-      canvas.style.cssText='width:100%;height:auto';
-      wrap.appendChild(canvas);
-      el.appendChild(wrap);
-      if(_statsChart){_statsChart.destroy();_statsChart=null;}
-      _statsChart=new Chart(canvas,{
+    });
+
+    // Include the overnight bridge from the final planner day to 8 AM next morning.
+    remainingSlots += 8;
+
+    totalEl.textContent=`${remainingSlots}h 0m`;
+
+    const todayPlan=plans[0];
+    const todayLastHour=todayPlan?.slots?.length ? Math.max(...todayPlan.slots.map(slot=>slot.hour)) + 1 : PLANNER_START_HOUR;
+    const todayEnd=new Date(now);
+    todayEnd.setHours(todayLastHour,0,0,0);
+    const todayDiffMs=Math.max(0,todayEnd.getTime() - now.getTime());
+    const todayMinutes=Math.floor(todayDiffMs / 60000);
+    const todayHoursWhole=Math.floor(todayMinutes / 60);
+    const todayMinutesRemainder=todayMinutes % 60;
+    todayEl.textContent=`${todayHoursWhole}h ${todayMinutesRemainder}m`;
+
+    const lastLabel=plannerLabel(plans[plans.length - 1] || makePlan('Today'), dayCount - 1);
+    metaEl.textContent=`${remainingSlots} remaining slots through 8:00 AM after ${lastLabel}`;
+  }
+
+  function clearDropTargets(){
+    document.querySelectorAll('.sched-drop-target').forEach(row=>row.classList.remove('sched-drop-target'));
+    document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
+  }
+
+  function updatePlannerModeUI(){
+    const cardsView=document.getElementById('planner-cards-view');
+    const calendarView=document.getElementById('planner-calendar-view');
+    const scheduleBtn=document.getElementById('schedule-toggle-btn');
+    const calBtn=document.getElementById('cal-toggle-btn');
+    cardsView?.classList.toggle('show',plannerMode === 'cards');
+    calendarView?.classList.toggle('show',plannerMode === 'calendar');
+    scheduleBtn?.classList.toggle('active',document.getElementById('schedule-panel')?.classList.contains('show') && plannerMode === 'cards');
+    calBtn?.classList.toggle('active',document.getElementById('schedule-panel')?.classList.contains('show') && plannerMode === 'calendar');
+  }
+
+  function randomColor(){
+    return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+  }
+
+  function renderStatsInto(el,plan){
+    el.innerHTML='';
+    const counts={};
+    plan.slots.forEach(slot=>slot.items.forEach(item=>{
+      const key=item.label;
+      if(!counts[key]) counts[key]={n:0,color:item.color || 'default'};
+      counts[key].n++;
+    }));
+    const entries=Object.entries(counts).sort((a,b)=>b[1].n-a[1].n);
+    if(!entries.length) return;
+
+    const head=document.createElement('div');
+    head.style.cssText='display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.45;margin-bottom:8px;padding:0 2px';
+    head.textContent='Tasking time';
+
+    const refresh=document.createElement('button');
+    refresh.type='button';
+    refresh.title='Refresh';
+    refresh.textContent='↻';
+    refresh.style.cssText='background:none;border:none;cursor:pointer;padding:0;line-height:1;display:inline-flex;align-items:center;color:inherit;font-size:11px';
+    refresh.addEventListener('click',()=>render());
+    head.appendChild(refresh);
+    el.appendChild(head);
+
+    entries.forEach(([label,{n,color}])=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
+      row.innerHTML=`<span style="background:${PILL_COLORS[color] || '#374151'};color:#fff;font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px">${label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.7">${n}h</span>`;
+      el.appendChild(row);
+    });
+
+    const wrap=document.createElement('div');
+    wrap.style.cssText='margin-top:48px;position:relative;width:100%;max-width:160px;margin-left:auto;margin-right:auto';
+    const canvas=document.createElement('canvas');
+    canvas.style.cssText='width:100%;height:auto';
+    wrap.appendChild(canvas);
+    el.appendChild(wrap);
+
+    try{
+      const chart=new Chart(canvas,{
         type:'doughnut',
         data:{
-          labels:entries.map(([l])=>l),
+          labels:entries.map(([label])=>label),
           datasets:[{
             data:entries.map(([,{n}])=>n),
-            backgroundColor:entries.map(([,{color}])=>PILL_COLORS[color]||'#374151'),
+            backgroundColor:entries.map(([,{color}])=>PILL_COLORS[color] || '#374151'),
             borderWidth:0,
             hoverOffset:4
           }]
@@ -2929,22 +2833,718 @@ async function kvSet(key,value){
           }
         }
       });
+      chartsByPlan.set(plan.id,chart);
     }catch{}
   }
 
-  document.getElementById('goals-clear-btn')?.addEventListener('click',()=>{
-    goals=defaultGoals();
-    save(goals);
+  function renderCalendarView(){
+    const calendarView=document.getElementById('planner-calendar-view');
+    if(!calendarView) return;
+    calendarView.innerHTML='';
+
+    const wrap=document.createElement('div');
+    wrap.className='planner-calendar-wrap';
+    const table=document.createElement('table');
+    table.className='planner-calendar-table';
+
+    const thead=document.createElement('thead');
+    const headRow=document.createElement('tr');
+    const timeHead=document.createElement('th');
+    timeHead.textContent='Time';
+    headRow.appendChild(timeHead);
+    plans.forEach((plan,index)=>{
+      const th=document.createElement('th');
+      const day=document.createElement('div');
+      day.className='planner-calendar-day';
+      const title=document.createElement('strong');
+      title.textContent=plannerLabel(plan,index);
+      const sub=document.createElement('span');
+      sub.textContent=`${plan.slots.length} slots`;
+      day.appendChild(title);
+      day.appendChild(sub);
+      th.appendChild(day);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const hours=getDisplayHours();
+    const tbody=document.createElement('tbody');
+    hours.forEach(hour=>{
+      const tr=document.createElement('tr');
+      const timeCell=document.createElement('td');
+      timeCell.className='planner-calendar-time';
+      timeCell.textContent=fmtHour(hour);
+      tr.appendChild(timeCell);
+
+      plans.forEach(plan=>{
+        const td=document.createElement('td');
+        td.className='planner-calendar-cell';
+        const slotInfo=ensureSlot(plan,hour);
+        const slot=slotInfo.slot;
+        const slotIdx=slotInfo.index;
+
+        const stack=document.createElement('div');
+        stack.className='planner-calendar-task-stack';
+
+        slot.items.forEach((item,itemIdx)=>{
+          const task=document.createElement('span');
+          task.className='planner-calendar-task';
+          task.dataset.color=item.color || 'default';
+          task.draggable=true;
+          task.style.background=PILL_COLORS[item.color] || PILL_COLORS.default;
+          const label=document.createElement('span');
+          label.className='planner-calendar-task-label';
+          label.textContent=item.label;
+          task.appendChild(label);
+
+          const remove=document.createElement('button');
+          remove.type='button';
+          remove.className='pill-rm';
+          remove.textContent='×';
+          remove.title='Remove';
+          remove.addEventListener('click',e=>{
+            e.stopPropagation();
+            removeItem(plan.id,slotIdx,itemIdx);
+          });
+          task.appendChild(remove);
+
+          task.addEventListener('dragstart',e=>{
+            dragSlotSource={planId:plan.id,slotIdx,itemIdx};
+            dragPillData=null;
+            e.dataTransfer.effectAllowed='move';
+            e.dataTransfer.setData('text/plain',item.label);
+            setTimeout(()=>task.classList.add('dragging-slot-pill'),0);
+          });
+          task.addEventListener('dragend',()=>{
+            task.classList.remove('dragging-slot-pill');
+            dragSlotSource=null;
+            dragOverPill=null;
+            clearDropTargets();
+            document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
+          });
+          task.addEventListener('dragover',e=>{
+            if(!dragSlotSource) return;
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
+            const rect=task.getBoundingClientRect();
+            const before=e.clientX < rect.left + rect.width / 2;
+            task.classList.add(before ? 'pill-drop-before' : 'pill-drop-after');
+            dragOverPill={planId:plan.id,slotIdx,itemIdx,before,hour};
+          });
+          task.addEventListener('dragleave',e=>{
+            if(!task.contains(e.relatedTarget)) task.classList.remove('pill-drop-before','pill-drop-after');
+          });
+          task.addEventListener('drop',e=>{
+            e.preventDefault();
+            e.stopPropagation();
+            task.classList.remove('pill-drop-before','pill-drop-after');
+            if(dragSlotSource){
+              moveDraggedItem(plan.id,hour,itemIdx,dragOverPill?.before);
+            }
+          });
+
+          stack.appendChild(task);
+        });
+
+        const input=document.createElement('input');
+        input.type='text';
+        input.className='sched-pill-add';
+        input.placeholder='';
+        const commit=()=>{
+          const label=input.value.trim();
+          if(!label) return;
+          input.value='';
+          addItemToSlot(plan.id,hour,{label,color:randomColor()});
+        };
+        input.addEventListener('keydown',e=>{
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            input.dataset.skipBlurCommit='1';
+            commit();
+          }
+        });
+        input.addEventListener('blur',()=>{
+          if(input.dataset.skipBlurCommit === '1'){
+            delete input.dataset.skipBlurCommit;
+            return;
+          }
+          commit();
+        });
+        stack.appendChild(input);
+
+        td.addEventListener('dragover',e=>{
+          if(!dragPillData && !dragSlotSource) return;
+          e.preventDefault();
+          document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
+          td.classList.add('drop-target');
+        });
+        td.addEventListener('dragleave',e=>{
+          if(!td.contains(e.relatedTarget)) td.classList.remove('drop-target');
+        });
+        td.addEventListener('drop',e=>{
+          e.preventDefault();
+          td.classList.remove('drop-target');
+          if(dragSlotSource){
+            moveDraggedItem(plan.id,hour);
+          }else if(dragPillData){
+            addItemToSlot(plan.id,hour,{...dragPillData});
+            dragPillData=null;
+          }
+        });
+
+        td.appendChild(stack);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    calendarView.appendChild(wrap);
+  }
+
+  function createSwatch(color,isSelected){
+    const sw=document.createElement('button');
+    sw.type='button';
+    sw.className='swatch'+(isSelected?' selected':'');
+    sw.dataset.color=color;
+    const styles={
+      green:'background:oklch(0.93 0.08 145);border-color:oklch(0.55 0.20 145)',
+      blue:'background:oklch(0.93 0.07 240);border-color:oklch(0.52 0.20 240)',
+      pink:'background:oklch(0.94 0.07 350);border-color:oklch(0.62 0.20 350)',
+      sky:'background:oklch(0.93 0.07 210);border-color:oklch(0.55 0.18 210)',
+      orange:'background:oklch(0.93 0.10 60);border-color:oklch(0.62 0.22 60)',
+      yellow:'background:oklch(0.97 0.12 95);border-color:oklch(0.75 0.16 95)',
+      red:'background:oklch(0.93 0.08 25);border-color:oklch(0.60 0.22 25)',
+      purple:'background:oklch(0.93 0.07 290);border-color:oklch(0.58 0.20 290)',
+      gray:'background:var(--bg-2);border-color:var(--line)'
+    };
+    sw.style.cssText=styles[color] || styles.gray;
+    sw.title=color[0].toUpperCase()+color.slice(1);
+    return sw;
+  }
+
+  function render(){
+    const container=document.getElementById('planner-cards');
+    if(!container) return;
+    destroyCharts();
+    container.innerHTML='';
+    updatePlannerTotalBar();
+
+    plans.forEach((plan,planIndex)=>{
+      const card=document.createElement('section');
+      card.className='schedule-card';
+      card.dataset.planId=plan.id;
+
+      const inner=document.createElement('div');
+      inner.className='schedule-inner';
+
+      const left=document.createElement('div');
+      left.className='sched-left';
+
+      const head=document.createElement('div');
+      head.className='schedule-panel-head';
+      const headLeft=document.createElement('div');
+      headLeft.style.cssText='display:flex;align-items:baseline;gap:10px';
+      const headTitle=document.createElement('h2');
+      headTitle.textContent='Schedule';
+      const dayTag=document.createElement('span');
+      dayTag.className='planner-day-tag';
+      dayTag.textContent=plannerLabel(plan,planIndex);
+      headLeft.appendChild(headTitle);
+      headLeft.appendChild(dayTag);
+
+      const headRight=document.createElement('div');
+      headRight.style.cssText='display:flex;align-items:center;gap:10px';
+      const summary=document.createElement('span');
+      summary.style.cssText='font-family:var(--mono);font-size:11px;font-weight:700;color:#ff6b00;opacity:.9';
+      summary.textContent=planSummary(plan.slots);
+      const clearBtn=document.createElement('button');
+      clearBtn.type='button';
+      clearBtn.className='sched-clear-all';
+      clearBtn.textContent='Clear All';
+      clearBtn.addEventListener('click',()=>{
+        plan.slots=defaultSlots();
+        savePlans();
+        render();
+      });
+      headRight.appendChild(summary);
+      headRight.appendChild(clearBtn);
+      if(plans.length > 1){
+        const removeBtn=document.createElement('button');
+        removeBtn.type='button';
+        removeBtn.className='planner-remove-day-btn';
+        removeBtn.textContent='Delete Day';
+        removeBtn.addEventListener('click',()=>{
+          if(!confirm(`Delete ${plannerLabel(plan,planIndex)}?`)) return;
+          plans=plans.filter(entry=>entry.id !== plan.id);
+          savePlans();
+          render();
+        });
+        headRight.appendChild(removeBtn);
+      }
+
+      head.appendChild(headLeft);
+      head.appendChild(headRight);
+      left.appendChild(head);
+
+      const bank=document.createElement('div');
+      bank.className='sched-pill-bank';
+      bankPills.forEach((pill,pillIndex)=>{
+        const wrap=document.createElement('div');
+        wrap.className='sched-pill-edit-wrap';
+        wrap.style.cssText='position:relative;display:inline-flex;align-items:center;';
+
+        const pillEl=document.createElement('div');
+        pillEl.className='sched-pill';
+        pillEl.dataset.color=pill.color;
+        pillEl.dataset.label=pill.label;
+        pillEl.draggable=true;
+        pillEl.textContent=pill.label;
+        pillEl.addEventListener('dragstart',e=>{
+          dragPillData={label:pill.label,color:pill.color};
+          dragSlotSource=null;
+          e.dataTransfer.effectAllowed='copy';
+          e.dataTransfer.setData('text/plain',pill.label);
+          setTimeout(()=>pillEl.classList.add('dragging-pill'),0);
+        });
+        pillEl.addEventListener('dragend',()=>{
+          pillEl.classList.remove('dragging-pill');
+          dragPillData=null;
+          clearDropTargets();
+          document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
+        });
+        pillEl.addEventListener('contextmenu',e=>{
+          e.preventDefault();
+          if(confirm(`Delete "${pill.label}"?`)){
+            bankPills.splice(pillIndex,1);
+            saveBank(bankPills);
+            render();
+          }
+        });
+
+        const editBtn=document.createElement('button');
+        editBtn.type='button';
+        editBtn.textContent='✎';
+        editBtn.style.cssText='position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;font-size:9px;border:1px solid var(--line);background:var(--card);color:var(--ink-3);cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:2';
+        wrap.addEventListener('mouseenter',()=>{ editBtn.style.display='flex'; });
+        wrap.addEventListener('mouseleave',()=>{ editBtn.style.display='none'; });
+        editBtn.addEventListener('click',e=>{
+          e.stopPropagation();
+          const label=prompt('Edit pill name:',pill.label);
+          if(label === null) return;
+          const color=prompt(`Color (${ALL_PILL_COLORS.join(', ')}):`,pill.color) || pill.color;
+          bankPills[pillIndex]={
+            label: label.trim() || pill.label,
+            color: ALL_PILL_COLORS.includes(color) ? color : pill.color
+          };
+          saveBank(bankPills);
+          render();
+        });
+
+        wrap.appendChild(pillEl);
+        wrap.appendChild(editBtn);
+        bank.appendChild(wrap);
+      });
+
+      const addPillBtn=document.createElement('button');
+      addPillBtn.type='button';
+      addPillBtn.className='sched-add-pill-btn';
+      addPillBtn.title='Add custom pill';
+      addPillBtn.textContent='+ task';
+      bank.appendChild(addPillBtn);
+      left.appendChild(bank);
+
+      const addPillForm=document.createElement('div');
+      addPillForm.className='sched-add-pill-form';
+      const addPillInput=document.createElement('input');
+      addPillInput.className='sched-add-pill-input';
+      addPillInput.placeholder='Task name…';
+      addPillInput.maxLength=24;
+      const swatches=document.createElement('div');
+      swatches.className='sched-color-swatches';
+      ['green','blue','pink','sky','orange','yellow','red','purple','gray'].forEach((color,colorIndex)=>{
+        const sw=createSwatch(color,colorIndex === 0);
+        sw.addEventListener('click',()=>{
+          swatches.querySelectorAll('.swatch').forEach(btn=>btn.classList.remove('selected'));
+          sw.classList.add('selected');
+        });
+        swatches.appendChild(sw);
+      });
+      const confirmAdd=document.createElement('button');
+      confirmAdd.type='button';
+      confirmAdd.className='sched-add-pill-confirm';
+      confirmAdd.textContent='Add';
+      const cancelAdd=document.createElement('button');
+      cancelAdd.type='button';
+      cancelAdd.className='sched-add-pill-cancel';
+      cancelAdd.textContent='✕';
+      addPillForm.appendChild(addPillInput);
+      addPillForm.appendChild(swatches);
+      addPillForm.appendChild(confirmAdd);
+      addPillForm.appendChild(cancelAdd);
+      left.appendChild(addPillForm);
+
+      addPillBtn.addEventListener('click',()=>{
+        addPillForm.classList.add('show');
+        addPillInput.focus();
+      });
+      cancelAdd.addEventListener('click',()=>{
+        addPillForm.classList.remove('show');
+        addPillInput.value='';
+      });
+      const commitBankPill=()=>{
+        const label=addPillInput.value.trim();
+        if(!label) return;
+        const selected=swatches.querySelector('.swatch.selected')?.dataset.color || 'green';
+        bankPills.push({label,color:selected});
+        saveBank(bankPills);
+        render();
+      };
+      confirmAdd.addEventListener('click',commitBankPill);
+      addPillInput.addEventListener('keydown',e=>{
+        if(e.key === 'Enter'){ e.preventDefault(); commitBankPill(); }
+        if(e.key === 'Escape'){ e.preventDefault(); cancelAdd.click(); }
+      });
+
+      const body=document.createElement('div');
+      body.className='sched-body';
+
+      plan.slots.forEach((slot,slotIndex)=>{
+        const row=document.createElement('div');
+        row.className='sched-row';
+        if(planIndex === 0 && slot.hour === new Date().getHours()) row.classList.add('sched-active');
+
+        const time=document.createElement('div');
+        time.className='sched-time';
+        time.textContent=fmtHour(slot.hour);
+
+        const pillsWrap=document.createElement('div');
+        pillsWrap.className='sched-task-pills';
+
+        slot.items.forEach((item,itemIndex)=>{
+          const pillEl=document.createElement('span');
+          pillEl.className='sched-task-pill';
+          pillEl.dataset.color=item.color || 'default';
+          pillEl.draggable=true;
+          pillEl.appendChild(document.createTextNode(item.label));
+
+          const remove=document.createElement('button');
+          remove.className='pill-rm';
+          remove.textContent='×';
+          remove.title='Remove';
+          remove.addEventListener('click',e=>{
+            e.stopPropagation();
+            const cardPlan=getPlan(plan.id);
+            if(!cardPlan) return;
+            cardPlan.slots[slotIndex].items.splice(itemIndex,1);
+            savePlans();
+            render();
+          });
+          pillEl.appendChild(remove);
+
+          pillEl.addEventListener('dragstart',e=>{
+            dragSlotSource={planId:plan.id,slotIdx:slotIndex,itemIdx:itemIndex};
+            dragPillData=null;
+            e.dataTransfer.effectAllowed='move';
+            e.dataTransfer.setData('text/plain',item.label);
+            setTimeout(()=>pillEl.classList.add('dragging-slot-pill'),0);
+          });
+          pillEl.addEventListener('dragend',()=>{
+            pillEl.classList.remove('dragging-slot-pill');
+            dragSlotSource=null;
+            dragOverPill=null;
+            clearDropTargets();
+            document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
+          });
+          pillEl.addEventListener('dragover',e=>{
+            if(!dragSlotSource) return;
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelectorAll('.pill-drop-before,.pill-drop-after').forEach(el=>el.classList.remove('pill-drop-before','pill-drop-after'));
+            const rect=pillEl.getBoundingClientRect();
+            const before=e.clientX < rect.left + rect.width / 2;
+            pillEl.classList.add(before ? 'pill-drop-before' : 'pill-drop-after');
+            dragOverPill={planId:plan.id,slotIdx:slotIndex,itemIdx:itemIndex,before};
+          });
+          pillEl.addEventListener('dragleave',e=>{
+            if(!pillEl.contains(e.relatedTarget)) pillEl.classList.remove('pill-drop-before','pill-drop-after');
+          });
+          pillEl.addEventListener('drop',e=>{
+            e.preventDefault();
+            e.stopPropagation();
+            pillEl.classList.remove('pill-drop-before','pill-drop-after');
+            if(!dragSlotSource || !dragOverPill) return;
+            const srcPlan=getPlan(dragSlotSource.planId);
+            const tgtPlan=getPlan(dragOverPill.planId);
+            if(!srcPlan || !tgtPlan) return;
+            if(dragSlotSource.planId === dragOverPill.planId && dragSlotSource.slotIdx === dragOverPill.slotIdx){
+              const items=tgtPlan.slots[dragSlotSource.slotIdx].items;
+              const [moved]=items.splice(dragSlotSource.itemIdx,1);
+              let at=dragOverPill.itemIdx;
+              if(dragSlotSource.itemIdx < dragOverPill.itemIdx) at--;
+              if(!dragOverPill.before) at++;
+              items.splice(Math.max(0,Math.min(at,items.length)),0,moved);
+            }else{
+              const [moved]=srcPlan.slots[dragSlotSource.slotIdx].items.splice(dragSlotSource.itemIdx,1);
+              tgtPlan.slots[dragOverPill.slotIdx].items.splice(dragOverPill.itemIdx + (dragOverPill.before ? 0 : 1),0,moved);
+            }
+            dragSlotSource=null;
+            dragOverPill=null;
+            savePlans();
+            render();
+          });
+
+          pillsWrap.appendChild(pillEl);
+        });
+
+        const addInput=document.createElement('input');
+        addInput.className='sched-pill-add';
+        addInput.placeholder='';
+        const commitInput=()=>{
+          const label=addInput.value.trim();
+          if(!label) return;
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan) return;
+          cardPlan.slots[slotIndex].items.push({label,color:randomColor()});
+          addInput.value='';
+          savePlans();
+          render();
+        };
+        addInput.addEventListener('keydown',e=>{
+          if(e.key === 'Enter'){ e.preventDefault(); commitInput(); }
+        });
+        addInput.addEventListener('blur',commitInput);
+        pillsWrap.appendChild(addInput);
+
+        row.addEventListener('dragover',e=>{
+          if(!dragPillData && !dragSlotSource) return;
+          if(dragSlotSource && e.target.closest('.sched-task-pill')) return;
+          e.preventDefault();
+          clearDropTargets();
+          row.classList.add('sched-drop-target');
+        });
+        row.addEventListener('dragleave',e=>{
+          if(!row.contains(e.relatedTarget)) row.classList.remove('sched-drop-target');
+        });
+        row.addEventListener('drop',e=>{
+          e.preventDefault();
+          clearDropTargets();
+          const targetPlan=getPlan(plan.id);
+          if(!targetPlan) return;
+          if(dragSlotSource){
+            const sourcePlan=getPlan(dragSlotSource.planId);
+            if(!sourcePlan) return;
+            if(dragSlotSource.planId === plan.id && dragSlotSource.slotIdx === slotIndex){
+              dragSlotSource=null;
+              dragOverPill=null;
+              return;
+            }
+            const [moved]=sourcePlan.slots[dragSlotSource.slotIdx].items.splice(dragSlotSource.itemIdx,1);
+            targetPlan.slots[slotIndex].items.push(moved);
+            dragSlotSource=null;
+            dragOverPill=null;
+            savePlans();
+            render();
+          }else if(dragPillData){
+            targetPlan.slots[slotIndex].items.push({...dragPillData});
+            dragPillData=null;
+            savePlans();
+            render();
+          }
+        });
+
+        const deleteRow=document.createElement('button');
+        deleteRow.type='button';
+        deleteRow.className='sched-row-del';
+        deleteRow.textContent='−';
+        deleteRow.title='Remove slot';
+        deleteRow.addEventListener('click',()=>{
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan) return;
+          cardPlan.slots.splice(slotIndex,1);
+          savePlans();
+          render();
+        });
+
+        row.appendChild(time);
+        row.appendChild(pillsWrap);
+        row.appendChild(deleteRow);
+        body.appendChild(row);
+      });
+
+      const nextHour=plan.slots.length ? (plan.slots[plan.slots.length - 1].hour + 1) : PLANNER_START_HOUR;
+      const addRow=document.createElement('button');
+      addRow.type='button';
+      addRow.className='sched-add-row';
+      addRow.textContent='+';
+      addRow.title=`Add ${fmtHour(nextHour)}`;
+      addRow.addEventListener('click',()=>{
+        const cardPlan=getPlan(plan.id);
+        if(!cardPlan) return;
+        cardPlan.slots.push({hour:nextHour,items:[]});
+        savePlans();
+        render();
+      });
+      body.appendChild(addRow);
+      left.appendChild(body);
+
+      const right=document.createElement('div');
+      right.className='goals-pane';
+      const goalsHead=document.createElement('div');
+      goalsHead.className='goals-head';
+      const goalsTitle=document.createElement('h3');
+      goalsTitle.innerHTML=`Goals<span>${plannerLabel(plan,planIndex)}</span>`;
+      const goalsReset=document.createElement('button');
+      goalsReset.type='button';
+      goalsReset.className='goals-clear-btn';
+      goalsReset.textContent='Reset';
+      goalsReset.addEventListener('click',()=>{
+        const cardPlan=getPlan(plan.id);
+        if(!cardPlan) return;
+        cardPlan.goals=defaultGoals();
+        savePlans();
+        render();
+      });
+      goalsHead.appendChild(goalsTitle);
+      goalsHead.appendChild(goalsReset);
+      right.appendChild(goalsHead);
+
+      const goalsList=document.createElement('div');
+      goalsList.className='goals-list';
+      plan.goals.forEach((goal,goalIndex)=>{
+        const row=document.createElement('div');
+        row.className='goal-row'+(goal.done?' done':'');
+        const wrap=document.createElement('div');
+        wrap.className='goal-cb-wrap';
+        const cb=document.createElement('input');
+        cb.type='checkbox';
+        cb.className='goal-cb';
+        cb.id=`${plan.id}-goal-${goalIndex}`;
+        cb.checked=goal.done;
+        const label=document.createElement('label');
+        label.className='goal-cb-label';
+        label.htmlFor=cb.id;
+        cb.addEventListener('change',()=>{
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan) return;
+          cardPlan.goals[goalIndex].done=cb.checked;
+          savePlans();
+          render();
+        });
+        wrap.appendChild(cb);
+        wrap.appendChild(label);
+        const input=document.createElement('input');
+        input.type='text';
+        input.className='goal-input';
+        input.value=goal.text;
+        input.addEventListener('input',()=>{
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan) return;
+          cardPlan.goals[goalIndex].text=input.value;
+          clearTimeout(inputSaveTimer);
+          inputSaveTimer=setTimeout(()=>savePlans(),350);
+        });
+        row.appendChild(wrap);
+        row.appendChild(input);
+        goalsList.appendChild(row);
+      });
+
+      const addGoal=document.createElement('button');
+      addGoal.type='button';
+      addGoal.className='goals-add-row-btn';
+      addGoal.textContent='+';
+      addGoal.title='Add goal';
+      addGoal.addEventListener('click',()=>{
+        const cardPlan=getPlan(plan.id);
+        if(!cardPlan) return;
+        cardPlan.goals.push({text:'',done:false});
+        savePlans();
+        render();
+      });
+      goalsList.appendChild(addGoal);
+      right.appendChild(goalsList);
+
+      const goalsStats=document.createElement('div');
+      goalsStats.className='goals-stats';
+      right.appendChild(goalsStats);
+      renderStatsInto(goalsStats,plan);
+
+      inner.appendChild(left);
+      inner.appendChild(right);
+      card.appendChild(inner);
+      container.appendChild(card);
+    });
+    renderCalendarView();
+    updatePlannerModeUI();
+  }
+
+  function openSchedule(mode='cards'){
+    const panel=document.getElementById('schedule-panel');
+    plannerMode=mode;
+    panel.classList.add('show');
     render();
-    renderStats();
-  });
+  }
+
+  async function syncFromSupabase(){
+    const remotePlans=await kvGet('planner_cards');
+    if(validPlans(remotePlans)){
+      plans=normalizePlans(remotePlans);
+      persistLocal();
+      if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
+      return;
+    }
+
+    const [remoteSchedule,remoteGoals]=await Promise.all([kvGet('schedule'),kvGet('goals')]);
+    if(validSlots(remoteSchedule) || validGoals(remoteGoals)){
+      const current=plans[0] || makePlan('Today');
+      plans=[normalizePlan({
+        ...current,
+        slots: validSlots(remoteSchedule) ? remoteSchedule : current.slots,
+        goals: validGoals(remoteGoals) ? remoteGoals : current.goals
+      },0)];
+      persistLocal();
+      kvSet('planner_cards',plans);
+      if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
+    }
+  }
+
+  let plans=loadLocalPlans();
+  let bankPills=loadBank();
 
   document.getElementById('schedule-toggle-btn')?.addEventListener('click',()=>{
-    setTimeout(()=>{render();renderStats();},0);
+    const panel=document.getElementById('schedule-panel');
+    if(panel.classList.contains('show') && plannerMode === 'cards'){
+      panel.classList.remove('show');
+      updatePlannerModeUI();
+      return;
+    }
+    openSchedule('cards');
   });
 
-  render();
-  renderStats();
+  document.getElementById('cal-toggle-btn')?.addEventListener('click',()=>{
+    const panel=document.getElementById('schedule-panel');
+    if(panel.classList.contains('show') && plannerMode === 'calendar'){
+      panel.classList.remove('show');
+      updatePlannerModeUI();
+      return;
+    }
+    openSchedule('calendar');
+  });
+
+  document.getElementById('planner-add-day-btn')?.addEventListener('click',()=>{
+    plans.push(makePlan(''));
+    savePlans();
+    render();
+  });
+
+  setInterval(()=>{
+    if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
+  },60000);
+
+  openSchedule('calendar');
   syncFromSupabase();
 })();
 
