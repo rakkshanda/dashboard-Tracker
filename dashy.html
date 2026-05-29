@@ -169,25 +169,22 @@
 .planner-calendar-task-label{min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
 .planner-comment-popover{position:fixed;z-index:1200;display:none;flex-direction:column;gap:10px;min-width:220px;max-width:min(320px,calc(100vw - 24px));padding:12px;border:2px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 18px 48px rgba(14,14,16,.18)}
 .planner-comment-popover.show{display:flex}
-.planner-comment-popover-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.planner-comment-popover-label{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
-.planner-comment-popover-edit-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;border:1.5px solid var(--line-soft);background:var(--card);color:var(--ink);font:800 13px/1 var(--mono);cursor:pointer}
-.planner-comment-popover-view{padding:10px 12px;border:1.5px solid var(--line-soft);border-radius:12px;background:var(--bg);color:var(--ink);font:700 12px/1.5 var(--mono);white-space:pre-wrap;word-break:break-word}
-.planner-comment-popover-view.empty{color:var(--ink-3);font-style:italic}
+.planner-comment-popover-view{display:flex;align-items:flex-start;gap:4px;color:var(--ink);font:700 12px/1.5 var(--mono);word-break:break-word}
+.planner-comment-popover-text{flex:1;min-width:0;white-space:pre-wrap;}
+.planner-comment-popover-view.empty .planner-comment-popover-text{color:var(--ink-3);font-style:italic}
+.planner-comment-edit-icon{flex-shrink:0;background:none;border:none;cursor:pointer;font-size:11px;line-height:1;padding:2px 3px;color:var(--ink-3);opacity:0;transition:opacity .12s;}
+.planner-comment-popover-view:hover .planner-comment-edit-icon{opacity:1;}
 .planner-comment-popover-input{width:100%;min-height:72px;padding:10px 12px;border:1.5px solid var(--line-soft);border-radius:12px;background:var(--bg);color:var(--ink);font:700 12px/1.4 var(--mono);resize:vertical;outline:none}
 .planner-comment-popover-input:focus{border-color:var(--acc)}
 .planner-comment-popover-actions{display:flex;justify-content:flex-end;gap:8px}
-.planner-comment-popover-btn{padding:7px 12px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:800;cursor:pointer}
+.planner-comment-popover-btn{width:28px;height:28px;padding:0;border-radius:50%;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:13px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .planner-comment-popover-btn.secondary{background:var(--card);color:var(--ink);border-color:var(--line-soft)}
-.planner-comment-popover.editing .planner-comment-popover-view,
-.planner-comment-popover.editing .planner-comment-popover-edit-toggle{display:none}
+.planner-comment-popover.editing .planner-comment-popover-view{display:none}
 .planner-comment-popover:not(.editing) .planner-comment-popover-input,
 .planner-comment-popover:not(.editing) .planner-comment-popover-actions{display:none}
 [data-theme="dark"] .planner-comment-popover{background:oklch(0.16 0 0);border-color:#3a3a3a;box-shadow:0 20px 52px rgba(0,0,0,.45)}
-[data-theme="dark"] .planner-comment-popover-label{color:rgba(242,239,232,.6)}
-[data-theme="dark"] .planner-comment-popover-edit-toggle{background:oklch(0.22 0 0);color:#fff;border-color:#4a4a4a}
-[data-theme="dark"] .planner-comment-popover-view{background:oklch(0.22 0 0);border-color:#3a3a3a;color:#fff}
-[data-theme="dark"] .planner-comment-popover-view.empty{color:rgba(255,255,255,.55)}
+[data-theme="dark"] .planner-comment-popover-view{color:#fff}
+[data-theme="dark"] .planner-comment-popover-view.empty .planner-comment-popover-text{color:rgba(255,255,255,.45)}
 [data-theme="dark"] .planner-comment-popover-input{background:oklch(0.22 0 0);border-color:#3a3a3a;color:#fff !important;-webkit-text-fill-color:#fff;caret-color:#fff}
 [data-theme="dark"] .planner-comment-popover-input::placeholder{color:rgba(255,255,255,.55)}
 [data-theme="dark"] .planner-comment-popover-btn.secondary{background:oklch(0.22 0 0);color:#fff;border-color:#4a4a4a}
@@ -507,7 +504,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-dd-grid button{padding:8px 0;border:2px solid var(--ink);border-radius:10px;background:var(--card);font-weight:900;font-size:1rem;cursor:pointer;font-variant-numeric:tabular-nums;transition:transform .15s;}
 .t-dd-grid button:hover{transform:translateY(-2px);}
 .t-dd-grid button.active{background:var(--t-accent,oklch(0.78 0.19 0));}
-.t-total-val{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;padding-top:4px;}
+.t-total-val{font-size:1.4rem;font-weight:900;font-variant-numeric:tabular-nums;padding-top:4px;color:#0f0f13;}
 .t-timer{position:relative;display:flex;flex-direction:column;align-items:center;padding:56px 0;z-index:1;}
 .t-countdown{position:absolute;font-size:clamp(4rem,14vw,10rem);font-weight:900;line-height:1;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;text-shadow:6px 6px 0 oklch(0.78 0.19 0);opacity:0;transform:scale(1.4);pointer-events:none;transition:opacity .15s,transform .15s;background:rgba(255,255,255,0.75);border-radius:16px;padding:8px 24px;}
 .t-countdown.show{opacity:1;transform:scale(1);}
@@ -522,7 +519,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-bar .t-fill{height:100%;width:0%;background:linear-gradient(90deg,oklch(0.78 0.19 0),oklch(0.74 0.19 45),oklch(0.88 0.21 130),oklch(0.82 0.14 215));transition:width .5s;}
 .t-bar .t-legend{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;margin-top:6px;}
 .t-actions{margin-top:36px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center;position:relative;z-index:1;}
-.t-btn{padding:12px 28px;border-radius:9999px;border:2px solid var(--ink);font-weight:900;text-transform:uppercase;letter-spacing:.15em;font-size:.85rem;background:var(--card);color:var(--ink);cursor:pointer;box-shadow:6px 6px 0 var(--ink);transition:transform .12s,box-shadow .12s;}
+.t-btn{padding:12px 28px;border-radius:9999px;border:2px solid #888;font-weight:900;text-transform:uppercase;letter-spacing:.15em;font-size:.85rem;background:var(--card);color:var(--ink);cursor:pointer;box-shadow:6px 6px 0 #888;transition:transform .12s,box-shadow .12s;}
 .t-btn:hover{transform:translateY(-2px);}
 .t-btn:active{transform:translate(4px,4px);box-shadow:none;}
 .t-btn.t-start{background:oklch(0.88 0.21 130);}
@@ -540,19 +537,19 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .timer-panel.t-fullscreen .t-actions{bottom:0;padding:16px 40px;background:transparent;border-top:none;}
 /* Timer dark mode */
 .t-card.t-dark{background:#0f0f13;color:#f0ede6;--t-ink:#f0ede6;}
-.t-card.t-dark .t-field{background:#1a1a22;border-color:#f0ede6;box-shadow:4px 4px 0 0 #f0ede6;}
-.t-card.t-dark .t-lbl{border-color:#f0ede6;}
+.t-card.t-dark .t-field{background:#1a1a22;border-color:#f0ede6;box-shadow:4px 4px 0 0 #6b7280;}
+.t-card.t-dark .t-lbl{color:#0f0f13;border-color:#6b7280;}
 .t-card.t-dark .t-dd-btn{color:#f0ede6;}
 .t-card.t-dark .t-chev{border-color:#f0ede6;}
 .t-card.t-dark .t-total-val{color:#f0ede6;}
-.t-card.t-dark .t-dd-menu{background:#1a1a22;border-color:#f0ede6;box-shadow:6px 6px 0 #f0ede6;}
+.t-card.t-dark .t-dd-menu{background:#1a1a22;border-color:#f0ede6;box-shadow:6px 6px 0 #6b7280;}
 .t-card.t-dark .t-dd-grid button{background:#1a1a22;border-color:#f0ede6;color:#f0ede6;}
 .t-card.t-dark .t-time{color:#f0ede6;text-shadow:6px 6px 0 #f0ede6;}
 .t-card.t-dark .t-time.running{text-shadow:6px 6px 0 oklch(0.78 0.19 0);}
 .t-card.t-dark .t-round-lbl{color:#f0ede6;}
 .t-card.t-dark .t-track{border-color:#f0ede6;}
 .t-card.t-dark .t-legend{color:#f0ede6;}
-.t-card.t-dark .t-btn{background:#1a1a22;color:#f0ede6;border-color:#f0ede6;box-shadow:6px 6px 0 #000;}
+.t-card.t-dark .t-btn{background:#1a1a22;color:#f0ede6;border-color:#6b7280;box-shadow:6px 6px 0 #6b7280;}
 .timer-panel.t-fullscreen .t-card.t-dark .t-btn{border-color:transparent;}
 .t-card.t-dark .t-btn.t-start{background:oklch(0.88 0.21 130);color:#0f0f13;}
 .t-card.t-dark .t-btn.t-start.running{background:oklch(0.78 0.19 0);color:#0f0f13;}
@@ -2491,6 +2488,29 @@ async function kvSet(key,value){
   ];
   const RANDOM_COLORS=['green','blue','pink','sky','orange','yellow','red','purple'];
   const PILL_COLORS={green:'#16a34a',blue:'#2563eb',pink:'#db2777',sky:'#0284c7',orange:'#ea580c',yellow:'#b45309',red:'#dc2626',purple:'#7c3aed',gray:'#4b5563',default:'#374151'};
+  const PILL_COLORS_100=[
+    '#ef233c','#d62828','#c1121f','#9b2226','#ae2012',
+    '#f72585','#db2777','#be185d','#9d174d','#831843',
+    '#ea580c','#c2410c','#9a3412','#7c2d12','#f77f00',
+    '#d97706','#b45309','#92400e','#78350f','#ca6702',
+    '#65a30d','#4d7c0f','#3f6212','#365314','#4a7c59',
+    '#16a34a','#15803d','#166534','#14532d','#065f46',
+    '#0d9488','#0f766e','#134e4a','#2a9d8f','#1b998b',
+    '#0284c7','#0369a1','#075985','#0c4a6e','#164e63',
+    '#2563eb','#1d4ed8','#1e40af','#1e3a8a','#1565c0',
+    '#4f46e5','#4338ca','#3730a3','#312e81','#3949ab',
+    '#7c3aed','#6d28d9','#5b21b6','#4c1d95','#5e35b1',
+    '#9d4edd','#7e22ce','#6b21a8','#581c87','#4a148c',
+    '#a21caf','#86198f','#701a75','#6a1b9a','#ad1457',
+    '#b5179e','#7209b7','#e91e63','#c2185b','#880e4f',
+    '#0f4c81','#1a3a6b','#003366','#1a237e','#004d7c',
+    '#006064','#00695c','#1b5e20','#33691e','#827717',
+    '#e65100','#bf360c','#4e342e','#3e2723','#263238',
+    '#546e7a','#37474f','#455a64','#33006f','#702963',
+    '#006b3c','#8b0000','#00416a','#4b0082','#2c003e',
+    '#ff4081','#ff6d00','#00897b','#1565c0','#6200ea',
+  ];
+  function resolveColor(c){return PILL_COLORS[c]||c||PILL_COLORS.default;}
   const chartsByPlan=new Map();
 
   let dragPillData=null;
@@ -2502,6 +2522,7 @@ async function kvSet(key,value){
   let commentPopover=null;
   let commentPopoverInput=null;
   let commentPopoverView=null;
+  let commentPopoverEditBtn=null;
 
   function uid(){
     return `plan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
@@ -2875,7 +2896,7 @@ async function kvSet(key,value){
   }
 
   function randomColor(){
-    return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+    return PILL_COLORS_100[Math.floor(Math.random() * PILL_COLORS_100.length)];
   }
 
   function ensureCommentPopover(){
@@ -2883,23 +2904,23 @@ async function kvSet(key,value){
     commentPopover=document.createElement('div');
     commentPopover.className='planner-comment-popover';
     commentPopover.innerHTML=`
-      <div class="planner-comment-popover-head">
-        <div class="planner-comment-popover-label">Extra comment</div>
-        <button type="button" class="planner-comment-popover-edit-toggle" data-action="edit" title="Edit comment" aria-label="Edit comment">✎</button>
+      <div class="planner-comment-popover-view">
+        <span class="planner-comment-popover-text"></span>
+        <button type="button" class="planner-comment-edit-icon" data-action="edit" title="Edit comment" aria-label="Edit comment">✏</button>
       </div>
-      <div class="planner-comment-popover-view"></div>
       <textarea class="planner-comment-popover-input" maxlength="160"></textarea>
       <div class="planner-comment-popover-actions">
-        <button type="button" class="planner-comment-popover-btn secondary" data-action="cancel">Cancel</button>
-        <button type="button" class="planner-comment-popover-btn" data-action="save">Save</button>
+        <button type="button" class="planner-comment-popover-btn secondary" data-action="cancel" title="Cancel" aria-label="Cancel">✕</button>
+        <button type="button" class="planner-comment-popover-btn" data-action="save" title="Save" aria-label="Save">✓</button>
       </div>
     `;
     commentPopoverInput=commentPopover.querySelector('.planner-comment-popover-input');
     commentPopoverView=commentPopover.querySelector('.planner-comment-popover-view');
+    commentPopoverEditBtn=commentPopover.querySelector('.planner-comment-edit-icon');
     commentPopover.addEventListener('click',e=>e.stopPropagation());
     commentPopover.querySelector('[data-action="cancel"]')?.addEventListener('click',exitCommentEditMode);
     commentPopover.querySelector('[data-action="save"]')?.addEventListener('click',saveCommentPopover);
-    commentPopover.querySelector('[data-action="edit"]')?.addEventListener('click',()=>setCommentPopoverMode('edit'));
+    commentPopoverEditBtn?.addEventListener('click',()=>setCommentPopoverMode('edit'));
     commentPopoverInput?.addEventListener('keydown',e=>{
       if((e.metaKey || e.ctrlKey) && e.key === 'Enter'){
         e.preventDefault();
@@ -2935,8 +2956,14 @@ async function kvSet(key,value){
     const comment=String(item.comment || '').trim();
     if(commentPopoverInput) commentPopoverInput.value=comment;
     if(commentPopoverView){
-      commentPopoverView.textContent=comment || 'No comment yet.';
+      const textEl=commentPopoverView.querySelector('.planner-comment-popover-text');
+      if(textEl) textEl.textContent=comment || 'No comment yet.';
       commentPopoverView.classList.toggle('empty',!comment);
+    }
+    if(commentPopoverEditBtn){
+      const actionLabel=comment ? 'Edit comment' : 'Add comment';
+      commentPopoverEditBtn.title=actionLabel;
+      commentPopoverEditBtn.setAttribute('aria-label',actionLabel);
     }
     syncCommentAnchor(comment);
   }
@@ -3042,7 +3069,7 @@ async function kvSet(key,value){
     entries.forEach(([label,{n,color}])=>{
       const row=document.createElement('div');
       row.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
-      row.innerHTML=`<span style="background:${PILL_COLORS[color] || '#374151'};color:#fff;font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px">${label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.7">${n}h</span>`;
+      row.innerHTML=`<span style="background:${resolveColor(color)};color:#fff;font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px">${label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.7">${n}h</span>`;
       el.appendChild(row);
     });
 
@@ -3060,7 +3087,7 @@ async function kvSet(key,value){
           labels:entries.map(([label])=>label),
           datasets:[{
             data:entries.map(([,{n}])=>n),
-            backgroundColor:entries.map(([,{color}])=>PILL_COLORS[color] || '#374151'),
+            backgroundColor:entries.map(([,{color}])=>resolveColor(color)),
             borderWidth:0,
             hoverOffset:4
           }]
@@ -3140,7 +3167,7 @@ async function kvSet(key,value){
           if(item.comment) task.classList.add('has-comment');
           task.dataset.color=item.color || 'default';
           task.draggable=true;
-          task.style.background=PILL_COLORS[item.color] || PILL_COLORS.default;
+          task.style.background=resolveColor(item.color);
           if(item.comment) task.title=item.comment;
           const label=document.createElement('span');
           label.className='planner-calendar-task-label';
@@ -3206,6 +3233,8 @@ async function kvSet(key,value){
         input.type='text';
         input.className='sched-pill-add';
         input.placeholder='';
+        input.dataset.planId=plan.id;
+        input.dataset.hour=hour;
         const commit=()=>{
           const label=input.value.trim();
           if(!label) return;
@@ -3216,7 +3245,17 @@ async function kvSet(key,value){
           if(e.key === 'Enter'){
             e.preventDefault();
             input.dataset.skipBlurCommit='1';
+            const pid=plan.id,hr=hour;
             commit();
+            const next=document.querySelector(`.sched-pill-add[data-plan-id="${pid}"][data-hour="${hr}"]`);
+            if(next) next.focus();
+          } else if(e.key === 'Tab'){
+            e.preventDefault();
+            input.dataset.skipBlurCommit='1';
+            commit();
+            const nextHour=e.shiftKey ? hour-1 : hour+1;
+            const next=document.querySelector(`.sched-pill-add[data-plan-id="${plan.id}"][data-hour="${nextHour}"]`);
+            if(next) next.focus();
           }
         });
         input.addEventListener('blur',()=>{
@@ -3565,6 +3604,8 @@ async function kvSet(key,value){
         const addInput=document.createElement('input');
         addInput.className='sched-pill-add';
         addInput.placeholder='';
+        addInput.dataset.planId=plan.id;
+        addInput.dataset.slotIndex=slotIndex;
         const commitInput=()=>{
           const label=addInput.value.trim();
           if(!label) return;
@@ -3576,9 +3617,19 @@ async function kvSet(key,value){
           render();
         };
         addInput.addEventListener('keydown',e=>{
-          if(e.key === 'Enter'){ e.preventDefault(); commitInput(); }
+          if(e.key === 'Enter'){
+            e.preventDefault();
+            addInput.dataset.skipBlurCommit='1';
+            const pid=plan.id,si=slotIndex;
+            commitInput();
+            const next=document.querySelector(`.sched-pill-add[data-plan-id="${pid}"][data-slot-index="${si}"]`);
+            if(next) next.focus();
+          }
         });
-        addInput.addEventListener('blur',commitInput);
+        addInput.addEventListener('blur',()=>{
+          if(addInput.dataset.skipBlurCommit==='1'){delete addInput.dataset.skipBlurCommit;return;}
+          commitInput();
+        });
         pillsWrap.appendChild(addInput);
 
         row.addEventListener('dragover',e=>{
