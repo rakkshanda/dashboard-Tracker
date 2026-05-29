@@ -147,21 +147,50 @@
 .planner-calendar-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;min-width:0}
 .planner-calendar-table th,.planner-calendar-table td{border-right:1.5px solid var(--line-soft);border-bottom:1.5px solid var(--line-soft);padding:10px 12px;vertical-align:top}
 .planner-calendar-table th:last-child,.planner-calendar-table td:last-child{border-right:none}
-.planner-calendar-table thead th{position:sticky;top:0;background:#111;color:#fff;z-index:1;text-align:left}
+.planner-calendar-table thead th{position:sticky;top:0;background:#111;color:#fff;z-index:1;text-align:center}
 .planner-calendar-table thead th:first-child,
 .planner-calendar-table tbody td:first-child{width:110px}
 .planner-calendar-table tbody td{background:#fff}
 .planner-calendar-table tbody tr:nth-child(even) td{background:rgba(14,14,16,.03)}
-.planner-calendar-time{font-family:var(--mono);font-size:11px;font-weight:800;color:var(--ink);white-space:nowrap}
-.planner-calendar-day{display:flex;flex-direction:column;gap:4px}
+.planner-calendar-time{font-family:var(--mono);font-size:11px;font-weight:900;color:var(--ink);white-space:nowrap;letter-spacing:-.01em}
+.time-range{display:inline-flex;align-items:baseline;gap:3px;flex-wrap:nowrap}
+.time-range-num{font-size:1.12em;font-weight:900;line-height:1}
+.time-range-suffix{font-size:1em;font-weight:900;line-height:1}
+.time-range-sep{font-size:1em;font-weight:900;line-height:1;opacity:.8}
+.planner-calendar-day{display:flex;flex-direction:column;gap:4px;align-items:center;justify-content:center;text-align:center}
 .planner-calendar-day strong{font-family:var(--display);font-size:16px;font-weight:800;letter-spacing:-.02em}
 .planner-calendar-day span{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.55}
 .planner-calendar-cell{min-width:0;overflow:hidden}
+.planner-calendar-cell.current-slot{border:2px dotted #16a34a !important;border-radius:12px;background:rgba(22,163,74,.08) !important}
 .planner-calendar-empty{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);opacity:.45}
 .planner-calendar-cell.drop-target{background:oklch(0.94 0.08 50 / .7)!important;outline:2px dashed var(--acc);outline-offset:-2px}
 .planner-calendar-task-stack{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-content:flex-start}
 .planner-calendar-task{display:inline-grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;align-self:flex-start;gap:4px;width:auto;max-width:100%;padding:5px 10px;border-radius:16px;font-size:11px;font-weight:800;font-family:var(--mono);letter-spacing:.03em;color:#fff;line-height:1.2;cursor:grab}
 .planner-calendar-task-label{min-width:0;white-space:normal;overflow-wrap:anywhere;word-break:break-word}
+.planner-comment-popover{position:fixed;z-index:1200;display:none;flex-direction:column;gap:10px;min-width:220px;max-width:min(320px,calc(100vw - 24px));padding:12px;border:2px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 18px 48px rgba(14,14,16,.18)}
+.planner-comment-popover.show{display:flex}
+.planner-comment-popover-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.planner-comment-popover-label{font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.planner-comment-popover-edit-toggle{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:999px;border:1.5px solid var(--line-soft);background:var(--card);color:var(--ink);font:800 13px/1 var(--mono);cursor:pointer}
+.planner-comment-popover-view{padding:10px 12px;border:1.5px solid var(--line-soft);border-radius:12px;background:var(--bg);color:var(--ink);font:700 12px/1.5 var(--mono);white-space:pre-wrap;word-break:break-word}
+.planner-comment-popover-view.empty{color:var(--ink-3);font-style:italic}
+.planner-comment-popover-input{width:100%;min-height:72px;padding:10px 12px;border:1.5px solid var(--line-soft);border-radius:12px;background:var(--bg);color:var(--ink);font:700 12px/1.4 var(--mono);resize:vertical;outline:none}
+.planner-comment-popover-input:focus{border-color:var(--acc)}
+.planner-comment-popover-actions{display:flex;justify-content:flex-end;gap:8px}
+.planner-comment-popover-btn{padding:7px 12px;border-radius:999px;border:2px solid var(--ink);background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:800;cursor:pointer}
+.planner-comment-popover-btn.secondary{background:var(--card);color:var(--ink);border-color:var(--line-soft)}
+.planner-comment-popover.editing .planner-comment-popover-view,
+.planner-comment-popover.editing .planner-comment-popover-edit-toggle{display:none}
+.planner-comment-popover:not(.editing) .planner-comment-popover-input,
+.planner-comment-popover:not(.editing) .planner-comment-popover-actions{display:none}
+[data-theme="dark"] .planner-comment-popover{background:oklch(0.16 0 0);border-color:#3a3a3a;box-shadow:0 20px 52px rgba(0,0,0,.45)}
+[data-theme="dark"] .planner-comment-popover-label{color:rgba(242,239,232,.6)}
+[data-theme="dark"] .planner-comment-popover-edit-toggle{background:oklch(0.22 0 0);color:#fff;border-color:#4a4a4a}
+[data-theme="dark"] .planner-comment-popover-view{background:oklch(0.22 0 0);border-color:#3a3a3a;color:#fff}
+[data-theme="dark"] .planner-comment-popover-view.empty{color:rgba(255,255,255,.55)}
+[data-theme="dark"] .planner-comment-popover-input{background:oklch(0.22 0 0);border-color:#3a3a3a;color:#fff !important;-webkit-text-fill-color:#fff;caret-color:#fff}
+[data-theme="dark"] .planner-comment-popover-input::placeholder{color:rgba(255,255,255,.55)}
+[data-theme="dark"] .planner-comment-popover-btn.secondary{background:oklch(0.22 0 0);color:#fff;border-color:#4a4a4a}
 .planner-calendar-input{flex:1;min-width:90px;padding:6px 4px;border:1.5px dashed transparent;border-radius:10px;background:transparent;color:var(--ink);font-family:var(--mono);font-size:10.5px;font-weight:700;outline:none}
 .planner-calendar-input:focus{border-color:var(--acc);background:#fff;padding-left:9px;padding-right:9px}
 [data-theme="light"] .planner-calendar-input:hover{border-color:var(--line-soft);background:rgba(14,14,16,.03);padding-left:9px;padding-right:9px}
@@ -182,6 +211,7 @@
 [data-theme="dark"] .planner-calendar-time,
 [data-theme="dark"] .planner-calendar-table td.planner-calendar-time,
 [data-theme="dark"] .planner-calendar-table th.planner-calendar-time{color:#fff !important}
+[data-theme="dark"] .planner-calendar-cell.current-slot{background:rgba(22,163,74,.14) !important}
 [data-theme="dark"] .planner-calendar-empty{color:rgba(242,239,232,.5)}
 [data-theme="dark"] .planner-calendar-cell.drop-target{background:oklch(0.26 0.05 70 / .9)!important}
 [data-theme="dark"] .planner-calendar-input{background:transparent;border-color:transparent;color:var(--bg)}
@@ -284,6 +314,7 @@
 .sched-task-pill[data-color="purple"]{background:#7c3aed}
 .sched-task-pill[data-color="gray"]{background:#4b5563}
 .sched-task-pill[data-color="default"]{background:#374151}
+.sched-task-pill.has-comment,.planner-calendar-task.has-comment{box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22)}
 /* pill-rm: hidden until row hovered */
 .pill-rm{background:transparent;border:none;cursor:pointer;font-size:12px;line-height:1;padding:0 1px;opacity:0;transition:opacity .12s;color:inherit}
 .sched-task-pill:hover .pill-rm{opacity:.6}
@@ -358,8 +389,8 @@
 .dt-stat-sub{font-size:10px;color:var(--ink-3);font-family:var(--sans);margin-top:2px}
 .dt-chart-box{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
 .dt-chart-box-title{font-family:var(--mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:10px}
-.sched-pill-add{border:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--ink);opacity:.3;outline:none;flex:1;min-width:100px;padding:2px 4px;cursor:text}
-.sched-pill-add:focus{opacity:.85}
+.sched-pill-add{border:none;background:transparent;font-family:var(--mono);font-size:11.5px;color:var(--ink);opacity:.3;outline:none;flex:0 0 28px;width:28px;min-width:28px;max-width:110px;padding:2px 4px;cursor:text;transition:width .12s ease,opacity .12s ease}
+.sched-pill-add:hover,.sched-pill-add:focus{width:84px;min-width:84px;opacity:.85}
 #sankey-chart svg{border-radius:var(--radius-sm)}
 /* ===== PIE CHARTS ===== */
 .pie-charts-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-top:20px}
@@ -543,7 +574,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
     <text x="730" y="380" font-family="sans-serif" font-weight="800" font-size="180" fill="#0E0E10" letter-spacing="-8">21</text>
   </svg>
 </template>
-<body data-theme="light" data-density="balanced" data-jobs-view="table" data-show-stats="true">
+<body data-theme="dark" data-density="balanced" data-jobs-view="table" data-show-stats="false">
 
 <div class="shell" id="app-root">
 
@@ -561,7 +592,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 2v3M11 2v3M2 7h12"/><path d="M5 10h.5M8 10h.5M11 10h.5M5 13h.5M8 13h.5"/></svg>
           Schedule
         </button>
-        <button class="pill outline has-filter" id="stats-toggle-btn">
+        <button class="pill outline" id="stats-toggle-btn">
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><rect x="2" y="8" width="3" height="6" rx="1"/><rect x="6.5" y="5" width="3" height="9" rx="1"/><rect x="11" y="2" width="3" height="12" rx="1"/></svg>
           Stats
         </button>
@@ -1645,7 +1676,10 @@ function setupStats(){
   const btn=document.getElementById('stats-toggle-btn');
   const hero=document.getElementById('hero-section');
   const strip=document.getElementById('stat-strip');
-  let visible=true;
+  let visible=false;
+  hero.style.display='none';
+  strip.style.display='none';
+  btn.classList.remove('has-filter');
   btn.addEventListener('click',()=>{
     visible=!visible;
     hero.style.display=visible?'':'none';
@@ -2442,6 +2476,7 @@ async function kvSet(key,value){
 // ===== PLANNER =====
 (function(){
   const PLANS_KEY='planner_cards_v1';
+  const PLANNER_START_DATE_KEY='planner_start_date_v1';
   const LEGACY_SCHEDULE_KEY='sched_v2';
   const LEGACY_GOALS_KEY='goals_v1';
   const BANK_KEY='sched_bank_v1';
@@ -2463,9 +2498,38 @@ async function kvSet(key,value){
   let dragOverPill=null;
   let inputSaveTimer=null;
   let plannerMode='cards';
+  let commentEditorState=null;
+  let commentPopover=null;
+  let commentPopoverInput=null;
+  let commentPopoverView=null;
 
   function uid(){
     return `plan_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
+  }
+
+  function atMidnight(date){
+    const d=new Date(date);
+    d.setHours(0,0,0,0);
+    return d;
+  }
+
+  function ymd(date){
+    const d=atMidnight(date);
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function loadPlannerStartDate(){
+    try{
+      const raw=localStorage.getItem(PLANNER_START_DATE_KEY);
+      if(raw){
+        const parsed=new Date(`${raw}T00:00:00`);
+        if(!Number.isNaN(parsed.getTime())) return atMidnight(parsed);
+      }
+    }catch{}
+    return atMidnight(new Date());
   }
 
   function isBlockedPillLabel(label){
@@ -2489,18 +2553,40 @@ async function kvSet(key,value){
   function fmtHour(h){
     const f=n=>{
       const normalized=((n % 24) + 24) % 24;
-      if(normalized === 0) return '12 AM';
-      if(normalized === 12) return '12 PM';
-      return normalized < 12 ? `${normalized} AM` : `${normalized - 12} PM`;
+      const hour=normalized === 0 ? 12 : normalized > 12 ? normalized - 12 : normalized;
+      const suffix=normalized < 12 ? 'AM' : 'PM';
+      return { hour, suffix };
     };
-    return `${f(h)} – ${f(h+1)}`;
+    const start=f(h);
+    const end=f(h+1);
+    return `${start.hour} ${start.suffix} – ${end.hour} ${end.suffix}`;
+  }
+
+  function fmtHourHtml(h){
+    const f=n=>{
+      const normalized=((n % 24) + 24) % 24;
+      const hour=normalized === 0 ? 12 : normalized > 12 ? normalized - 12 : normalized;
+      const suffix=normalized < 12 ? 'AM' : 'PM';
+      return { hour, suffix };
+    };
+    const start=f(h);
+    const end=f(h+1);
+    return `<span class="time-range"><span class="time-range-num">${start.hour}</span><span class="time-range-suffix">${start.suffix}</span><span class="time-range-sep">–</span><span class="time-range-num">${end.hour}</span><span class="time-range-suffix">${end.suffix}</span></span>`;
+  }
+
+  function normalizeItem(item){
+    return {
+      label:String(item?.label || '').trim(),
+      color:item?.color || 'default',
+      comment:String(item?.comment || '').trim()
+    };
   }
 
   function sanitizeItems(items){
     if(!Array.isArray(items)) return [];
     return items
       .filter(item=>item && !isBlockedPillLabel(item.label))
-      .map(item=>({label:String(item.label || '').trim(),color:item.color || 'default'}))
+      .map(normalizeItem)
       .filter(item=>item.label);
   }
 
@@ -2561,18 +2647,33 @@ async function kvSet(key,value){
   }
 
   function plannerDate(index){
-    const date=new Date();
-    date.setHours(0,0,0,0);
+    const date=new Date(plannerStartDate);
     date.setDate(date.getDate() + index);
     return date;
   }
 
   function plannerLabel(plan,index){
-    if(index === 0) return 'Today';
-    return plannerDate(index).toLocaleDateString('en-US',{
+    const date=plannerDate(index);
+    const today=atMidnight(new Date());
+    if(date.getTime() === today.getTime()) return 'Today';
+    return date.toLocaleDateString('en-US',{
       month:'short',
       day:'numeric'
     });
+  }
+
+  function remainingSlotsForPlan(plan,index){
+    const planDay=plannerDate(index);
+    const today=atMidnight(new Date());
+    const planTime=planDay.getTime();
+    const todayTime=today.getTime();
+
+    if(planTime < todayTime) return 0;
+    if(planTime > todayTime) return plan.slots.length;
+
+    const currentHour=new Date().getHours();
+    const threshold=Math.max(currentHour, PLANNER_START_HOUR);
+    return plan.slots.filter(slot=>slot.hour >= threshold).length;
   }
 
   function planSummary(slots){
@@ -2589,6 +2690,7 @@ async function kvSet(key,value){
     const cleanPlans=normalizePlans(plans);
     plans=cleanPlans;
     localStorage.setItem(PLANS_KEY,JSON.stringify(cleanPlans));
+    localStorage.setItem(PLANNER_START_DATE_KEY,ymd(plannerStartDate));
     if(cleanPlans[0]){
       localStorage.setItem(LEGACY_SCHEDULE_KEY,JSON.stringify(cleanPlans[0].slots));
       localStorage.setItem(LEGACY_GOALS_KEY,JSON.stringify(cleanPlans[0].goals));
@@ -2669,6 +2771,7 @@ async function kvSet(key,value){
     const plan=getPlan(planId);
     if(!plan || !plan.slots[slotIdx]) return;
     plan.slots[slotIdx].items.splice(itemIdx,1);
+    closeCommentPopover();
     savePlans();
     render();
   }
@@ -2677,7 +2780,11 @@ async function kvSet(key,value){
     const plan=getPlan(planId);
     if(!plan) return;
     const {slot}=ensureSlot(plan,hour);
-    slot.items.push({label:String(item.label || '').trim(),color:item.color || randomColor()});
+    slot.items.push({
+      label:String(item.label || '').trim(),
+      color:item.color || randomColor(),
+      comment:String(item.comment || '').trim()
+    });
     savePlans();
     render();
   }
@@ -2719,26 +2826,7 @@ async function kvSet(key,value){
     if(!totalEl || !todayEl || !metaEl) return;
 
     const now=new Date();
-    const currentHour=now.getHours();
-    const currentMinutes=now.getMinutes();
     const dayCount=Math.max(plans.length,1);
-
-    let remainingSlots=0;
-    plans.forEach((plan,planIndex)=>{
-      plan.slots.forEach(slot=>{
-        if(planIndex === 0){
-          // Skip slots that have fully finished today.
-          if(slot.hour < currentHour) return;
-          if(slot.hour === currentHour && currentMinutes >= 60) return;
-        }
-        remainingSlots += 1;
-      });
-    });
-
-    // Include the overnight bridge from the final planner day to 8 AM next morning.
-    remainingSlots += 8;
-
-    totalEl.textContent=`${remainingSlots}h 0m`;
 
     const todayPlan=plans[0];
     const todayLastHour=todayPlan?.slots?.length ? Math.max(...todayPlan.slots.map(slot=>slot.hour)) + 1 : PLANNER_START_HOUR;
@@ -2750,8 +2838,24 @@ async function kvSet(key,value){
     const todayMinutesRemainder=todayMinutes % 60;
     todayEl.textContent=`${todayHoursWhole}h ${todayMinutesRemainder}m`;
 
+    let overallMinutes=todayMinutes;
+    if(plans.length > 1){
+      const middleDayHours=plans
+        .slice(1, -1)
+        .reduce((sum, plan) => sum + plan.slots.length, 0);
+      const lastPlan=plans[plans.length - 1];
+      const lastDayHours=lastPlan.slots.filter(slot => slot.hour <= 8).length;
+      overallMinutes += (middleDayHours + lastDayHours) * 60;
+    }
+
+    const overallHoursWhole=Math.floor(overallMinutes / 60);
+    const overallMinutesRemainder=overallMinutes % 60;
+    totalEl.textContent=`${overallHoursWhole}h ${overallMinutesRemainder}m`;
+
     const lastLabel=plannerLabel(plans[plans.length - 1] || makePlan('Today'), dayCount - 1);
-    metaEl.textContent=`${remainingSlots} remaining slots through 8:00 AM after ${lastLabel}`;
+    metaEl.textContent=plans.length > 1
+      ? `today + full middle days + ${lastLabel} until 8:00 AM`
+      : `remaining time for ${lastLabel}`;
   }
 
   function clearDropTargets(){
@@ -2772,6 +2876,143 @@ async function kvSet(key,value){
 
   function randomColor(){
     return RANDOM_COLORS[Math.floor(Math.random() * RANDOM_COLORS.length)];
+  }
+
+  function ensureCommentPopover(){
+    if(commentPopover) return commentPopover;
+    commentPopover=document.createElement('div');
+    commentPopover.className='planner-comment-popover';
+    commentPopover.innerHTML=`
+      <div class="planner-comment-popover-head">
+        <div class="planner-comment-popover-label">Extra comment</div>
+        <button type="button" class="planner-comment-popover-edit-toggle" data-action="edit" title="Edit comment" aria-label="Edit comment">✎</button>
+      </div>
+      <div class="planner-comment-popover-view"></div>
+      <textarea class="planner-comment-popover-input" maxlength="160"></textarea>
+      <div class="planner-comment-popover-actions">
+        <button type="button" class="planner-comment-popover-btn secondary" data-action="cancel">Cancel</button>
+        <button type="button" class="planner-comment-popover-btn" data-action="save">Save</button>
+      </div>
+    `;
+    commentPopoverInput=commentPopover.querySelector('.planner-comment-popover-input');
+    commentPopoverView=commentPopover.querySelector('.planner-comment-popover-view');
+    commentPopover.addEventListener('click',e=>e.stopPropagation());
+    commentPopover.querySelector('[data-action="cancel"]')?.addEventListener('click',exitCommentEditMode);
+    commentPopover.querySelector('[data-action="save"]')?.addEventListener('click',saveCommentPopover);
+    commentPopover.querySelector('[data-action="edit"]')?.addEventListener('click',()=>setCommentPopoverMode('edit'));
+    commentPopoverInput?.addEventListener('keydown',e=>{
+      if((e.metaKey || e.ctrlKey) && e.key === 'Enter'){
+        e.preventDefault();
+        saveCommentPopover();
+      }
+      if(e.key === 'Escape'){
+        e.preventDefault();
+        exitCommentEditMode();
+      }
+    });
+    document.body.appendChild(commentPopover);
+    return commentPopover;
+  }
+
+  function getCommentEditorItem(){
+    if(!commentEditorState) return null;
+    const plan=getPlan(commentEditorState.planId);
+    return plan?.slots?.[commentEditorState.slotIdx]?.items?.[commentEditorState.itemIdx] || null;
+  }
+
+  function syncCommentAnchor(comment){
+    const anchorEl=commentEditorState?.anchorEl;
+    if(!anchorEl) return;
+    const hasComment=Boolean(comment);
+    anchorEl.classList.toggle('has-comment',hasComment);
+    if(hasComment) anchorEl.title=comment;
+    else anchorEl.removeAttribute('title');
+  }
+
+  function renderCommentPopoverContent(){
+    const item=getCommentEditorItem();
+    if(!item) return closeCommentPopover();
+    const comment=String(item.comment || '').trim();
+    if(commentPopoverInput) commentPopoverInput.value=comment;
+    if(commentPopoverView){
+      commentPopoverView.textContent=comment || 'No comment yet.';
+      commentPopoverView.classList.toggle('empty',!comment);
+    }
+    syncCommentAnchor(comment);
+  }
+
+  function exitCommentEditMode(){
+    const item=getCommentEditorItem();
+    if(item?.comment){
+      setCommentPopoverMode('view');
+      return;
+    }
+    closeCommentPopover();
+  }
+
+  function setCommentPopoverMode(mode){
+    if(!commentPopover || !commentEditorState) return;
+    const item=getCommentEditorItem();
+    const nextMode=mode === 'edit' ? 'edit' : 'view';
+    commentEditorState.mode=nextMode;
+    commentPopover.classList.toggle('editing',nextMode === 'edit');
+    renderCommentPopoverContent();
+    positionCommentPopover(commentEditorState.anchorEl);
+    if(nextMode === 'edit' && commentPopoverInput){
+      requestAnimationFrame(()=>{
+        commentPopoverInput.focus();
+        commentPopoverInput.setSelectionRange(commentPopoverInput.value.length,commentPopoverInput.value.length);
+      });
+    }else{
+      commentPopoverInput?.blur();
+    }
+    if(!item?.comment && nextMode === 'view' && commentPopoverView){
+      commentPopoverView.classList.add('empty');
+    }
+  }
+
+  function positionCommentPopover(anchorEl){
+    if(!commentPopover || !anchorEl) return;
+    const rect=anchorEl.getBoundingClientRect();
+    const popRect=commentPopover.getBoundingClientRect();
+    const gap=10;
+    let left=rect.left;
+    let top=rect.bottom + gap;
+    if(left + popRect.width > window.innerWidth - 12) left=window.innerWidth - popRect.width - 12;
+    if(left < 12) left=12;
+    if(top + popRect.height > window.innerHeight - 12) top=Math.max(12, rect.top - popRect.height - gap);
+    commentPopover.style.left=`${left}px`;
+    commentPopover.style.top=`${top}px`;
+  }
+
+  function openCommentPopover(planId,slotIdx,itemIdx,anchorEl){
+    const plan=getPlan(planId);
+    const item=plan?.slots?.[slotIdx]?.items?.[itemIdx];
+    if(!item || !anchorEl) return;
+    ensureCommentPopover();
+    commentEditorState={planId,slotIdx,itemIdx,anchorEl,mode:item.comment ? 'view' : 'edit'};
+    commentPopover.classList.add('show');
+    setCommentPopoverMode(commentEditorState.mode);
+    positionCommentPopover(anchorEl);
+    requestAnimationFrame(()=>positionCommentPopover(anchorEl));
+  }
+
+  function closeCommentPopover(){
+    commentEditorState=null;
+    if(commentPopover) commentPopover.classList.remove('show');
+    if(commentPopoverInput){
+      commentPopoverInput.blur();
+      commentPopoverInput.value='';
+    }
+  }
+
+  function saveCommentPopover(){
+    if(!commentEditorState) return;
+    const item=getCommentEditorItem();
+    if(!item) return closeCommentPopover();
+    item.comment=String(commentPopoverInput?.value || '').trim();
+    savePlans();
+    setCommentPopoverMode('view');
   }
 
   function renderStatsInto(el,plan){
@@ -2859,7 +3100,7 @@ async function kvSet(key,value){
       const title=document.createElement('strong');
       title.textContent=plannerLabel(plan,index);
       const sub=document.createElement('span');
-      sub.textContent=`${plan.slots.length} slots`;
+      sub.textContent=`${remainingSlotsForPlan(plan,index)} slots`;
       day.appendChild(title);
       day.appendChild(sub);
       th.appendChild(day);
@@ -2869,17 +3110,23 @@ async function kvSet(key,value){
     table.appendChild(thead);
 
     const hours=getDisplayHours();
+    const currentHour=new Date().getHours();
     const tbody=document.createElement('tbody');
     hours.forEach(hour=>{
       const tr=document.createElement('tr');
       const timeCell=document.createElement('td');
       timeCell.className='planner-calendar-time';
-      timeCell.textContent=fmtHour(hour);
+      timeCell.innerHTML=fmtHourHtml(hour);
       tr.appendChild(timeCell);
 
-      plans.forEach(plan=>{
+      plans.forEach((plan,planIndex)=>{
         const td=document.createElement('td');
         td.className='planner-calendar-cell';
+        const planDay=plannerDate(planIndex);
+        const today=atMidnight(new Date());
+        if(hour === currentHour && planDay.getTime() === today.getTime()){
+          td.classList.add('current-slot');
+        }
         const slotInfo=ensureSlot(plan,hour);
         const slot=slotInfo.slot;
         const slotIdx=slotInfo.index;
@@ -2890,9 +3137,11 @@ async function kvSet(key,value){
         slot.items.forEach((item,itemIdx)=>{
           const task=document.createElement('span');
           task.className='planner-calendar-task';
+          if(item.comment) task.classList.add('has-comment');
           task.dataset.color=item.color || 'default';
           task.draggable=true;
           task.style.background=PILL_COLORS[item.color] || PILL_COLORS.default;
+          if(item.comment) task.title=item.comment;
           const label=document.createElement('span');
           label.className='planner-calendar-task-label';
           label.textContent=item.label;
@@ -2943,6 +3192,11 @@ async function kvSet(key,value){
             if(dragSlotSource){
               moveDraggedItem(plan.id,hour,itemIdx,dragOverPill?.before);
             }
+          });
+          task.addEventListener('click',e=>{
+            if(e.target.closest('.pill-rm')) return;
+            e.stopPropagation();
+            openCommentPopover(plan.id,slotIdx,itemIdx,task);
           });
 
           stack.appendChild(task);
@@ -3029,6 +3283,7 @@ async function kvSet(key,value){
   function render(){
     const container=document.getElementById('planner-cards');
     if(!container) return;
+    closeCommentPopover();
     destroyCharts();
     container.innerHTML='';
     updatePlannerTotalBar();
@@ -3104,7 +3359,7 @@ async function kvSet(key,value){
         pillEl.draggable=true;
         pillEl.textContent=pill.label;
         pillEl.addEventListener('dragstart',e=>{
-          dragPillData={label:pill.label,color:pill.color};
+          dragPillData={label:pill.label,color:pill.color,comment:''};
           dragSlotSource=null;
           e.dataTransfer.effectAllowed='copy';
           e.dataTransfer.setData('text/plain',pill.label);
@@ -3219,7 +3474,7 @@ async function kvSet(key,value){
 
         const time=document.createElement('div');
         time.className='sched-time';
-        time.textContent=fmtHour(slot.hour);
+        time.innerHTML=fmtHourHtml(slot.hour);
 
         const pillsWrap=document.createElement('div');
         pillsWrap.className='sched-task-pills';
@@ -3227,8 +3482,10 @@ async function kvSet(key,value){
         slot.items.forEach((item,itemIndex)=>{
           const pillEl=document.createElement('span');
           pillEl.className='sched-task-pill';
+          if(item.comment) pillEl.classList.add('has-comment');
           pillEl.dataset.color=item.color || 'default';
           pillEl.draggable=true;
+          if(item.comment) pillEl.title=item.comment;
           pillEl.appendChild(document.createTextNode(item.label));
 
           const remove=document.createElement('button');
@@ -3296,6 +3553,11 @@ async function kvSet(key,value){
             savePlans();
             render();
           });
+          pillEl.addEventListener('click',e=>{
+            if(e.target.closest('.pill-rm')) return;
+            e.stopPropagation();
+            openCommentPopover(plan.id,slotIndex,itemIndex,pillEl);
+          });
 
           pillsWrap.appendChild(pillEl);
         });
@@ -3308,7 +3570,7 @@ async function kvSet(key,value){
           if(!label) return;
           const cardPlan=getPlan(plan.id);
           if(!cardPlan) return;
-          cardPlan.slots[slotIndex].items.push({label,color:randomColor()});
+          cardPlan.slots[slotIndex].items.push({label,color:randomColor(),comment:''});
           addInput.value='';
           savePlans();
           render();
@@ -3349,7 +3611,7 @@ async function kvSet(key,value){
             savePlans();
             render();
           }else if(dragPillData){
-            targetPlan.slots[slotIndex].items.push({...dragPillData});
+            targetPlan.slots[slotIndex].items.push({...dragPillData,comment:String(dragPillData.comment || '').trim()});
             dragPillData=null;
             savePlans();
             render();
@@ -3511,6 +3773,7 @@ async function kvSet(key,value){
     }
   }
 
+  let plannerStartDate=loadPlannerStartDate();
   let plans=loadLocalPlans();
   let bankPills=loadBank();
 
@@ -3539,6 +3802,23 @@ async function kvSet(key,value){
     savePlans();
     render();
   });
+
+  document.addEventListener('click',e=>{
+    if(!commentEditorState || !commentPopover?.classList.contains('show')) return;
+    if(commentPopover.contains(e.target)) return;
+    if(commentEditorState.anchorEl?.contains(e.target)) return;
+    closeCommentPopover();
+  });
+  window.addEventListener('resize',()=>{
+    if(commentEditorState?.anchorEl && commentPopover?.classList.contains('show')){
+      positionCommentPopover(commentEditorState.anchorEl);
+    }
+  });
+  window.addEventListener('scroll',()=>{
+    if(commentEditorState?.anchorEl && commentPopover?.classList.contains('show')){
+      positionCommentPopover(commentEditorState.anchorEl);
+    }
+  },true);
 
   setInterval(()=>{
     if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
