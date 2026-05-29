@@ -2873,10 +2873,7 @@ async function kvSet(key,value){
     const overallMinutesRemainder=overallMinutes % 60;
     totalEl.textContent=`${overallHoursWhole}h ${overallMinutesRemainder}m`;
 
-    const lastLabel=plannerLabel(plans[plans.length - 1] || makePlan('Today'), dayCount - 1);
-    metaEl.textContent=plans.length > 1
-      ? `today + full middle days + ${lastLabel} until 8:00 AM`
-      : `remaining time for ${lastLabel}`;
+    metaEl.textContent='';
   }
 
   function clearDropTargets(){
