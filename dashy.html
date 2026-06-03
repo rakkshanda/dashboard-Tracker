@@ -223,40 +223,7 @@
 /* colored header strip */
 .schedule-panel-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#111;border-bottom:2.5px solid #333;min-height:52px;box-sizing:border-box}
 .schedule-panel-head h2{font-family:var(--display);font-size:20px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
-.sched-left>.sched-pill-bank,.sched-left>.sched-add-pill-form,.sched-body{padding-left:16px;padding-right:16px}
-/* pill bank strip */
-.sched-pill-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 12px;border-bottom:2px solid #e0e0e0;margin-bottom:0;background:#f5f5f5;opacity:0;max-height:0;overflow:hidden;padding-top:0;padding-bottom:0;border-bottom-width:0;transition:opacity .18s,max-height .18s,padding .18s,border-bottom-width .18s}
-.sched-left:hover .sched-pill-bank{opacity:1;max-height:200px;padding-top:12px;padding-bottom:12px;border-bottom-width:2px}
-[data-theme="dark"] .sched-pill-bank{background:#1a1a1a;border-bottom-color:#333}
-.sched-add-pill-form{display:none;align-items:center;gap:8px;padding:10px 16px 12px;flex-wrap:wrap;border-bottom:2px solid #e0e0e0;background:#f5f5f5}
-.sched-add-pill-form.show{display:flex}
-.sched-add-pill-input{flex:1;min-width:120px;padding:6px 10px;border:2px solid #ccc;border-radius:999px;font-size:12px;font-family:var(--mono);font-weight:700;background:#fff;color:var(--ink);outline:none;transition:border-color .12s}
-.sched-add-pill-input:focus{border-color:#ff6b00}
-.sched-color-swatches{display:flex;gap:5px;align-items:center}
-.swatch{width:20px;height:20px;border-radius:50%;border:2px solid;cursor:pointer;transition:transform .12s,outline .12s;outline:2px solid transparent;outline-offset:2px}
-.swatch:hover{transform:scale(1.15)}
-.swatch.selected{outline-color:var(--ink)}
-.sched-add-pill-confirm{padding:5px 14px;border-radius:999px;font-size:11.5px;font-weight:800;font-family:var(--mono);cursor:pointer;border:2px solid var(--ink);background:var(--ink);color:var(--bg);transition:opacity .12s}
-.sched-add-pill-confirm:hover{opacity:.85}
-.sched-add-pill-cancel{background:transparent;border:none;cursor:pointer;font-size:15px;color:var(--ink-3);padding:0 4px;line-height:1;transition:color .12s}
-.sched-add-pill-cancel:hover{color:var(--ink)}
-.sched-add-pill-btn{display:inline-flex;align-items:center;padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:800;font-family:var(--mono);cursor:pointer;border:2px dashed var(--line);background:transparent;color:var(--ink);opacity:.6;transition:opacity .15s,border-color .15s,background .15s}
-.sched-add-pill-btn:hover{opacity:1;border-color:var(--acc);background:var(--card)}
-/* pills in bank */
-.sched-pill{display:inline-flex;align-items:center;padding:7px 18px;border-radius:999px;font-size:13px;font-weight:800;font-family:var(--mono);letter-spacing:.04em;cursor:grab;user-select:none;border:none;transition:opacity .12s;white-space:nowrap;color:#fff}
-.sched-pill:hover{opacity:.8}
-.sched-pill:active{cursor:grabbing;opacity:.6}
-.sched-pill.dragging-pill{opacity:.4;transform:scale(.9)}
-.sched-pill[data-color="green"]{background:#16a34a}
-.sched-pill[data-color="blue"]{background:#2563eb}
-.sched-pill[data-color="pink"]{background:#db2777}
-.sched-pill[data-color="sky"]{background:#0284c7}
-.sched-pill[data-color="orange"]{background:#ea580c}
-.sched-pill[data-color="yellow"]{background:#b45309}
-.sched-pill[data-color="red"]{background:#dc2626}
-.sched-pill[data-color="purple"]{background:#7c3aed}
-.sched-pill[data-color="gray"]{background:#4b5563}
-.sched-pill[data-color="default"]{background:#374151}
+.sched-left>.sched-body{padding-left:16px;padding-right:16px}
 /* schedule grid rows */
 .sched-row{display:grid;grid-template-columns:110px 1fr auto;align-items:start;border-bottom:none;border-left:4px solid transparent;transition:background .12s,border-color .12s}
 .sched-row:nth-child(even){background:oklch(0.5 0 0 / .03)}
@@ -281,7 +248,10 @@
 .goals-add-row-btn:hover{opacity:1!important;color:var(--acc)}
 .goals-list{display:flex;flex-direction:column;gap:10px;position:relative;z-index:1;padding:16px 16px;background:#fff}
 .goals-stats{padding:0 16px 16px 16px;background:#fff;font-family:var(--sans);flex:1}
-.goal-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f4f4f4;border-radius:12px;border:none;transition:all .18s}
+.goal-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f4f4f4;border-radius:12px;border:none;transition:opacity .12s;cursor:default}
+.goal-drag-handle{cursor:grab;color:#bbb;font-size:14px;line-height:1;flex-shrink:0;padding:0 2px;user-select:none}
+.goal-drag-handle:active{cursor:grabbing}
+.goal-row.dragging-goal{opacity:.35}
 .goal-row:focus-within{outline:1.5px solid #ff6b00;outline-offset:1px}
 .goal-row.done{background:#efefef;opacity:.6}
 [data-theme="dark"] .goal-row.done{background:oklch(0.22 0.04 350 / .45)}
@@ -295,6 +265,9 @@
 .goal-input{flex:1;border:none;background:transparent;font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--ink);outline:none;min-width:0;transition:opacity .2s}
 .goal-input::placeholder{color:var(--ink);opacity:.22;font-weight:400}
 .goal-row.done .goal-input{text-decoration:line-through;opacity:.4}
+.goal-del-btn{background:none;border:none;cursor:pointer;font-size:16px;line-height:1;color:#bbb;padding:0 2px;opacity:0;transition:opacity .12s,color .12s;flex-shrink:0}
+.goal-row:hover .goal-del-btn{opacity:.5}
+.goal-del-btn:hover{opacity:1!important;color:#e53e3e}
 .sched-clear-all{font-size:11px;font-weight:800;font-family:var(--mono);color:#fff;background:#444;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;transition:opacity .12s}
 .sched-clear-all:hover{opacity:.75}
 /* task pill area */
@@ -317,7 +290,7 @@
 .sched-task-pill:hover .pill-rm{opacity:.6}
 .planner-calendar-task:hover .pill-rm{opacity:.6}
 .pill-rm:hover{opacity:1!important}
-.sched-row-del{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;color:var(--ink-3);padding:8px 12px;align-self:center;transition:color .12s,opacity .12s;font-family:var(--mono);font-weight:400;opacity:0}
+.sched-row-del{background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1;color:var(--ink-3);padding:8px 12px;align-self:center;transition:color .12s,opacity .12s;font-family:var(--mono);font-weight:400;opacity:0;pointer-events:auto}
 .sched-row:hover .sched-row-del{opacity:.5}
 .sched-row-del:hover{color:#e53e3e;opacity:1!important}
 .sched-add-row{display:flex;justify-content:center;align-items:center;width:100%;padding:8px 14px;cursor:pointer;border:none;border-top:1.5px dashed var(--line);background:transparent;font-size:20px;font-weight:700;color:var(--ink-3);font-family:var(--mono);transition:color .12s,background .12s,opacity .12s;opacity:0}
@@ -571,7 +544,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
     <text x="730" y="380" font-family="sans-serif" font-weight="800" font-size="180" fill="#0E0E10" letter-spacing="-8">21</text>
   </svg>
 </template>
-<body data-theme="dark" data-density="balanced" data-jobs-view="table" data-show-stats="false">
+<body data-theme="light" data-density="balanced" data-jobs-view="table" data-show-stats="false">
 
 <div class="shell" id="app-root">
 
@@ -643,7 +616,13 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           <strong id="planner-today-remaining">0h 0m</strong>
         </div>
       </div>
-      <div class="planner-total-meta" id="planner-total-meta">until end of last planned day</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <div class="planner-total-meta" id="planner-total-meta">until end of last planned day</div>
+        <div style="position:relative">
+          <button id="planner-start-date-btn" title="Change start date" style="background:transparent;border:none;cursor:pointer;font-family:var(--mono);font-size:12px;font-weight:800;color:#fff;padding:3px 0;letter-spacing:-.01em;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.35)">—</button>
+          <input type="date" id="planner-start-date-input" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;top:0;left:0">
+        </div>
+      </div>
     </div>
     <div class="planner-view show" id="planner-cards-view">
       <div class="planner-cards" id="planner-cards"></div>
@@ -2476,16 +2455,9 @@ async function kvSet(key,value){
   const PLANNER_START_DATE_KEY='planner_start_date_v1';
   const LEGACY_SCHEDULE_KEY='sched_v2';
   const LEGACY_GOALS_KEY='goals_v1';
-  const BANK_KEY='sched_bank_v1';
   const COUNT=5;
-  const BLOCKED_PILL_LABELS=new Set(['PPT']);
-  const ALL_PILL_COLORS=['green','blue','pink','sky','orange','yellow','red','purple','gray','default'];
   const PLANNER_START_HOUR=6;
   const PLANNER_END_HOUR=24;
-  const DEFAULT_BANK=[
-    {label:'HAI',color:'green'},{label:'JA',color:'blue'},
-    {label:'Meal',color:'pink'},{label:'Shower',color:'sky'}
-  ];
   const RANDOM_COLORS=['green','blue','pink','sky','orange','yellow','red','purple'];
   const PILL_COLORS={green:'#16a34a',blue:'#2563eb',pink:'#db2777',sky:'#0284c7',orange:'#ea580c',yellow:'#b45309',red:'#dc2626',purple:'#7c3aed',gray:'#4b5563',default:'#374151'};
   const PILL_COLORS_100=[
@@ -2513,9 +2485,9 @@ async function kvSet(key,value){
   function resolveColor(c){return PILL_COLORS[c]||c||PILL_COLORS.default;}
   const chartsByPlan=new Map();
 
-  let dragPillData=null;
   let dragSlotSource=null;
   let dragOverPill=null;
+  let dragGoalSource=null;
   let inputSaveTimer=null;
   let plannerMode='cards';
   let commentEditorState=null;
@@ -2551,10 +2523,6 @@ async function kvSet(key,value){
       }
     }catch{}
     return atMidnight(new Date());
-  }
-
-  function isBlockedPillLabel(label){
-    return BLOCKED_PILL_LABELS.has(String(label || '').trim().toUpperCase());
   }
 
   function defaultSlots(){
@@ -2606,22 +2574,20 @@ async function kvSet(key,value){
   function sanitizeItems(items){
     if(!Array.isArray(items)) return [];
     return items
-      .filter(item=>item && !isBlockedPillLabel(item.label))
+      .filter(item=>item)
       .map(normalizeItem)
       .filter(item=>item.label);
   }
 
   function sanitizeSlots(data){
-    const base=new Map(defaultSlots().map(slot=>[slot.hour,{hour:slot.hour,items:[]}]));
-    if(Array.isArray(data)){
-      data
-        .filter(slot=>slot && typeof slot.hour==='number')
-        .forEach(slot=>{
-          if(slot.hour < PLANNER_START_HOUR) return;
-          base.set(slot.hour,{hour:slot.hour,items:sanitizeItems(slot.items)});
-        });
+    if(Array.isArray(data) && data.length > 0){
+      const cleaned=data
+        .filter(slot=>slot && typeof slot.hour==='number' && slot.hour >= PLANNER_START_HOUR)
+        .map(slot=>({hour:slot.hour,items:sanitizeItems(slot.items)}))
+        .sort((a,b)=>a.hour-b.hour);
+      if(cleaned.length > 0) return cleaned;
     }
-    return Array.from(base.values()).sort((a,b)=>a.hour-b.hour);
+    return defaultSlots();
   }
 
   function sanitizeGoals(data){
@@ -2630,15 +2596,6 @@ async function kvSet(key,value){
       text: String(goal?.text || ''),
       done: !!goal?.done
     }));
-  }
-
-  function sanitizeBank(data){
-    if(!Array.isArray(data)) return DEFAULT_BANK.map(x=>({...x}));
-    const clean=data
-      .filter(pill=>pill && !isBlockedPillLabel(pill.label))
-      .map(pill=>({label:String(pill.label || '').trim(),color:pill.color || 'default'}))
-      .filter(pill=>pill.label);
-    return clean.length ? clean : DEFAULT_BANK.map(x=>({...x}));
   }
 
   function normalizePlan(plan,index=0){
@@ -2708,13 +2665,11 @@ async function kvSet(key,value){
   }
 
   function persistLocal(){
-    const cleanPlans=normalizePlans(plans);
-    plans=cleanPlans;
-    localStorage.setItem(PLANS_KEY,JSON.stringify(cleanPlans));
+    localStorage.setItem(PLANS_KEY,JSON.stringify(plans));
     localStorage.setItem(PLANNER_START_DATE_KEY,ymd(plannerStartDate));
-    if(cleanPlans[0]){
-      localStorage.setItem(LEGACY_SCHEDULE_KEY,JSON.stringify(cleanPlans[0].slots));
-      localStorage.setItem(LEGACY_GOALS_KEY,JSON.stringify(cleanPlans[0].goals));
+    if(plans[0]){
+      localStorage.setItem(LEGACY_SCHEDULE_KEY,JSON.stringify(plans[0].slots));
+      localStorage.setItem(LEGACY_GOALS_KEY,JSON.stringify(plans[0].goals));
     }
   }
 
@@ -2747,20 +2702,6 @@ async function kvSet(key,value){
       if(validPlans(stored)) return normalizePlans(stored);
     }catch{}
     return loadLegacyLocal();
-  }
-
-  function loadBank(){
-    try{
-      const stored=JSON.parse(localStorage.getItem(BANK_KEY));
-      if(Array.isArray(stored) && stored.length) return sanitizeBank(stored);
-    }catch{}
-    return DEFAULT_BANK.map(x=>({...x}));
-  }
-
-  function saveBank(nextBank){
-    bankPills=sanitizeBank(nextBank);
-    localStorage.setItem(BANK_KEY,JSON.stringify(bankPills));
-    kvSet('pill_bank',bankPills);
   }
 
   function findPlanIndex(planId){
@@ -2815,7 +2756,9 @@ async function kvSet(key,value){
     const srcPlan=getPlan(dragSlotSource.planId);
     const targetPlan=getPlan(targetPlanId);
     if(!srcPlan || !targetPlan) return false;
-    const sourceSlot=srcPlan.slots[dragSlotSource.slotIdx];
+    const sourceSlot=dragSlotSource.slotHour!=null
+      ? srcPlan.slots.find(s=>s.hour===dragSlotSource.slotHour)
+      : srcPlan.slots[dragSlotSource.slotIdx];
     if(!sourceSlot) return false;
     const [moved]=sourceSlot.items.splice(dragSlotSource.itemIdx,1);
     if(!moved) return false;
@@ -2874,6 +2817,11 @@ async function kvSet(key,value){
     totalEl.textContent=`${overallHoursWhole}h ${overallMinutesRemainder}m`;
 
     metaEl.textContent='';
+
+    const dateInput=document.getElementById('planner-start-date-input');
+    if(dateInput) dateInput.value=ymd(plannerStartDate);
+    const dateBtn=document.getElementById('planner-start-date-btn');
+    if(dateBtn) dateBtn.textContent=plannerStartDate.toLocaleDateString('en-US',{month:'long',day:'numeric'});
   }
 
   function clearDropTargets(){
@@ -3107,8 +3055,29 @@ async function kvSet(key,value){
     if(!calendarView) return;
     calendarView.innerHTML='';
 
+    const calHeader=document.createElement('div');
+    calHeader.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#111;border-bottom:2.5px solid #333;border-radius:calc(var(--radius) - 4px) calc(var(--radius) - 4px) 0 0';
+    const calTitle=document.createElement('h2');
+    calTitle.style.cssText='font-family:var(--display);font-size:20px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em';
+    calTitle.textContent='Calendar';
+    const calClearBtn=document.createElement('button');
+    calClearBtn.type='button';
+    calClearBtn.className='sched-clear-all';
+    calClearBtn.textContent='Clear All';
+    calClearBtn.addEventListener('click',()=>{
+      if(!confirm('Clear all tasks from every day?')) return;
+      plans.forEach(plan=>{ plan.slots=defaultSlots(); });
+      savePlans();
+      render();
+    });
+    calHeader.appendChild(calTitle);
+    calHeader.appendChild(calClearBtn);
+    calendarView.appendChild(calHeader);
+
     const wrap=document.createElement('div');
     wrap.className='planner-calendar-wrap';
+    wrap.style.borderTopLeftRadius='0';
+    wrap.style.borderTopRightRadius='0';
     const table=document.createElement('table');
     table.className='planner-calendar-table';
 
@@ -3151,9 +3120,8 @@ async function kvSet(key,value){
         if(hour === currentHour && planDay.getTime() === today.getTime()){
           td.classList.add('current-slot');
         }
-        const slotInfo=ensureSlot(plan,hour);
-        const slot=slotInfo.slot;
-        const slotIdx=slotInfo.index;
+        const slotIdx=plan.slots.findIndex(s=>s.hour===hour);
+        const slot=slotIdx>=0 ? plan.slots[slotIdx] : {hour,items:[]};
 
         const stack=document.createElement('div');
         stack.className='planner-calendar-task-stack';
@@ -3178,13 +3146,18 @@ async function kvSet(key,value){
           remove.title='Remove';
           remove.addEventListener('click',e=>{
             e.stopPropagation();
-            removeItem(plan.id,slotIdx,itemIdx);
+            const p=getPlan(plan.id);
+            if(!p) return;
+            const si=p.slots.findIndex(s=>s.hour===hour);
+            if(si<0) return;
+            p.slots[si].items.splice(itemIdx,1);
+            savePlans();
+            render();
           });
           task.appendChild(remove);
 
           task.addEventListener('dragstart',e=>{
-            dragSlotSource={planId:plan.id,slotIdx,itemIdx};
-            dragPillData=null;
+            dragSlotSource={planId:plan.id,slotHour:hour,itemIdx};
             e.dataTransfer.effectAllowed='move';
             e.dataTransfer.setData('text/plain',item.label);
             setTimeout(()=>task.classList.add('dragging-slot-pill'),0);
@@ -3204,7 +3177,7 @@ async function kvSet(key,value){
             const rect=task.getBoundingClientRect();
             const before=e.clientX < rect.left + rect.width / 2;
             task.classList.add(before ? 'pill-drop-before' : 'pill-drop-after');
-            dragOverPill={planId:plan.id,slotIdx,itemIdx,before,hour};
+            dragOverPill={planId:plan.id,slotHour:hour,itemIdx,before,hour};
           });
           task.addEventListener('dragleave',e=>{
             if(!task.contains(e.relatedTarget)) task.classList.remove('pill-drop-before','pill-drop-after');
@@ -3220,7 +3193,11 @@ async function kvSet(key,value){
           task.addEventListener('click',e=>{
             if(e.target.closest('.pill-rm')) return;
             e.stopPropagation();
-            openCommentPopover(plan.id,slotIdx,itemIdx,task);
+            const p=getPlan(plan.id);
+            if(!p) return;
+            const si=p.slots.findIndex(s=>s.hour===hour);
+            if(si<0) return;
+            openCommentPopover(plan.id,si,itemIdx,task);
           });
 
           stack.appendChild(task);
@@ -3265,7 +3242,7 @@ async function kvSet(key,value){
         stack.appendChild(input);
 
         td.addEventListener('dragover',e=>{
-          if(!dragPillData && !dragSlotSource) return;
+          if(!dragSlotSource) return;
           e.preventDefault();
           document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
           td.classList.add('drop-target');
@@ -3276,12 +3253,7 @@ async function kvSet(key,value){
         td.addEventListener('drop',e=>{
           e.preventDefault();
           td.classList.remove('drop-target');
-          if(dragSlotSource){
-            moveDraggedItem(plan.id,hour);
-          }else if(dragPillData){
-            addItemToSlot(plan.id,hour,{...dragPillData});
-            dragPillData=null;
-          }
+          if(dragSlotSource) moveDraggedItem(plan.id,hour);
         });
 
         td.appendChild(stack);
@@ -3381,125 +3353,6 @@ async function kvSet(key,value){
       head.appendChild(headRight);
       left.appendChild(head);
 
-      const bank=document.createElement('div');
-      bank.className='sched-pill-bank';
-      bankPills.forEach((pill,pillIndex)=>{
-        const wrap=document.createElement('div');
-        wrap.className='sched-pill-edit-wrap';
-        wrap.style.cssText='position:relative;display:inline-flex;align-items:center;';
-
-        const pillEl=document.createElement('div');
-        pillEl.className='sched-pill';
-        pillEl.dataset.color=pill.color;
-        pillEl.dataset.label=pill.label;
-        pillEl.draggable=true;
-        pillEl.textContent=pill.label;
-        pillEl.addEventListener('dragstart',e=>{
-          dragPillData={label:pill.label,color:pill.color,comment:''};
-          dragSlotSource=null;
-          e.dataTransfer.effectAllowed='copy';
-          e.dataTransfer.setData('text/plain',pill.label);
-          setTimeout(()=>pillEl.classList.add('dragging-pill'),0);
-        });
-        pillEl.addEventListener('dragend',()=>{
-          pillEl.classList.remove('dragging-pill');
-          dragPillData=null;
-          clearDropTargets();
-          document.querySelectorAll('.planner-calendar-cell.drop-target').forEach(el=>el.classList.remove('drop-target'));
-        });
-        pillEl.addEventListener('contextmenu',e=>{
-          e.preventDefault();
-          if(confirm(`Delete "${pill.label}"?`)){
-            bankPills.splice(pillIndex,1);
-            saveBank(bankPills);
-            render();
-          }
-        });
-
-        const editBtn=document.createElement('button');
-        editBtn.type='button';
-        editBtn.textContent='✎';
-        editBtn.style.cssText='position:absolute;top:-6px;right:-6px;width:16px;height:16px;border-radius:50%;font-size:9px;border:1px solid var(--line);background:var(--card);color:var(--ink-3);cursor:pointer;display:none;align-items:center;justify-content:center;padding:0;line-height:1;z-index:2';
-        wrap.addEventListener('mouseenter',()=>{ editBtn.style.display='flex'; });
-        wrap.addEventListener('mouseleave',()=>{ editBtn.style.display='none'; });
-        editBtn.addEventListener('click',e=>{
-          e.stopPropagation();
-          const label=prompt('Edit pill name:',pill.label);
-          if(label === null) return;
-          const color=prompt(`Color (${ALL_PILL_COLORS.join(', ')}):`,pill.color) || pill.color;
-          bankPills[pillIndex]={
-            label: label.trim() || pill.label,
-            color: ALL_PILL_COLORS.includes(color) ? color : pill.color
-          };
-          saveBank(bankPills);
-          render();
-        });
-
-        wrap.appendChild(pillEl);
-        wrap.appendChild(editBtn);
-        bank.appendChild(wrap);
-      });
-
-      const addPillBtn=document.createElement('button');
-      addPillBtn.type='button';
-      addPillBtn.className='sched-add-pill-btn';
-      addPillBtn.title='Add custom pill';
-      addPillBtn.textContent='+ task';
-      bank.appendChild(addPillBtn);
-      left.appendChild(bank);
-
-      const addPillForm=document.createElement('div');
-      addPillForm.className='sched-add-pill-form';
-      const addPillInput=document.createElement('input');
-      addPillInput.className='sched-add-pill-input';
-      addPillInput.placeholder='Task name…';
-      addPillInput.maxLength=24;
-      const swatches=document.createElement('div');
-      swatches.className='sched-color-swatches';
-      ['green','blue','pink','sky','orange','yellow','red','purple','gray'].forEach((color,colorIndex)=>{
-        const sw=createSwatch(color,colorIndex === 0);
-        sw.addEventListener('click',()=>{
-          swatches.querySelectorAll('.swatch').forEach(btn=>btn.classList.remove('selected'));
-          sw.classList.add('selected');
-        });
-        swatches.appendChild(sw);
-      });
-      const confirmAdd=document.createElement('button');
-      confirmAdd.type='button';
-      confirmAdd.className='sched-add-pill-confirm';
-      confirmAdd.textContent='Add';
-      const cancelAdd=document.createElement('button');
-      cancelAdd.type='button';
-      cancelAdd.className='sched-add-pill-cancel';
-      cancelAdd.textContent='✕';
-      addPillForm.appendChild(addPillInput);
-      addPillForm.appendChild(swatches);
-      addPillForm.appendChild(confirmAdd);
-      addPillForm.appendChild(cancelAdd);
-      left.appendChild(addPillForm);
-
-      addPillBtn.addEventListener('click',()=>{
-        addPillForm.classList.add('show');
-        addPillInput.focus();
-      });
-      cancelAdd.addEventListener('click',()=>{
-        addPillForm.classList.remove('show');
-        addPillInput.value='';
-      });
-      const commitBankPill=()=>{
-        const label=addPillInput.value.trim();
-        if(!label) return;
-        const selected=swatches.querySelector('.swatch.selected')?.dataset.color || 'green';
-        bankPills.push({label,color:selected});
-        saveBank(bankPills);
-        render();
-      };
-      confirmAdd.addEventListener('click',commitBankPill);
-      addPillInput.addEventListener('keydown',e=>{
-        if(e.key === 'Enter'){ e.preventDefault(); commitBankPill(); }
-        if(e.key === 'Escape'){ e.preventDefault(); cancelAdd.click(); }
-      });
-
       const body=document.createElement('div');
       body.className='sched-body';
 
@@ -3520,6 +3373,7 @@ async function kvSet(key,value){
           pillEl.className='sched-task-pill';
           if(item.comment) pillEl.classList.add('has-comment');
           pillEl.dataset.color=item.color || 'default';
+          pillEl.style.background=resolveColor(item.color);
           pillEl.draggable=true;
           if(item.comment) pillEl.title=item.comment;
           pillEl.appendChild(document.createTextNode(item.label));
@@ -3528,11 +3382,14 @@ async function kvSet(key,value){
           remove.className='pill-rm';
           remove.textContent='×';
           remove.title='Remove';
+          remove.addEventListener('mousedown',e=>e.preventDefault());
           remove.addEventListener('click',e=>{
             e.stopPropagation();
             const cardPlan=getPlan(plan.id);
             if(!cardPlan) return;
-            cardPlan.slots[slotIndex].items.splice(itemIndex,1);
+            const s=cardPlan.slots.find(sl=>sl.hour===slot.hour);
+            if(!s) return;
+            s.items.splice(itemIndex,1);
             savePlans();
             render();
           });
@@ -3540,7 +3397,6 @@ async function kvSet(key,value){
 
           pillEl.addEventListener('dragstart',e=>{
             dragSlotSource={planId:plan.id,slotIdx:slotIndex,itemIdx:itemIndex};
-            dragPillData=null;
             e.dataTransfer.effectAllowed='move';
             e.dataTransfer.setData('text/plain',item.label);
             setTimeout(()=>pillEl.classList.add('dragging-slot-pill'),0);
@@ -3608,7 +3464,9 @@ async function kvSet(key,value){
           if(!label) return;
           const cardPlan=getPlan(plan.id);
           if(!cardPlan) return;
-          cardPlan.slots[slotIndex].items.push({label,color:randomColor(),comment:''});
+          const targetSlot=cardPlan.slots.find(s=>s.hour===slotHour);
+          if(!targetSlot) return;
+          targetSlot.items.push({label,color:randomColor(),comment:''});
           addInput.value='';
           savePlans();
           render();
@@ -3630,8 +3488,8 @@ async function kvSet(key,value){
         pillsWrap.appendChild(addInput);
 
         row.addEventListener('dragover',e=>{
-          if(!dragPillData && !dragSlotSource) return;
-          if(dragSlotSource && e.target.closest('.sched-task-pill')) return;
+          if(!dragSlotSource && !dragGoalSource) return;
+          if(e.target.closest('.sched-task-pill')) return;
           e.preventDefault();
           clearDropTargets();
           row.classList.add('sched-drop-target');
@@ -3644,6 +3502,16 @@ async function kvSet(key,value){
           clearDropTargets();
           const targetPlan=getPlan(plan.id);
           if(!targetPlan) return;
+          if(dragGoalSource && dragGoalSource.label){
+            const targetSlot=targetPlan.slots.find(s=>s.hour===slotHour);
+            if(targetSlot){
+              targetSlot.items.push({label:dragGoalSource.label,color:dragGoalSource.color,comment:''});
+              dragGoalSource=null;
+              savePlans();
+              render();
+            }
+            return;
+          }
           if(dragSlotSource){
             const sourcePlan=getPlan(dragSlotSource.planId);
             if(!sourcePlan) return;
@@ -3658,11 +3526,6 @@ async function kvSet(key,value){
             dragOverPill=null;
             savePlans();
             render();
-          }else if(dragPillData){
-            targetPlan.slots[slotIndex].items.push({...dragPillData,comment:String(dragPillData.comment || '').trim()});
-            dragPillData=null;
-            savePlans();
-            render();
           }
         });
 
@@ -3671,10 +3534,15 @@ async function kvSet(key,value){
         deleteRow.className='sched-row-del';
         deleteRow.textContent='−';
         deleteRow.title='Remove slot';
-        deleteRow.addEventListener('click',()=>{
+        const slotHour=slot.hour;
+        deleteRow.addEventListener('mousedown',e=>e.preventDefault());
+        deleteRow.addEventListener('click',e=>{
+          e.stopPropagation();
           const cardPlan=getPlan(plan.id);
           if(!cardPlan) return;
-          cardPlan.slots.splice(slotIndex,1);
+          const idx=cardPlan.slots.findIndex(s=>s.hour===slotHour);
+          if(idx === -1) return;
+          cardPlan.slots.splice(idx,1);
           savePlans();
           render();
         });
@@ -3727,6 +3595,13 @@ async function kvSet(key,value){
       plan.goals.forEach((goal,goalIndex)=>{
         const row=document.createElement('div');
         row.className='goal-row'+(goal.done?' done':'');
+        row.draggable=true;
+
+        const handle=document.createElement('span');
+        handle.className='goal-drag-handle';
+        handle.textContent='⠿';
+        handle.addEventListener('mousedown',e=>e.stopPropagation());
+
         const wrap=document.createElement('div');
         wrap.className='goal-cb-wrap';
         const cb=document.createElement('input');
@@ -3757,8 +3632,71 @@ async function kvSet(key,value){
           clearTimeout(inputSaveTimer);
           inputSaveTimer=setTimeout(()=>savePlans(),350);
         });
+
+        row.addEventListener('dragstart',e=>{
+          dragGoalSource={planId:plan.id,goalIndex,label:goal.text,color:randomColor()};
+          e.dataTransfer.effectAllowed='move';
+          e.dataTransfer.setData('text/plain',goal.text);
+          setTimeout(()=>row.classList.add('dragging-goal'),0);
+        });
+        row.addEventListener('dragover',e=>{
+          if(!dragGoalSource || dragGoalSource.planId!==plan.id) return;
+          e.preventDefault();
+          e.stopPropagation();
+          const dragging=goalsList.querySelector('.dragging-goal');
+          if(!dragging || dragging===row) return;
+          const rect=row.getBoundingClientRect();
+          if(e.clientY<rect.top+rect.height/2){
+            goalsList.insertBefore(dragging,row);
+          } else {
+            row.after(dragging);
+          }
+        });
+        row.addEventListener('drop',e=>{
+          e.preventDefault();
+          e.stopPropagation();
+          if(!dragGoalSource || dragGoalSource.planId!==plan.id) return;
+          const dragging=goalsList.querySelector('.dragging-goal');
+          if(!dragging) return;
+          const goalRows=[...goalsList.querySelectorAll('.goal-row')];
+          const newIdx=goalRows.indexOf(dragging);
+          const from=dragGoalSource.goalIndex;
+          dragGoalSource=null;
+          if(newIdx<0 || newIdx===from){render();return;}
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan){render();return;}
+          const [moved]=cardPlan.goals.splice(from,1);
+          cardPlan.goals.splice(newIdx,0,moved);
+          savePlans();
+          render();
+        });
+        row.addEventListener('dragend',()=>{
+          row.classList.remove('dragging-goal');
+          if(dragGoalSource){
+            dragGoalSource=null;
+            render();
+          }
+        });
+
+        const delGoal=document.createElement('button');
+        delGoal.type='button';
+        delGoal.className='goal-del-btn';
+        delGoal.textContent='×';
+        delGoal.title='Delete';
+        delGoal.addEventListener('mousedown',e=>e.preventDefault());
+        delGoal.addEventListener('click',e=>{
+          e.stopPropagation();
+          const cardPlan=getPlan(plan.id);
+          if(!cardPlan) return;
+          cardPlan.goals.splice(goalIndex,1);
+          savePlans();
+          render();
+        });
+
+        row.appendChild(handle);
         row.appendChild(wrap);
         row.appendChild(input);
+        row.appendChild(delGoal);
         goalsList.appendChild(row);
       });
 
@@ -3823,7 +3761,6 @@ async function kvSet(key,value){
 
   let plannerStartDate=loadPlannerStartDate();
   let plans=loadLocalPlans();
-  let bankPills=loadBank();
 
   document.getElementById('schedule-toggle-btn')?.addEventListener('click',()=>{
     const panel=document.getElementById('schedule-panel');
@@ -3851,6 +3788,24 @@ async function kvSet(key,value){
     render();
   });
 
+  document.getElementById('planner-start-date-btn')?.addEventListener('click',()=>{
+    const input=document.getElementById('planner-start-date-input');
+    if(!input) return;
+    input.style.pointerEvents='auto';
+    input.showPicker?.();
+    input.click();
+    setTimeout(()=>{ input.style.pointerEvents='none'; }, 500);
+  });
+
+  document.getElementById('planner-start-date-input')?.addEventListener('change',function(){
+    const parsed=new Date(`${this.value}T00:00:00`);
+    if(!Number.isNaN(parsed.getTime())){
+      plannerStartDate=atMidnight(parsed);
+      savePlans();
+      render();
+    }
+  });
+
   document.addEventListener('click',e=>{
     if(!commentEditorState || !commentPopover?.classList.contains('show')) return;
     if(commentPopover.contains(e.target)) return;
@@ -3872,7 +3827,7 @@ async function kvSet(key,value){
     if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
   },60000);
 
-  openSchedule('calendar');
+  openSchedule('cards');
   syncFromSupabase();
 })();
 
