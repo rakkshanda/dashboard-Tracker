@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tasks — JobTracker</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tasks">
+<link rel="apple-touch-icon" href="icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#f5f5f4;
+    --card:#ffffff;
+    --ink:#0e0e10;
+    --ink2:#5a5a62;
+    --ink3:#9a9aa2;
+    --acc:#ff6b00;
+    --line:#e5e5e8;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --mono:'SF Mono','Fira Code',monospace;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bot:env(safe-area-inset-bottom,0px);
+  }
+  html{height:100%;background:#111}
+  body{
+    min-height:100%;height:100%;
+    background:var(--bg);
+    font-family:var(--sans);
+    display:flex;flex-direction:column;
+    max-width:480px;margin:0 auto;
+    position:relative;
+  }
+
+  /* Header */
+  header{
+    background:#111;
+    padding:calc(16px + var(--safe-top)) 20px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:10;
+    border-bottom:1px solid #333;
+  }
+  .brand{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.03em}
+  .brand span{color:var(--acc)}
+  .status{font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.45);font-weight:600}
+  .status.syncing{color:#fbbf24}
+  .status.error{color:#f87171}
+  .status.ok{color:#4ade80}
+
+  /* Toolbar */
+  .toolbar{
+    padding:12px 16px;
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    display:flex;gap:8px;
+  }
+  .filter-btn{
+    padding:6px 14px;border-radius:999px;
+    font-size:12px;font-weight:700;font-family:var(--mono);
+    border:1.5px solid var(--line);background:transparent;color:var(--ink2);
+    cursor:pointer;transition:all .15s;letter-spacing:.02em;
+  }
+  .filter-btn.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  /* List */
+  main{flex:1;overflow-y:auto;padding:12px 16px;padding-bottom:calc(100px + var(--safe-bot))}
+  .empty{
+    text-align:center;padding:60px 20px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink3);line-height:2;
+  }
+  .task-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--card);border-radius:14px;
+    padding:14px 16px;margin-bottom:8px;
+    border:1.5px solid var(--line);
+    transition:opacity .2s,border-color .15s;
+    position:relative;overflow:hidden;
+  }
+  .task-item.done{opacity:.55}
+  .task-item.done .task-label{text-decoration:line-through;color:var(--ink3)}
+
+  /* Checkbox */
+  .cb-wrap{flex-shrink:0}
+  .cb{display:none}
+  .cb-label{
+    width:24px;height:24px;border-radius:7px;
+    border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:all .18s;background:#fff;
+    flex-shrink:0;
+  }
+  .cb-label:active{transform:scale(.9)}
+  .cb:checked+.cb-label{background:var(--acc);border-color:var(--acc)}
+  .cb:checked+.cb-label::after{content:'✓';color:#fff;font-size:13px;font-weight:900;line-height:1}
+
+  .task-label{flex:1;font-size:15px;font-weight:600;color:var(--ink);line-height:1.35;word-break:break-word}
+  .task-del{
+    flex-shrink:0;background:none;border:none;cursor:pointer;
+    padding:6px;border-radius:8px;color:var(--ink3);
+    transition:color .15s,background .15s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .task-del:active{color:#ef4444;background:#fee2e2}
+
+  /* Progress bar */
+  .progress-bar{
+    height:3px;background:var(--line);
+    position:relative;overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;background:var(--acc);
+    transition:width .3s ease;border-radius:999px;
+  }
+
+  /* Add input — fixed at bottom */
+  .add-bar{
+    position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+    width:100%;max-width:480px;
+    background:var(--card);
+    border-top:1.5px solid var(--line);
+    padding:12px 16px;
+    padding-bottom:calc(12px + var(--safe-bot));
+    display:flex;gap:8px;align-items:center;
+    z-index:10;
+  }
+  .add-input{
+    flex:1;padding:12px 16px;
+    border:2px solid var(--line);border-radius:999px;
+    font-size:15px;font-family:var(--sans);font-weight:500;
+    background:#fff;color:var(--ink);
+    outline:none;transition:border-color .15s;
+    -webkit-appearance:none;
+  }
+  .add-input:focus{border-color:var(--acc)}
+  .add-input::placeholder{color:var(--ink3)}
+  .add-btn{
+    width:44px;height:44px;border-radius:50%;
+    background:var(--ink);color:#fff;
+    border:none;cursor:pointer;
+    font-size:22px;font-weight:300;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;transition:background .15s,transform .1s;
+  }
+  .add-btn:active{transform:scale(.92);background:#333}
+
+  /* Completed count chip */
+  .count-chip{
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;
+    padding:4px 12px;text-align:center;
+    border-top:1px dashed var(--line);margin:4px 0 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">job<span>/</span>tasks</div>
+  <div class="status" id="status">loading…</div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+<div class="toolbar">
+  <button class="filter-btn active" id="f-all">All</button>
+  <button class="filter-btn" id="f-todo">To do</button>
+  <button class="filter-btn" id="f-done">Done</button>
+</div>
+
+<main id="list-wrap">
+  <div class="empty" id="empty-state">No tasks yet.<br>Add one below.</div>
+</main>
+
+<div class="add-bar">
+  <input class="add-input" id="add-input" type="text" placeholder="Add a task…" autocomplete="off" autocorrect="off">
+  <button class="add-btn" id="add-btn" aria-label="Add task">+</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://dmzonyrwdqzugsshcxgb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtem9ueXJ3ZHF6dWdzc2hjeGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNzgzNTgsImV4cCI6MjA3Njc1NDM1OH0.0MYp26X7h1JR_r4KO-p_f3aX-dsiaO6Z9ZS8rjU9e7g';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let tasks = [];
+let filter = 'all'; // 'all' | 'todo' | 'done'
+
+const genId = () => crypto.randomUUID
+  ? crypto.randomUUID()
+  : `t_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+// ---- DOM refs ----
+const listWrap = document.getElementById('list-wrap');
+const emptyState = document.getElementById('empty-state');
+const statusEl = document.getElementById('status');
+const progressEl = document.getElementById('progress');
+const addInput = document.getElementById('add-input');
+const addBtn = document.getElementById('add-btn');
+
+// ---- Status indicator ----
+function setStatus(state, text) {
+  statusEl.className = 'status ' + state;
+  statusEl.textContent = text;
+}
+
+// ---- Render ----
+function render() {
+  // Clear non-empty-state children
+  [...listWrap.children].forEach(c => { if (c !== emptyState) c.remove(); });
+
+  const visible = tasks.filter(t =>
+    filter === 'all' ? true :
+    filter === 'todo' ? !t.done :
+    t.done
+  );
+
+  const done = tasks.filter(t => t.done).length;
+  const pct = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
+  progressEl.style.width = pct + '%';
+
+  if (!visible.length) {
+    emptyState.style.display = '';
+    return;
+  }
+  emptyState.style.display = 'none';
+
+  // Separate pending / done for grouping
+  const pending = visible.filter(t => !t.done);
+  const completed = visible.filter(t => t.done);
+
+  pending.forEach(t => listWrap.appendChild(makeItem(t)));
+
+  if (completed.length && filter !== 'todo') {
+    if (pending.length) {
+      const sep = document.createElement('div');
+      sep.className = 'count-chip';
+      sep.textContent = `${completed.length} completed`;
+      listWrap.appendChild(sep);
+    }
+    completed.forEach(t => listWrap.appendChild(makeItem(t)));
+  }
+}
+
+function makeItem(task) {
+  const el = document.createElement('div');
+  el.className = 'task-item' + (task.done ? ' done' : '');
+  el.dataset.id = task.id;
+
+  const cbId = 'cb_' + task.id;
+  el.innerHTML = `
+    <div class="cb-wrap">
+      <input class="cb" type="checkbox" id="${cbId}" ${task.done ? 'checked' : ''}>
+      <label class="cb-label" for="${cbId}"></label>
+    </div>
+    <span class="task-label"></span>
+    <button class="task-del" aria-label="Delete">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/>
+      </svg>
+    </button>
+  `;
+  el.querySelector('.task-label').textContent = task.text;
+
+  el.querySelector('.cb').addEventListener('change', e => {
+    toggleDone(task.id, e.target.checked);
+  });
+  el.querySelector('.task-del').addEventListener('click', () => {
+    deleteTask(task.id);
+  });
+
+  return el;
+}
+
+// ---- Data ops ----
+function toggleDone(id, done) {
+  tasks = tasks.map(t => t.id === id ? { ...t, done } : t);
+  render();
+  syncUp();
+}
+
+function deleteTask(id) {
+  tasks = tasks.filter(t => t.id !== id);
+  render();
+  syncUp();
+}
+
+function addTask(text) {
+  const t = { id: genId(), text, done: false, sort_order: tasks.length * 100 };
+  tasks = [t, ...tasks]; // prepend
+  // fix sort_order
+  tasks = tasks.map((t, i) => ({ ...t, sort_order: i * 100 }));
+  render();
+  syncUp();
+}
+
+// ---- Supabase sync ----
+async function syncUp() {
+  setStatus('syncing', 'saving…');
+  try {
+    await sb.from('tasks').delete().not('id', 'is', null);
+    if (tasks.length) {
+      await sb.from('tasks').insert(
+        tasks.map(t => ({ id: t.id, text: t.text, done: t.done, sort_order: t.sort_order, updated_at: new Date().toISOString() }))
+      );
+    }
+    setStatus('ok', 'saved');
+    setTimeout(() => setStatus('', ''), 1500);
+  } catch (e) {
+    console.error(e);
+    setStatus('error', 'offline');
+  }
+}
+
+async function syncDown() {
+  setStatus('syncing', 'loading…');
+  try {
+    const { data, error } = await sb.from('tasks').select('id,text,done,sort_order').order('sort_order');
+    if (error) throw error;
+    tasks = data || [];
+    render();
+    setStatus('ok', 'synced');
+    setTimeout(() => setStatus('', ''), 1500);
+  } catch (e) {
+    console.error(e);
+    setStatus('error', 'offline');
+  }
+}
+
+// ---- Filter buttons ----
+document.getElementById('f-all').addEventListener('click', () => setFilter('all'));
+document.getElementById('f-todo').addEventListener('click', () => setFilter('todo'));
+document.getElementById('f-done').addEventListener('click', () => setFilter('done'));
+
+function setFilter(f) {
+  filter = f;
+  document.getElementById('f-all').classList.toggle('active', f === 'all');
+  document.getElementById('f-todo').classList.toggle('active', f === 'todo');
+  document.getElementById('f-done').classList.toggle('active', f === 'done');
+  render();
+}
+
+// ---- Add task ----
+function handleAdd() {
+  const text = addInput.value.trim();
+  if (!text) return;
+  addTask(text);
+  addInput.value = '';
+  addInput.focus();
+}
+addBtn.addEventListener('click', handleAdd);
+addInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAdd(); });
+
+// ---- Refresh on tab focus ----
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') syncDown();
+});
+
+// ---- Service worker ----
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ---- Init ----
+syncDown();
+</script>
+</body>
+</html>

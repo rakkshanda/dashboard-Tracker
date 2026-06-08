@@ -2361,15 +2361,52 @@ function initTasksUI(){
   const input=document.getElementById('new-task-input');
   const addBtn=document.getElementById('add-task-btn');
   if(!list||!input||!addBtn)return;
-  const STORAGE_KEY='dashy_tasks_v1';
-  const readTasks=()=>{try{const r=localStorage.getItem(STORAGE_KEY);if(!r)return[];const p=JSON.parse(r);return Array.isArray(p)?p:[];}catch{return[];}};
-  const writeTasks=tasks=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));}catch{}};
-  const collectFromDOM=()=>[...list.querySelectorAll('li')].map(li=>({text:li.querySelector('.task-text')?.textContent||'',done:li.classList.contains('completed')}));
-  const saveFromDOM=()=>writeTasks(collectFromDOM());
+
+  const STORAGE_KEY='dashy_tasks_v2';
+  const genId=()=>(crypto.randomUUID?crypto.randomUUID():`t_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+
+  const readLocal=()=>{
+    try{
+      const r=localStorage.getItem(STORAGE_KEY);
+      if(r){const p=JSON.parse(r);if(Array.isArray(p))return p;}
+      // migrate v1 (no ids)
+      const old=localStorage.getItem('dashy_tasks_v1');
+      if(old){const p=JSON.parse(old);if(Array.isArray(p))return p.map((t,i)=>({id:genId(),text:t.text||'',done:!!t.done,sort_order:i*100}));}
+    }catch{}
+    return[];
+  };
+  const saveLocal=tasks=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(tasks));}catch{}};
+
+  // Supabase sync — fire-and-forget, errors are silent
+  async function syncUp(tasks){
+    try{
+      await _sb.from('tasks').delete().not('id','is',null);
+      if(tasks.length) await _sb.from('tasks').insert(tasks.map(t=>({id:t.id,text:t.text,done:t.done,sort_order:t.sort_order,updated_at:new Date().toISOString()})));
+    }catch(e){console.warn('tasks sync↑ failed',e);}
+  }
+  async function syncDown(){
+    try{
+      const{data,error}=await _sb.from('tasks').select('id,text,done,sort_order').order('sort_order');
+      if(error||!data||!data.length)return;
+      saveLocal(data);
+      list.innerHTML='';
+      data.forEach(t=>addToDOM(t.text,t.done,t.id,false));
+    }catch(e){console.warn('tasks sync↓ failed',e);}
+  }
+
+  const collectFromDOM=()=>[...list.querySelectorAll('li')].map((li,i)=>({
+    id:li.dataset.taskId||genId(),
+    text:li.querySelector('.task-text')?.textContent||'',
+    done:li.classList.contains('completed'),
+    sort_order:i*100
+  }));
+  const saveFromDOM=()=>{const t=collectFromDOM();saveLocal(t);syncUp(t);};
+
   let draggingTask=null;
   const getDragAfter=y=>[...list.querySelectorAll('li:not(.dragging)')].reduce((cl,ch)=>{const b=ch.getBoundingClientRect(),o=y-b.top-b.height/2;return o<0&&o>cl.offset?{offset:o,element:ch}:cl;},{offset:Number.NEGATIVE_INFINITY,element:null}).element;
   list.addEventListener('dragover',e=>{if(!draggingTask)return;e.preventDefault();const a=getDragAfter(e.clientY);if(!a)list.appendChild(draggingTask);else if(a!==draggingTask)list.insertBefore(draggingTask,a);});
   list.addEventListener('drop',e=>{if(draggingTask){e.preventDefault();saveFromDOM();}});
+
   const enableEdit=li=>{
     const span=li.querySelector('.task-text');if(!span)return;
     span.addEventListener('dblclick',()=>{
@@ -2382,8 +2419,13 @@ function initTasksUI(){
       inp.addEventListener('blur',()=>finish(true));
     });
   };
-  const addToDOM=(text,done=false,persist=true,top=false)=>{
-    const li=document.createElement('li');li.classList.toggle('completed',!!done);li.draggable=true;
+
+  const addToDOM=(text,done=false,id=null,persist=true,top=false)=>{
+    const taskId=id||genId();
+    const li=document.createElement('li');
+    li.dataset.taskId=taskId;
+    li.classList.toggle('completed',!!done);
+    li.draggable=true;
     li.innerHTML=`<input type="checkbox" class="task-check" ${done?'checked':''}><span class="task-text"></span><button class="task-delete" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg></button>`;
     li.querySelector('.task-text').textContent=text;
     li.querySelector('.task-check').addEventListener('change',e=>{li.classList.toggle('completed',e.target.checked);saveFromDOM();});
@@ -2394,20 +2436,23 @@ function initTasksUI(){
     if(top&&list.firstChild)list.insertBefore(li,list.firstChild);else list.appendChild(li);
     if(persist)saveFromDOM();
   };
-  const addTask=()=>{const t=(input.value||'').trim();if(!t)return;addToDOM(t,false,true,true);input.value='';input.focus();};
+
+  const addTask=()=>{const t=(input.value||'').trim();if(!t)return;addToDOM(t,false,null,true,true);input.value='';input.focus();};
   addBtn.addEventListener('click',addTask);
   input.addEventListener('keydown',e=>{if(e.key==='Enter')addTask();});
   document.getElementById('clear-completed-btn')?.addEventListener('click',()=>{list.querySelectorAll('li.completed').forEach(li=>li.remove());saveFromDOM();});
   document.getElementById('clear-all-tasks-btn')?.addEventListener('click',()=>{list.innerHTML='';saveFromDOM();});
-  readTasks().forEach(t=>addToDOM(t.text,t.done,false,false));
 
-  // Toggle button
+  // Render from local storage immediately, then sync from Supabase
+  readLocal().forEach(t=>addToDOM(t.text,t.done,t.id,false));
+  syncDown();
+
   document.getElementById('tasks-toggle-btn')?.addEventListener('click',()=>{
     const panel=document.getElementById('tasks-panel');
     const btn=document.getElementById('tasks-toggle-btn');
     panel.classList.toggle('show');
     btn.classList.toggle('active',panel.classList.contains('show'));
-    if(panel.classList.contains('show'))input.focus();
+    if(panel.classList.contains('show')){input.focus();syncDown();}
   });
 }
 initTasksUI();
