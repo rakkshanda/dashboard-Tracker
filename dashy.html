@@ -3531,6 +3531,14 @@ async function kvSet(key,value){
             commitInput();
             const next=document.querySelector(`.sched-pill-add[data-plan-id="${pid}"][data-slot-index="${si}"]`);
             if(next) next.focus();
+          } else if(e.key === 'Tab'){
+            e.preventDefault();
+            addInput.dataset.skipBlurCommit='1';
+            const pid=plan.id;
+            const nextIndex=slotIndex + (e.shiftKey ? -1 : 1);
+            commitInput();
+            const next=document.querySelector(`.sched-pill-add[data-plan-id="${pid}"][data-slot-index="${nextIndex}"]`);
+            if(next) next.focus();
           }
         });
         addInput.addEventListener('blur',()=>{
