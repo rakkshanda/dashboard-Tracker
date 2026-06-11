@@ -434,6 +434,42 @@ tr.row-selected td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 .task-delete svg{width:13px;height:13px}
 .task-edit-input{flex:1;border:none;background:transparent;font-size:13px;font-family:var(--sans);color:var(--ink);outline:none}
 .tasks-empty{text-align:center;padding:24px;font-family:var(--mono);font-size:11px;color:var(--ink-4);text-transform:uppercase;letter-spacing:.08em}
+/* ===== EXPENSE TRACKER ===== */
+.expenses-panel{background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;display:none;overflow:hidden}
+.expenses-panel.show{display:block}
+.expenses-panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;background:#111;border-bottom:2.5px solid #333}
+.expenses-panel-head h2{font-family:var(--display);font-size:22px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
+.expenses-net{font-family:var(--mono);font-size:13px;font-weight:800;color:#fff;padding:5px 14px;border-radius:999px;background:#444;transition:background .15s}
+.expenses-net.positive{background:#16a34a}
+.expenses-net.negative{background:#dc2626}
+.expenses-body{display:grid;grid-template-columns:1fr 1fr;background:#fff}
+@media(max-width:680px){.expenses-body{grid-template-columns:1fr}}
+.expense-col{display:flex;flex-direction:column}
+.expense-col[data-kind="refunds"]{border-left:2px solid #e0e0e0}
+@media(max-width:680px){.expense-col[data-kind="refunds"]{border-left:none;border-top:2px solid #e0e0e0}}
+.expense-col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+.expense-col-head h3{margin:0;font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.expense-total{font-family:var(--mono);font-size:13px;font-weight:800}
+.expense-col[data-kind="spending"] .expense-total{color:#dc2626}
+.expense-col[data-kind="refunds"] .expense-total{color:#16a34a}
+.expense-input-row{display:flex;gap:6px;padding:10px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+.expense-label-input{flex:1;min-width:0;padding:7px 12px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+.expense-amount-input{width:80px;flex-shrink:0;padding:7px 10px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+.expense-label-input:focus,.expense-amount-input:focus{border-color:#111}
+.expense-add-btn{padding:7px 16px;background:#111;color:#fff;border:none;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--mono);letter-spacing:.03em;transition:opacity .12s;white-space:nowrap}
+.expense-add-btn:hover{opacity:.8}
+.expense-list{list-style:none;display:flex;flex-direction:column;gap:6px;background:#fff;padding:10px 16px 16px;margin:0;min-height:20px}
+.expense-list li{display:flex;align-items:center;gap:10px;background:#f4f4f4;border:none;border-radius:10px;padding:9px 12px}
+.expense-item-label{flex:1;font-size:13px;font-family:var(--sans);font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expense-item-amount{font-family:var(--mono);font-size:13px;font-weight:800;white-space:nowrap}
+.expense-col[data-kind="spending"] .expense-item-amount{color:#dc2626}
+.expense-col[data-kind="refunds"] .expense-item-amount{color:#16a34a}
+.expense-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
+.expense-item-del:hover{color:#ef4444}
+.expense-item-del svg{width:13px;height:13px}
+.expense-empty{text-align:center;padding:18px 24px;font-family:var(--mono);font-size:11px;color:var(--ink-4);text-transform:uppercase;letter-spacing:.08em}
+.expense-col-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.expense-col-footer .expense-total{font-size:14px;text-transform:none;letter-spacing:0}
 /* ===== TAG OVERRIDE DROPDOWN ===== */
 .tag-dropdown{position:fixed;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;box-shadow:3px 3px 0 var(--line);z-index:9999;min-width:80px}
 .tag-dd-opt{padding:7px 14px;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;cursor:pointer;color:var(--ink-2);transition:background .1s}
@@ -593,6 +629,10 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg>
           Day Tracker
         </button>
+        <button class="pill outline" id="expenses-toggle-btn">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><circle cx="8" cy="8" r="6"/><path d="M8 4.5v7M10 6.2c0-.9-.9-1.7-2-1.7s-2 .6-2 1.5c0 2 4 1 4 3 0 .9-.9 1.5-2 1.5s-2-.8-2-1.7"/></svg>
+          Expenses
+        </button>
       </div>
       <button class="pill outline icon-only" id="theme-toggle" aria-label="Toggle theme">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 9.5A5 5 0 016.5 3a.5.5 0 00-.7-.45A6 6 0 1013.45 10.2a.5.5 0 00-.45-.7z"/></svg>
@@ -731,6 +771,48 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <button class="task-add-btn" id="add-task-btn">+ Add</button>
     </div>
     <ul id="tasks-list" class="tasks-list"></ul>
+  </div>
+
+  <!-- EXPENSE TRACKER PANEL -->
+  <div class="expenses-panel" id="expenses-panel">
+    <div class="expenses-panel-head">
+      <h2>Expense Tracker</h2>
+      <div class="expenses-net" id="expenses-net">Net: $0.00</div>
+    </div>
+    <div class="expenses-body">
+      <div class="expense-col" data-kind="spending">
+        <div class="expense-col-head">
+          <h3>Spending</h3>
+          <span class="expense-total" id="spending-total">$0.00</span>
+        </div>
+        <div class="expense-input-row">
+          <input type="text" class="expense-label-input" id="spending-label-input" placeholder="What did you spend on?" autocomplete="off" />
+          <input type="number" class="expense-amount-input" id="spending-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
+          <button class="expense-add-btn" id="spending-add-btn">+ Add</button>
+        </div>
+        <ul class="expense-list" id="spending-list"></ul>
+        <div class="expense-col-footer">
+          <span>Total</span>
+          <span class="expense-total" id="spending-total-footer">$0.00</span>
+        </div>
+      </div>
+      <div class="expense-col" data-kind="refunds">
+        <div class="expense-col-head">
+          <h3>Refunds</h3>
+          <span class="expense-total" id="refunds-total">$0.00</span>
+        </div>
+        <div class="expense-input-row">
+          <input type="text" class="expense-label-input" id="refunds-label-input" placeholder="Refund source" autocomplete="off" />
+          <input type="number" class="expense-amount-input" id="refunds-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
+          <button class="expense-add-btn" id="refunds-add-btn">+ Add</button>
+        </div>
+        <ul class="expense-list" id="refunds-list"></ul>
+        <div class="expense-col-footer">
+          <span>Total</span>
+          <span class="expense-total" id="refunds-total-footer">$0.00</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- TIMER PANEL -->
@@ -1659,10 +1741,10 @@ function setupStats(){
   const btn=document.getElementById('stats-toggle-btn');
   const hero=document.getElementById('hero-section');
   const strip=document.getElementById('stat-strip');
-  let visible=false;
-  hero.style.display='none';
-  strip.style.display='none';
-  btn.classList.remove('has-filter');
+  let visible=true;
+  hero.style.display='';
+  strip.style.display='';
+  btn.classList.add('has-filter');
   btn.addEventListener('click',()=>{
     visible=!visible;
     hero.style.display=visible?'':'none';
@@ -2457,6 +2539,113 @@ function initTasksUI(){
 }
 initTasksUI();
 
+// ===== EXPENSE TRACKER =====
+(function(){
+  const lists={spending:document.getElementById('spending-list'),refunds:document.getElementById('refunds-list')};
+  const totalEls={spending:document.getElementById('spending-total'),refunds:document.getElementById('refunds-total')};
+  const footerTotalEls={spending:document.getElementById('spending-total-footer'),refunds:document.getElementById('refunds-total-footer')};
+  const labelInputs={spending:document.getElementById('spending-label-input'),refunds:document.getElementById('refunds-label-input')};
+  const amountInputs={spending:document.getElementById('spending-amount-input'),refunds:document.getElementById('refunds-amount-input')};
+  const addBtns={spending:document.getElementById('spending-add-btn'),refunds:document.getElementById('refunds-add-btn')};
+  const netEl=document.getElementById('expenses-net');
+  if(!lists.spending||!lists.refunds)return;
+
+  const STORAGE_KEY='dashy_expenses_v1';
+  const genId=()=>(crypto.randomUUID?crypto.randomUUID():`e_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+  const fmt=n=>`$${(Math.round(n*100)/100).toFixed(2)}`;
+
+  let data={spending:[],refunds:[]};
+
+  const readLocal=()=>{
+    try{
+      const r=localStorage.getItem(STORAGE_KEY);
+      if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.spending)&&Array.isArray(p.refunds))return p;}
+    }catch{}
+    return{spending:[],refunds:[]};
+  };
+  const saveLocal=d=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch{}};
+  const persist=()=>{saveLocal(data);kvSet('expenses',data);};
+
+  function renderList(kind){
+    const ul=lists[kind];
+    ul.innerHTML='';
+    const entries=data[kind];
+    if(!entries.length){
+      const li=document.createElement('li');
+      li.className='expense-empty';
+      li.style.cssText='background:none;padding:18px 0';
+      li.textContent=kind==='spending'?'No expenses yet.':'No refunds yet.';
+      ul.appendChild(li);
+    }else{
+      entries.forEach(item=>{
+        const li=document.createElement('li');
+        li.dataset.id=item.id;
+        li.innerHTML=`<span class="expense-item-label"></span><span class="expense-item-amount"></span><button class="expense-item-del" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg></button>`;
+        li.querySelector('.expense-item-label').textContent=item.label;
+        li.querySelector('.expense-item-amount').textContent=fmt(item.amount);
+        li.querySelector('.expense-item-del').addEventListener('click',()=>{
+          data[kind]=data[kind].filter(e=>e.id!==item.id);
+          persist();
+          render();
+        });
+        ul.appendChild(li);
+      });
+    }
+    const total=entries.reduce((s,e)=>s+e.amount,0);
+    totalEls[kind].textContent=fmt(total);
+    return total;
+  }
+
+  function render(){
+    const spendingTotal=renderList('spending');
+    const refundsTotal=renderList('refunds');
+    const net=refundsTotal-spendingTotal;
+    netEl.textContent=`Net: ${net<0?'-':''}${fmt(Math.abs(net))}`;
+    netEl.classList.toggle('positive',net>=0);
+    netEl.classList.toggle('negative',net<0);
+  }
+
+  function addEntry(kind){
+    const labelInput=labelInputs[kind],amountInput=amountInputs[kind];
+    const label=(labelInput.value||'').trim();
+    const amount=parseFloat(amountInput.value);
+    if(!label||!isFinite(amount)||amount<=0)return;
+    data[kind].push({id:genId(),label,amount});
+    persist();
+    render();
+    labelInput.value='';
+    amountInput.value='';
+    labelInput.focus();
+  }
+
+  ['spending','refunds'].forEach(kind=>{
+    addBtns[kind].addEventListener('click',()=>addEntry(kind));
+    amountInputs[kind].addEventListener('keydown',e=>{if(e.key==='Enter')addEntry(kind);});
+    labelInputs[kind].addEventListener('keydown',e=>{if(e.key==='Enter')amountInputs[kind].focus();});
+  });
+
+  async function syncDown(){
+    const remote=await kvGet('expenses');
+    if(remote&&Array.isArray(remote.spending)&&Array.isArray(remote.refunds)){
+      data=remote;
+      saveLocal(data);
+      render();
+    }
+  }
+
+  data=readLocal();
+  render();
+  syncDown();
+
+  document.getElementById('expenses-toggle-btn')?.addEventListener('click',()=>{
+    const panel=document.getElementById('expenses-panel');
+    const btn=document.getElementById('expenses-toggle-btn');
+    panel.classList.toggle('show');
+    btn.classList.toggle('active',panel.classList.contains('show'));
+    if(panel.classList.contains('show'))syncDown();
+  });
+})();
+
 // ===== GITHUB COMMIT NUDGE =====
 (function(){
   const USER='rakkshanda';
@@ -2535,7 +2724,6 @@ async function kvSet(key,value){
     '#ff4081','#ff6d00','#00897b','#1565c0','#6200ea',
   ];
   function resolveColor(c){return PILL_COLORS[c]||c||PILL_COLORS.default;}
-  const chartsByPlan=new Map();
 
   let dragSlotSource=null;
   let dragOverPill=null;
@@ -2709,11 +2897,6 @@ async function kvSet(key,value){
   function planSummary(slots){
     const planned=slots.filter(slot=>slot.items.length).length;
     return planned ? `${planned}h planned` : 'Blank day';
-  }
-
-  function destroyCharts(){
-    chartsByPlan.forEach(chart=>{ try{ chart.destroy(); }catch{} });
-    chartsByPlan.clear();
   }
 
   function persistLocal(){
@@ -3069,37 +3252,6 @@ async function kvSet(key,value){
       row.innerHTML=`<span style="background:${resolveColor(color)};color:#fff;font-family:var(--mono);font-size:11px;font-weight:800;padding:3px 10px;border-radius:999px">${label}</span><span style="font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ink);opacity:.7">${n}h</span>`;
       el.appendChild(row);
     });
-
-    const wrap=document.createElement('div');
-    wrap.style.cssText='margin-top:48px;position:relative;width:100%;max-width:160px;margin-left:auto;margin-right:auto';
-    const canvas=document.createElement('canvas');
-    canvas.style.cssText='width:100%;height:auto';
-    wrap.appendChild(canvas);
-    el.appendChild(wrap);
-
-    try{
-      const chart=new Chart(canvas,{
-        type:'doughnut',
-        data:{
-          labels:entries.map(([label])=>label),
-          datasets:[{
-            data:entries.map(([,{n}])=>n),
-            backgroundColor:entries.map(([,{color}])=>resolveColor(color)),
-            borderWidth:0,
-            hoverOffset:4
-          }]
-        },
-        options:{
-          responsive:true,
-          cutout:'62%',
-          plugins:{
-            legend:{display:false},
-            tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.parsed}h`}}
-          }
-        }
-      });
-      chartsByPlan.set(plan.id,chart);
-    }catch{}
   }
 
   function renderCalendarView(){
@@ -3344,7 +3496,6 @@ async function kvSet(key,value){
     const container=document.getElementById('planner-cards');
     if(!container) return;
     closeCommentPopover();
-    destroyCharts();
     container.innerHTML='';
     updatePlannerTotalBar();
 
