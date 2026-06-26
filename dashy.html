@@ -86,6 +86,11 @@
 .status-pill[data-value="withdrawn"]{background:#6b7280;color:#fff}
 .status-pill[data-value="ended"]{background:#111;color:#fff}
 .modal-close:hover{color:#fff}
+.panel-close-x{position:absolute;top:12px;right:14px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:none;border:none;cursor:pointer;font-size:18px;line-height:1;z-index:5;transition:all .12s}
+.panel-close-x.on-dark{color:rgba(255,255,255,.55)}
+.panel-close-x.on-dark:hover{color:#fff;background:rgba(255,255,255,.12)}
+.panel-close-x.on-light{color:var(--ink-4)}
+.panel-close-x.on-light:hover{color:var(--ink);background:var(--acc-5)}
 /* ===== COMMIT NUDGE ===== */
 .commit-nudge{display:none;margin:14px 18px 0;padding:14px 18px;background:oklch(0.88 0.13 350);border:2px solid #0E0E10;border-radius:var(--radius);box-shadow:5px 5px 0 #0E0E10;align-items:center;gap:14px;animation:nudgeIn .25s ease}
 .commit-nudge.show{display:flex}
@@ -97,7 +102,7 @@
 .commit-nudge-close{background:transparent;border:2px solid #0E0E10;border-radius:50%;width:28px;height:28px;flex-shrink:0;cursor:pointer;font-size:14px;font-weight:900;color:#0E0E10;display:flex;align-items:center;justify-content:center;transition:background .12s,transform .12s}
 .commit-nudge-close:hover{background:#0E0E10;color:oklch(0.88 0.13 350);transform:rotate(90deg)}
 /* ===== INSIGHTS PANEL ===== */
-.insights-panel{display:none;padding:24px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px}
+.insights-panel{display:none;position:relative;padding:24px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px}
 .insights-panel.show{display:block}
 .insights-panel h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:16px}
 .insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
@@ -106,7 +111,7 @@
 .insight-value{font-family:var(--display);font-size:26px;font-weight:800;color:var(--ink);line-height:1}
 .insight-sub{font-size:11px;color:var(--ink-3);margin-top:4px;font-family:var(--sans)}
 /* ===== SANKEY PANEL ===== */
-.sankey-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px}
+.sankey-panel{display:none;position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px}
 .sankey-panel.show{display:block}
 .sankey-panel h2{font-family:var(--display);font-size:20px;font-weight:800;color:var(--ink);margin-bottom:16px}
 .github-panel{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px}
@@ -123,7 +128,7 @@
   .pill.icon-only{padding:7px;width:30px;height:30px}
 }
 /* ===== SCHEDULE PANEL — FUNKY ===== */
-.schedule-panel{display:none;background:var(--bg-2);border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:14px;overflow:hidden}
+.schedule-panel{display:none;position:relative;background:var(--bg-2);border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:14px;overflow:hidden}
 .schedule-panel.show{display:flex;flex-direction:column}
 .planner-total-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:12px 16px;margin-bottom:14px;border:2px solid var(--line);border-radius:calc(var(--radius) - 6px);background:linear-gradient(135deg,#111 0%,#1c1c1f 100%);color:#fff;flex-wrap:wrap}
 .planner-total-metrics{display:flex;gap:20px;flex-wrap:wrap}
@@ -306,7 +311,7 @@
 .sched-task-pill.pill-drop-before,.planner-calendar-task.pill-drop-before{box-shadow:-5px 0 0 3px var(--acc);transform:translateX(3px)}
 .sched-task-pill.pill-drop-after,.planner-calendar-task.pill-drop-after{box-shadow:5px 0 0 3px var(--acc);transform:translateX(-3px)}
 /* ===== DAY TRACKER ===== */
-.dt-panel{display:none;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;overflow:hidden}
+.dt-panel{display:none;position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;overflow:hidden}
 .dt-panel.show{display:block}
 .dt-active-card{display:none;padding:16px 22px;border-bottom:1.5px solid var(--line);align-items:center;justify-content:space-between;gap:16px;transition:background .3s}
 .dt-active-card.show{display:flex}
@@ -407,7 +412,7 @@ tr.row-selected td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 .day-cell.day-selected{background:var(--acc)!important;border-color:var(--acc)!important;color:var(--ink)!important}
 .day-cell.day-selected .d-label,.day-cell.day-selected .d-num{color:var(--ink)!important}
 /* ===== TASKS PANEL ===== */
-.tasks-panel{background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;display:none;overflow:hidden}
+.tasks-panel{background:#111;position:relative;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;display:none;overflow:hidden}
 .tasks-panel.show{display:block}
 .tasks-panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;background:#111;border-bottom:2.5px solid #333}
 .tasks-panel-head h2{font-family:var(--display);font-size:22px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
@@ -435,41 +440,76 @@ tr.row-selected td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 .task-edit-input{flex:1;border:none;background:transparent;font-size:13px;font-family:var(--sans);color:var(--ink);outline:none}
 .tasks-empty{text-align:center;padding:24px;font-family:var(--mono);font-size:11px;color:var(--ink-4);text-transform:uppercase;letter-spacing:.08em}
 /* ===== EXPENSE TRACKER ===== */
-.expenses-panel{background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;display:none;overflow:hidden}
+.expenses-panel{background:#111;position:relative;border:2.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:0;display:none;overflow:hidden}
 .expenses-panel.show{display:block}
 .expenses-panel-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;background:#111;border-bottom:2.5px solid #333}
 .expenses-panel-head h2{font-family:var(--display);font-size:22px;font-weight:900;color:#fff;margin:0;letter-spacing:-.03em}
 .expenses-net{font-family:var(--mono);font-size:13px;font-weight:800;color:#fff;padding:5px 14px;border-radius:999px;background:#444;transition:background .15s}
 .expenses-net.positive{background:#16a34a}
 .expenses-net.negative{background:#dc2626}
-.expenses-body{display:grid;grid-template-columns:1fr 1fr;background:#fff}
+.expenses-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;align-items:stretch;grid-auto-rows:1fr}
 @media(max-width:680px){.expenses-body{grid-template-columns:1fr}}
-.expense-col{display:flex;flex-direction:column}
-.expense-col[data-kind="refunds"]{border-left:2px solid #e0e0e0}
-@media(max-width:680px){.expense-col[data-kind="refunds"]{border-left:none;border-top:2px solid #e0e0e0}}
-.expense-col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+.expense-col{display:flex;flex-direction:column;height:100%;min-width:0;overflow:hidden}
+.expense-col+.expense-col{border-left:2px solid #e0e0e0}
+@media(max-width:680px){.expense-col+.expense-col{border-left:none;border-top:2px solid #e0e0e0}}
+.expense-col.drag-target{background:oklch(0.97 0.03 90)}
+.expense-col-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0;gap:10px;flex-shrink:0}
 .expense-col-head h3{margin:0;font-family:var(--display);font-size:15px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
 .expense-total{font-family:var(--mono);font-size:13px;font-weight:800}
-.expense-col[data-kind="spending"] .expense-total{color:#dc2626}
+.expense-col[data-kind="debt"] .expense-total{color:#dc2626}
 .expense-col[data-kind="refunds"] .expense-total{color:#16a34a}
-.expense-input-row{display:flex;gap:6px;padding:10px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+.expense-col[data-kind="other"] .expense-total{color:#16a34a}
+.expense-col[data-kind="personal"] .expense-total{color:var(--ink)}
+.expense-input-row{display:grid;grid-template-columns:minmax(0,1fr) 80px auto;align-items:center;gap:6px;padding:10px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0;flex-shrink:0}
+@media(max-width:900px){.expense-input-row{grid-template-columns:minmax(0,1fr)}}
 .expense-label-input{flex:1;min-width:0;padding:7px 12px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
-.expense-amount-input{width:80px;flex-shrink:0;padding:7px 10px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;transition:border-color .15s}
+.expense-amount-input{width:80px;max-width:100%;flex-shrink:0;padding:7px 10px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;transition:border-color .15s;box-sizing:border-box}
+@media(max-width:900px){.expense-amount-input{width:100%}}
 .expense-label-input:focus,.expense-amount-input:focus{border-color:#111}
 .expense-add-btn{padding:7px 16px;background:#111;color:#fff;border:none;border-radius:999px;font-size:11px;font-weight:800;cursor:pointer;font-family:var(--mono);letter-spacing:.03em;transition:opacity .12s;white-space:nowrap}
+@media(max-width:900px){.expense-add-btn{width:100%}}
 .expense-add-btn:hover{opacity:.8}
-.expense-list{list-style:none;display:flex;flex-direction:column;gap:6px;background:#fff;padding:10px 16px 16px;margin:0;min-height:20px}
-.expense-list li{display:flex;align-items:center;gap:10px;background:#f4f4f4;border:none;border-radius:10px;padding:9px 12px}
+.expense-list{list-style:none;display:flex;flex-direction:column;gap:6px;background:#fff;padding:10px 16px 16px;margin:0;min-height:120px;flex:1;min-width:0;overflow-y:auto}
+.expense-list li{display:flex;align-items:center;gap:10px;background:#f4f4f4;border:none;border-radius:10px;padding:9px 12px;min-width:0}
+.expense-list li[data-id]{cursor:grab}
+.expense-list li.selected{outline:2px solid var(--acc);background:oklch(0.96 0.04 85)}
+.expense-list li.editing{cursor:default;align-items:center}
+.expense-list li.dragging{opacity:.45}
+.expense-list li.expense-drop-before{box-shadow:0 -4px 0 0 var(--acc)}
+.expense-list li.expense-drop-after{box-shadow:0 4px 0 0 var(--acc)}
 .expense-item-label{flex:1;font-size:13px;font-family:var(--sans);font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .expense-item-amount{font-family:var(--mono);font-size:13px;font-weight:800;white-space:nowrap}
-.expense-col[data-kind="spending"] .expense-item-amount{color:#dc2626}
+.expense-col[data-kind="debt"] .expense-item-amount{color:#dc2626}
 .expense-col[data-kind="refunds"] .expense-item-amount{color:#16a34a}
+.expense-col[data-kind="other"] .expense-item-amount{color:#16a34a}
+.expense-col[data-kind="personal"] .expense-item-amount{color:var(--ink)}
+.expense-item-edit-fields{display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px;flex:1;min-width:0}
+.expense-item-edit-input{width:100%;min-width:0;padding:7px 10px;border:1.5px solid #bbb;border-radius:8px;background:#fff;color:var(--ink);font:600 12px var(--sans);outline:none;box-sizing:border-box}
+.expense-item-edit-input.amount{font-family:var(--mono)}
+.expense-item-edit-input:focus{border-color:var(--acc)}
+.expense-item-toggles{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.expense-item-toggle{width:14px;height:14px;border-radius:999px;border:1.5px solid currentColor;background:transparent;opacity:.35;cursor:pointer;transition:opacity .12s,transform .12s,background .12s}
+.expense-item-toggle:hover{opacity:.7;transform:scale(1.06)}
+.expense-item-toggle.active{opacity:1}
+.expense-item-toggle.blue{color:#2563eb}
+.expense-item-toggle.blue.active{background:#2563eb}
+.expense-item-toggle.green{color:#16a34a}
+.expense-item-toggle.green.active{background:#16a34a}
+.expense-item-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.expense-item-edit,.expense-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
+.expense-item-edit:hover{color:var(--acc)}
+.expense-item-save,.expense-item-cancel{border:none;cursor:pointer;padding:6px 9px;border-radius:8px;font:800 10px var(--mono);letter-spacing:.03em;flex-shrink:0}
+.expense-item-save{background:var(--ink);color:#fff}
+.expense-item-cancel{background:#ddd;color:#444}
 .expense-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
 .expense-item-del:hover{color:#ef4444}
-.expense-item-del svg{width:13px;height:13px}
+.expense-item-edit svg,.expense-item-del svg{width:13px;height:13px}
 .expense-empty{text-align:center;padding:18px 24px;font-family:var(--mono);font-size:11px;color:var(--ink-4);text-transform:uppercase;letter-spacing:.08em}
-.expense-col-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3)}
+.expense-col-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);gap:10px;flex-shrink:0}
 .expense-col-footer .expense-total{font-size:14px;text-transform:none;letter-spacing:0}
+.expense-col-subfooter{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 12px;background:#f5f5f5;border-top:1px dashed #d8d8d8;font-family:var(--mono);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);gap:10px;flex-shrink:0}
+.expense-col-subfooter .expense-total{font-size:12px;text-transform:none;letter-spacing:0}
+.expense-col[data-kind="refunds"] .expense-tax-total{color:#dc2626}
 /* ===== TAG OVERRIDE DROPDOWN ===== */
 .tag-dropdown{position:fixed;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;box-shadow:3px 3px 0 var(--line);z-index:9999;min-width:80px}
 .tag-dd-opt{padding:7px 14px;font-family:var(--mono);font-size:10px;font-weight:700;text-transform:uppercase;cursor:pointer;color:var(--ink-2);transition:background .1s}
@@ -652,6 +692,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- SCHEDULE PANEL (top, open by default) -->
   <div class="schedule-panel" id="schedule-panel">
+    <button class="panel-close-x on-dark" id="schedule-close-btn" title="Close">×</button>
     <div class="planner-total-bar" id="planner-total-bar">
       <div class="planner-total-metrics">
         <div class="planner-total-copy">
@@ -682,6 +723,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- DAY TRACKER PANEL -->
   <div class="dt-panel" id="dt-panel">
+    <button class="panel-close-x on-light" data-close="dt-toggle-btn" title="Close">×</button>
     <div class="dt-active-card" id="dt-active-card">
       <div class="dt-ac-left">
         <span class="dt-ac-dot" id="dt-ac-dot"></span>
@@ -729,6 +771,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- INSIGHTS PANEL -->
   <div class="insights-panel" id="insights-panel">
+    <button class="panel-close-x on-light" data-close="insights-toggle-btn" title="Close">×</button>
     <h2>Insights</h2>
     <div class="insights-grid" id="insights-grid">
       <div class="insight-card"><div class="insight-label">Total Applied</div><div class="insight-value" id="ins-total">0</div></div>
@@ -753,12 +796,14 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- SANKEY PANEL -->
   <div class="sankey-panel" id="sankey-panel">
+    <button class="panel-close-x on-light" data-close="sankey-toggle-btn" title="Close">×</button>
     <h2>Application Flow (Sankey)</h2>
     <div id="sankey-chart" style="min-height:300px"></div>
   </div>
 
   <!-- TASKS PANEL -->
   <div class="tasks-panel" id="tasks-panel">
+    <button class="panel-close-x on-dark" data-close="tasks-toggle-btn" title="Close">×</button>
     <div class="tasks-panel-head">
       <h2>Tasks</h2>
       <div class="tasks-panel-actions">
@@ -775,25 +820,26 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 
   <!-- EXPENSE TRACKER PANEL -->
   <div class="expenses-panel" id="expenses-panel">
+    <button class="panel-close-x on-dark" data-close="expenses-toggle-btn" title="Close">×</button>
     <div class="expenses-panel-head">
       <h2>Expense Tracker</h2>
       <div class="expenses-net" id="expenses-net">Net: $0.00</div>
     </div>
     <div class="expenses-body">
-      <div class="expense-col" data-kind="spending">
+      <div class="expense-col" data-kind="debt">
         <div class="expense-col-head">
-          <h3>Spending</h3>
-          <span class="expense-total" id="spending-total">$0.00</span>
+          <h3>Debt</h3>
+          <span class="expense-total" id="debt-total">$0.00</span>
         </div>
         <div class="expense-input-row">
-          <input type="text" class="expense-label-input" id="spending-label-input" placeholder="What did you spend on?" autocomplete="off" />
-          <input type="number" class="expense-amount-input" id="spending-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
-          <button class="expense-add-btn" id="spending-add-btn">+ Add</button>
+          <input type="text" class="expense-label-input" id="debt-label-input" placeholder="Debt item" autocomplete="off" />
+          <input type="number" class="expense-amount-input" id="debt-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
+          <button type="button" class="expense-add-btn" id="debt-add-btn">+ Add</button>
         </div>
-        <ul class="expense-list" id="spending-list"></ul>
+        <ul class="expense-list" id="debt-list"></ul>
         <div class="expense-col-footer">
           <span>Total</span>
-          <span class="expense-total" id="spending-total-footer">$0.00</span>
+          <span class="expense-total" id="debt-total-footer">$0.00</span>
         </div>
       </div>
       <div class="expense-col" data-kind="refunds">
@@ -804,12 +850,48 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
         <div class="expense-input-row">
           <input type="text" class="expense-label-input" id="refunds-label-input" placeholder="Refund source" autocomplete="off" />
           <input type="number" class="expense-amount-input" id="refunds-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
-          <button class="expense-add-btn" id="refunds-add-btn">+ Add</button>
+          <button type="button" class="expense-add-btn" id="refunds-add-btn">+ Add</button>
         </div>
         <ul class="expense-list" id="refunds-list"></ul>
         <div class="expense-col-footer">
           <span>Total</span>
           <span class="expense-total" id="refunds-total-footer">$0.00</span>
+        </div>
+        <div class="expense-col-subfooter">
+          <span>Sales Tax (10%)</span>
+          <span class="expense-total expense-tax-total" id="refunds-tax-total">$0.00</span>
+        </div>
+      </div>
+      <div class="expense-col" data-kind="other">
+        <div class="expense-col-head">
+          <h3>Other</h3>
+          <span class="expense-total" id="other-total">$0.00</span>
+        </div>
+        <div class="expense-input-row">
+          <input type="text" class="expense-label-input" id="other-label-input" placeholder="Other expense" autocomplete="off" />
+          <input type="number" class="expense-amount-input" id="other-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
+          <button type="button" class="expense-add-btn" id="other-add-btn">+ Add</button>
+        </div>
+        <ul class="expense-list" id="other-list"></ul>
+        <div class="expense-col-footer">
+          <span>Total</span>
+          <span class="expense-total" id="other-total-footer">$0.00</span>
+        </div>
+      </div>
+      <div class="expense-col" data-kind="personal">
+        <div class="expense-col-head">
+          <h3>Personal</h3>
+          <span class="expense-total" id="personal-total">$0.00</span>
+        </div>
+        <div class="expense-input-row">
+          <input type="text" class="expense-label-input" id="personal-label-input" placeholder="Personal expense" autocomplete="off" />
+          <input type="number" class="expense-amount-input" id="personal-amount-input" placeholder="0.00" step="0.01" inputmode="decimal" />
+          <button type="button" class="expense-add-btn" id="personal-add-btn">+ Add</button>
+        </div>
+        <ul class="expense-list" id="personal-list"></ul>
+        <div class="expense-col-footer">
+          <span>Total</span>
+          <span class="expense-total" id="personal-total-footer">$0.00</span>
         </div>
       </div>
     </div>
@@ -822,6 +904,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       <button class="t-fs-ctl-btn" id="t-btnFsExit" title="Exit fullscreen">✕ Exit</button>
     </div>
     <div class="t-card" id="t-card">
+      <button class="panel-close-x on-light" data-close="timer-toggle-btn" title="Close">×</button>
       <div class="t-controls">
         <div class="t-field">
           <div class="t-lbl pink">Rounds</div>
@@ -885,6 +968,7 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
       </div>
     </div>
     <div class="panel week-panel">
+      <button class="panel-close-x on-light" data-close="stats-toggle-btn" title="Close">×</button>
       <div class="panel-head">
         <span class="eyebrow" id="week-range-eyebrow">This Week</span>
         <div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;opacity:0.6;">7 days</div>
@@ -1190,6 +1274,22 @@ let selectedWeekIdx = -1;
 const currentFilters = { date:'all', status:['saved'], company:[], location:'all', source:'all', tag:'all', specificDate:null };
 const TAG_OVERRIDES_KEY='dashy_tag_overrides';
 let tagOverrides=JSON.parse(localStorage.getItem(TAG_OVERRIDES_KEY)||'{}');
+const PANEL_PREFS_KEY='dashy_panel_prefs_v1';
+let panelPrefs=(()=>{
+  try{
+    const saved=JSON.parse(localStorage.getItem(PANEL_PREFS_KEY)||'{}');
+    return saved&&typeof saved==='object'?saved:{};
+  }catch{
+    return{};
+  }
+})();
+function getPanelPref(key,fallback){
+  return Object.prototype.hasOwnProperty.call(panelPrefs,key)?panelPrefs[key]:fallback;
+}
+function setPanelPref(key,value){
+  panelPrefs[key]=value;
+  try{localStorage.setItem(PANEL_PREFS_KEY,JSON.stringify(panelPrefs));}catch{}
+}
 
 const STATUS_LABELS = { saved:'Saved', applied:'Applied', resume_screening:'Resume Screening', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn', ended:'Ended' };
 const ALL_STATUSES = ['saved','applied','rejected','resume_screening','interview','offer','withdrawn','ended'];
@@ -1263,7 +1363,7 @@ function startLiveClock() {
 const CACHE_KEY = 'dashy_jobs_cache';
 function saveCache(data){ try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){} }
 function loadCache(){ try{const c=localStorage.getItem(CACHE_KEY);if(c){const p=JSON.parse(c);if(p&&Array.isArray(p.data))return p.data;}}catch(e){}return null; }
-function applyJobData(data){ ALL_JOBS=data; populateDropdownOptions(); applyFilters(); updateHeroPanels(); updateStatStrip(); if(document.getElementById('insights-panel').classList.contains('show')){updateInsights();renderPieCharts();} }
+function applyJobData(data){ ALL_JOBS=data; populateDropdownOptions(); applyFilters(); updateHeroPanels(); updateStatStrip(); if(document.getElementById('insights-panel').classList.contains('show')){updateInsights();renderPieCharts();} if(document.getElementById('sankey-panel').classList.contains('show'))renderSankey(); }
 
 // ===== LOAD =====
 async function loadJobs() {
@@ -1578,8 +1678,16 @@ function renderPieCharts(){
 
 // ===== FOCUS TIMER =====
 function setupTimer(){
-  document.getElementById('timer-toggle-btn')?.addEventListener('click',()=>{
-    document.getElementById('timer-panel').classList.toggle('show');
+  const timerPanel=document.getElementById('timer-panel');
+  const timerToggleBtn=document.getElementById('timer-toggle-btn');
+  const applyTimerVisibility=visible=>{
+    timerPanel?.classList.toggle('show',visible);
+    timerToggleBtn?.classList.toggle('active',visible);
+    setPanelPref('timer_open',visible);
+  };
+  applyTimerVisibility(!!getPanelPref('timer_open',timerPanel?.classList.contains('show')));
+  timerToggleBtn?.addEventListener('click',()=>{
+    applyTimerVisibility(!timerPanel?.classList.contains('show'));
   });
 
   const ROUND_OPTS = [1,2,3,4,5,6,7,8,10,12,15,20,25,30,40];
@@ -1704,7 +1812,6 @@ function setupTimer(){
     update();
   };
   const fsBtn=document.getElementById('t-btnFs');
-  const timerPanel=document.getElementById('timer-panel');
   const tCard=document.getElementById('t-card');
   const darkBtn=document.getElementById('t-btnDark');
   const fsExitBtn=document.getElementById('t-btnFsExit');
@@ -1741,29 +1848,46 @@ function setupStats(){
   const btn=document.getElementById('stats-toggle-btn');
   const hero=document.getElementById('hero-section');
   const strip=document.getElementById('stat-strip');
-  let visible=true;
-  hero.style.display='';
-  strip.style.display='';
-  btn.classList.add('has-filter');
-  btn.addEventListener('click',()=>{
-    visible=!visible;
+  const applyStatsVisibility=visible=>{
     hero.style.display=visible?'':'none';
     strip.style.display=visible?'':'none';
     btn.classList.toggle('has-filter',visible);
+    setPanelPref('stats_visible',visible);
+  };
+  applyStatsVisibility(!!getPanelPref('stats_visible',hero.style.display!=='none'&&strip.style.display!=='none'));
+  btn.addEventListener('click',()=>{
+    applyStatsVisibility(hero.style.display==='none');
   });
 }
 
 // ===== INSIGHTS & SANKEY =====
 function setupInsightsSankey(){
-  document.getElementById('insights-toggle-btn').addEventListener('click',()=>{
-    const panel=document.getElementById('insights-panel');
-    panel.classList.toggle('show');
-    if(panel.classList.contains('show')){updateInsights();renderPieCharts();}
+  const insightsPanel=document.getElementById('insights-panel');
+  const insightsBtn=document.getElementById('insights-toggle-btn');
+  const sankeyPanel=document.getElementById('sankey-panel');
+  const sankeyBtn=document.getElementById('sankey-toggle-btn');
+
+  const applyInsightsVisibility=visible=>{
+    insightsPanel.classList.toggle('show',visible);
+    insightsBtn.classList.toggle('active',visible);
+    setPanelPref('insights_open',visible);
+    if(visible){updateInsights();renderPieCharts();}
+  };
+  const applySankeyVisibility=visible=>{
+    sankeyPanel.classList.toggle('show',visible);
+    sankeyBtn.classList.toggle('active',visible);
+    setPanelPref('sankey_open',visible);
+    if(visible)renderSankey();
+  };
+
+  applyInsightsVisibility(!!getPanelPref('insights_open',insightsPanel.classList.contains('show')));
+  applySankeyVisibility(!!getPanelPref('sankey_open',sankeyPanel.classList.contains('show')));
+
+  insightsBtn.addEventListener('click',()=>{
+    applyInsightsVisibility(!insightsPanel.classList.contains('show'));
   });
-  document.getElementById('sankey-toggle-btn').addEventListener('click',()=>{
-    const panel=document.getElementById('sankey-panel');
-    panel.classList.toggle('show');
-    if(panel.classList.contains('show'))renderSankey();
+  sankeyBtn.addEventListener('click',()=>{
+    applySankeyVisibility(!sankeyPanel.classList.contains('show'));
   });
 }
 
@@ -2373,7 +2497,10 @@ function renderCards(){
             <span class="tag-pill ${getTag(j.title,j.id)}" style="margin-top:4px;">${getTag(j.title,j.id).toUpperCase()}</span>
           </div>
         </div>
-        <button class="star-btn ${star?'on':''} star-toggle" data-id="${id}"><svg viewBox="0 0 16 16" fill="${star?'currentColor':'none'}" stroke="currentColor" stroke-width="1.4"><path d="M8 1.5l2 4.5 5 .5-3.7 3.4 1.1 4.9L8 12.4 3.6 14.8l1.1-4.9L1 6.5l5-.5z"/></svg></button>
+        <div style="display:flex;align-items:center;gap:2px;">
+          <button class="star-btn ${star?'on':''} star-toggle" data-id="${id}"><svg viewBox="0 0 16 16" fill="${star?'currentColor':'none'}" stroke="currentColor" stroke-width="1.4"><path d="M8 1.5l2 4.5 5 .5-3.7 3.4 1.1 4.9L8 12.4 3.6 14.8l1.1-4.9L1 6.5l5-.5z"/></svg></button>
+          <button class="job-card-close" data-id="${id}" title="Delete">×</button>
+        </div>
       </div>
       <div class="meta-row"><span class="badge ${status}">${sl}</span><span class="sep">·</span><span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-3);font-weight:600;">${src}</span></div>
       <div class="job-card-foot">
@@ -2393,6 +2520,7 @@ function renderCards(){
     const job=ALL_JOBS.find(j=>String(j.id)===String(jobId));if(job)job.favorite=isOn;updateTabCounts();
   }));
   container.querySelectorAll('.edit-btn').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();openEditModal(btn.dataset.id);}));
+  container.querySelectorAll('.job-card-close').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();deletingJobId=btn.dataset.id;document.getElementById('delete-modal').classList.add('show');}));
   if(isNumberingMode)container.querySelectorAll('.job-card').forEach(card=>{card.style.cursor='pointer';card.addEventListener('click',e=>{if(e.target.closest('button,a'))return;assignRank(card.dataset.id);});});
 }
 
@@ -2529,78 +2657,277 @@ function initTasksUI(){
   readLocal().forEach(t=>addToDOM(t.text,t.done,t.id,false));
   syncDown();
 
-  document.getElementById('tasks-toggle-btn')?.addEventListener('click',()=>{
-    const panel=document.getElementById('tasks-panel');
-    const btn=document.getElementById('tasks-toggle-btn');
-    panel.classList.toggle('show');
-    btn.classList.toggle('active',panel.classList.contains('show'));
-    if(panel.classList.contains('show')){input.focus();syncDown();}
+  const tasksPanel=document.getElementById('tasks-panel');
+  const tasksBtn=document.getElementById('tasks-toggle-btn');
+  const applyTasksVisibility=visible=>{
+    tasksPanel.classList.toggle('show',visible);
+    tasksBtn.classList.toggle('active',visible);
+    setPanelPref('tasks_open',visible);
+    if(visible){input.focus();syncDown();}
+  };
+  applyTasksVisibility(!!getPanelPref('tasks_open',tasksPanel.classList.contains('show')));
+  tasksBtn?.addEventListener('click',()=>{
+    applyTasksVisibility(!tasksPanel.classList.contains('show'));
   });
 }
 initTasksUI();
 
 // ===== EXPENSE TRACKER =====
 (function(){
-  const lists={spending:document.getElementById('spending-list'),refunds:document.getElementById('refunds-list')};
-  const totalEls={spending:document.getElementById('spending-total'),refunds:document.getElementById('refunds-total')};
-  const footerTotalEls={spending:document.getElementById('spending-total-footer'),refunds:document.getElementById('refunds-total-footer')};
-  const labelInputs={spending:document.getElementById('spending-label-input'),refunds:document.getElementById('refunds-label-input')};
-  const amountInputs={spending:document.getElementById('spending-amount-input'),refunds:document.getElementById('refunds-amount-input')};
-  const addBtns={spending:document.getElementById('spending-add-btn'),refunds:document.getElementById('refunds-add-btn')};
+  const KINDS=['debt','refunds','other','personal'];
+  const LEGACY_KIND_MAP={spending:'debt'};
+  const lists={debt:document.getElementById('debt-list'),refunds:document.getElementById('refunds-list'),other:document.getElementById('other-list'),personal:document.getElementById('personal-list')};
+  const totalEls={debt:document.getElementById('debt-total'),refunds:document.getElementById('refunds-total'),other:document.getElementById('other-total'),personal:document.getElementById('personal-total')};
+  const footerTotalEls={debt:document.getElementById('debt-total-footer'),refunds:document.getElementById('refunds-total-footer'),other:document.getElementById('other-total-footer'),personal:document.getElementById('personal-total-footer')};
+  const refundsTaxEl=document.getElementById('refunds-tax-total');
+  const labelInputs={debt:document.getElementById('debt-label-input'),refunds:document.getElementById('refunds-label-input'),other:document.getElementById('other-label-input'),personal:document.getElementById('personal-label-input')};
+  const amountInputs={debt:document.getElementById('debt-amount-input'),refunds:document.getElementById('refunds-amount-input'),other:document.getElementById('other-amount-input'),personal:document.getElementById('personal-amount-input')};
+  const addBtns={debt:document.getElementById('debt-add-btn'),refunds:document.getElementById('refunds-add-btn'),other:document.getElementById('other-add-btn'),personal:document.getElementById('personal-add-btn')};
   const netEl=document.getElementById('expenses-net');
-  if(!lists.spending||!lists.refunds)return;
+  if(KINDS.some(kind=>!lists[kind]))return;
 
   const STORAGE_KEY='dashy_expenses_v1';
   const genId=()=>(crypto.randomUUID?crypto.randomUUID():`e_${Date.now()}_${Math.random().toString(36).slice(2)}`);
   const fmt=n=>`$${(Math.round(n*100)/100).toFixed(2)}`;
 
-  let data={spending:[],refunds:[]};
+  const emptyData=()=>({debt:[],refunds:[],other:[],personal:[]});
+  const normalizeData=payload=>{
+    const next=emptyData();
+    if(payload&&typeof payload==='object'){
+      KINDS.forEach(kind=>{
+        if(Array.isArray(payload[kind]))next[kind]=payload[kind];
+      });
+      Object.entries(LEGACY_KIND_MAP).forEach(([legacyKind,currentKind])=>{
+        if(Array.isArray(payload[legacyKind])&&!next[currentKind].length)next[currentKind]=payload[legacyKind];
+      });
+    }
+    return next;
+  };
+
+  let data=emptyData();
 
   const readLocal=()=>{
     try{
       const r=localStorage.getItem(STORAGE_KEY);
-      if(r){const p=JSON.parse(r);if(p&&Array.isArray(p.spending)&&Array.isArray(p.refunds))return p;}
+      if(r)return normalizeData(JSON.parse(r));
     }catch{}
-    return{spending:[],refunds:[]};
+    return emptyData();
   };
   const saveLocal=d=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}catch{}};
   const persist=()=>{saveLocal(data);kvSet('expenses',data);};
+  let draggedExpense=null;
+  const selectedExpenseIds=new Set();
+  let editingExpense=null;
+
+  function syncSelectedExpenses(){
+    const validIds=new Set(KINDS.flatMap(kind=>data[kind].map(item=>item.id)));
+    [...selectedExpenseIds].forEach(id=>{if(!validIds.has(id))selectedExpenseIds.delete(id);});
+  }
+
+  function hasSelectedExpenses(){
+    syncSelectedExpenses();
+    return selectedExpenseIds.size>0;
+  }
+
+  function clearExpenseDragState(){
+    Object.values(lists).forEach(ul=>{
+      ul.closest('.expense-col')?.classList.remove('drag-target');
+      ul.querySelectorAll('.expense-drop-before,.expense-drop-after,.dragging').forEach(el=>el.classList.remove('expense-drop-before','expense-drop-after','dragging'));
+    });
+  }
+
+  function moveEntry(fromKind,toKind,entryId,targetIndex=null){
+    const srcItems=data[fromKind];
+    const srcIndex=srcItems.findIndex(item=>item.id===entryId);
+    if(srcIndex===-1)return;
+    const [moved]=srcItems.splice(srcIndex,1);
+    const destItems=data[toKind];
+    let insertAt=targetIndex==null?destItems.length:Math.max(0,Math.min(targetIndex,destItems.length));
+    if(fromKind===toKind&&srcIndex<insertAt)insertAt--;
+    destItems.splice(insertAt,0,moved);
+    persist();
+    render();
+  }
+
+  function startEditingEntry(kind,entryId){
+    const entry=data[kind].find(item=>item.id===entryId);
+    if(!entry)return;
+    editingExpense={kind,id:entryId,label:entry.label,amount:String(entry.amount)};
+    render();
+  }
+
+  function cancelEditingEntry(){
+    editingExpense=null;
+    render();
+  }
+
+  function saveEditingEntry(){
+    if(!editingExpense)return;
+    const entry=data[editingExpense.kind].find(item=>item.id===editingExpense.id);
+    if(!entry)return;
+    const label=(editingExpense.label||'').trim();
+    const amount=Math.abs(parseFloat(editingExpense.amount));
+    if(!label||!isFinite(amount)||amount===0)return;
+    entry.label=label;
+    entry.amount=amount;
+    editingExpense=null;
+    persist();
+    render();
+  }
+
+  function toggleRefundFlag(entryId,flag){
+    const entry=data.refunds.find(item=>item.id===entryId);
+    if(!entry)return;
+    entry[flag]=!entry[flag];
+    persist();
+    render();
+  }
 
   function renderList(kind){
     const ul=lists[kind];
     ul.innerHTML='';
     const entries=data[kind];
+    const showSelectedTotals=hasSelectedExpenses();
     if(!entries.length){
       const li=document.createElement('li');
       li.className='expense-empty';
       li.style.cssText='background:none;padding:18px 0';
-      li.textContent=kind==='spending'?'No expenses yet.':'No refunds yet.';
+      li.textContent=kind==='debt'?'No debt yet.':kind==='refunds'?'No refunds yet.':kind==='personal'?'No personal expenses yet.':'No other entries yet.';
       ul.appendChild(li);
     }else{
-      entries.forEach(item=>{
+      entries.forEach((item,itemIndex)=>{
         const li=document.createElement('li');
         li.dataset.id=item.id;
-        li.innerHTML=`<span class="expense-item-label"></span><span class="expense-item-amount"></span><button class="expense-item-del" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg></button>`;
-        li.querySelector('.expense-item-label').textContent=item.label;
-        li.querySelector('.expense-item-amount').textContent=fmt(item.amount);
-        li.querySelector('.expense-item-del').addEventListener('click',()=>{
-          data[kind]=data[kind].filter(e=>e.id!==item.id);
-          persist();
-          render();
+        const isEditing=editingExpense&&editingExpense.kind===kind&&editingExpense.id===item.id;
+        li.draggable=!isEditing;
+        li.classList.toggle('selected',selectedExpenseIds.has(item.id));
+        li.classList.toggle('editing',!!isEditing);
+        if(isEditing){
+          li.innerHTML=`<div class="expense-item-edit-fields"><input class="expense-item-edit-input label" type="text" /><input class="expense-item-edit-input amount" type="number" step="0.01" inputmode="decimal" /></div><div class="expense-item-actions"><button type="button" class="expense-item-save">Save</button><button type="button" class="expense-item-cancel">Cancel</button></div>`;
+          const labelInput=li.querySelector('.expense-item-edit-input.label');
+          const amountInput=li.querySelector('.expense-item-edit-input.amount');
+          labelInput.value=editingExpense.label;
+          amountInput.value=editingExpense.amount;
+          labelInput.addEventListener('input',e=>{editingExpense.label=e.target.value;});
+          amountInput.addEventListener('input',e=>{editingExpense.amount=e.target.value;});
+          labelInput.addEventListener('keydown',e=>{
+            if(e.key==='Enter'){e.preventDefault();saveEditingEntry();}
+            if(e.key==='Escape'){e.preventDefault();cancelEditingEntry();}
+          });
+          amountInput.addEventListener('keydown',e=>{
+            if(e.key==='Enter'){e.preventDefault();saveEditingEntry();}
+            if(e.key==='Escape'){e.preventDefault();cancelEditingEntry();}
+          });
+          li.querySelector('.expense-item-save').addEventListener('click',e=>{
+            e.stopPropagation();
+            saveEditingEntry();
+          });
+          li.querySelector('.expense-item-cancel').addEventListener('click',e=>{
+            e.stopPropagation();
+            cancelEditingEntry();
+          });
+          setTimeout(()=>labelInput.focus(),0);
+        }else{
+          li.innerHTML=`<span class="expense-item-label"></span><span class="expense-item-amount"></span>${kind==='refunds'?'<div class="expense-item-toggles"><button type="button" class="expense-item-toggle blue" title="Blue toggle"></button><button type="button" class="expense-item-toggle green" title="Green toggle"></button></div>':''}<div class="expense-item-actions"><button type="button" class="expense-item-edit" title="Edit"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-8 8H3v-3z"/></svg></button><button type="button" class="expense-item-del" title="Delete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg></button></div>`;
+          li.querySelector('.expense-item-label').textContent=item.label;
+          li.querySelector('.expense-item-amount').textContent=fmt(item.amount);
+          if(kind==='refunds'){
+            const blueBtn=li.querySelector('.expense-item-toggle.blue');
+            const greenBtn=li.querySelector('.expense-item-toggle.green');
+            blueBtn.classList.toggle('active',!!item.blue_toggle);
+            greenBtn.classList.toggle('active',!!item.green_toggle);
+            blueBtn.addEventListener('click',e=>{
+              e.stopPropagation();
+              toggleRefundFlag(item.id,'blue_toggle');
+            });
+            greenBtn.addEventListener('click',e=>{
+              e.stopPropagation();
+              toggleRefundFlag(item.id,'green_toggle');
+            });
+          }
+          li.querySelector('.expense-item-edit').addEventListener('click',e=>{
+            e.stopPropagation();
+            startEditingEntry(kind,item.id);
+          });
+          li.querySelector('.expense-item-del').addEventListener('click',e=>{
+            e.stopPropagation();
+            selectedExpenseIds.delete(item.id);
+            data[kind]=data[kind].filter(e=>e.id!==item.id);
+            persist();
+            render();
+          });
+          li.addEventListener('click',()=>{
+            if(selectedExpenseIds.has(item.id))selectedExpenseIds.delete(item.id);
+            else selectedExpenseIds.add(item.id);
+            render();
+          });
+        }
+        li.addEventListener('dragstart',e=>{
+          if(isEditing){e.preventDefault();return;}
+          draggedExpense={kind,id:item.id};
+          e.dataTransfer.effectAllowed='move';
+          e.dataTransfer.setData('text/plain',item.id);
+          setTimeout(()=>li.classList.add('dragging'),0);
+        });
+        li.addEventListener('dragend',()=>{
+          draggedExpense=null;
+          clearExpenseDragState();
+        });
+        li.addEventListener('dragover',e=>{
+          if(!draggedExpense)return;
+          e.preventDefault();
+          clearExpenseDragState();
+          ul.closest('.expense-col')?.classList.add('drag-target');
+          const before=e.clientY<li.getBoundingClientRect().top+li.offsetHeight/2;
+          li.classList.add(before?'expense-drop-before':'expense-drop-after');
+        });
+        li.addEventListener('dragleave',e=>{
+          if(!li.contains(e.relatedTarget))li.classList.remove('expense-drop-before','expense-drop-after');
+        });
+        li.addEventListener('drop',e=>{
+          if(!draggedExpense)return;
+          e.preventDefault();
+          const before=e.clientY<li.getBoundingClientRect().top+li.offsetHeight/2;
+          moveEntry(draggedExpense.kind,kind,draggedExpense.id,itemIndex+(before?0:1));
+          draggedExpense=null;
+          clearExpenseDragState();
         });
         ul.appendChild(li);
       });
     }
-    const total=entries.reduce((s,e)=>s+e.amount,0);
+    ul.ondragover=e=>{
+      if(!draggedExpense)return;
+      e.preventDefault();
+      ul.closest('.expense-col')?.classList.add('drag-target');
+    };
+    ul.ondragleave=e=>{
+      if(ul.contains(e.relatedTarget))return;
+      ul.closest('.expense-col')?.classList.remove('drag-target');
+      ul.querySelectorAll('.expense-drop-before,.expense-drop-after').forEach(el=>el.classList.remove('expense-drop-before','expense-drop-after'));
+    };
+    ul.ondrop=e=>{
+      if(!draggedExpense)return;
+      e.preventDefault();
+      if(e.target.closest('li[data-id]'))return;
+      moveEntry(draggedExpense.kind,kind,draggedExpense.id);
+      draggedExpense=null;
+      clearExpenseDragState();
+    };
+    const total=(showSelectedTotals?entries.filter(entry=>selectedExpenseIds.has(entry.id)):entries).reduce((s,e)=>s+e.amount,0);
     totalEls[kind].textContent=fmt(total);
+    footerTotalEls[kind].textContent=fmt(total);
+    if(kind==='refunds'&&refundsTaxEl)refundsTaxEl.textContent=fmt(total*0.10);
     return total;
   }
 
   function render(){
-    const spendingTotal=renderList('spending');
+    const showSelectedTotals=hasSelectedExpenses();
+    const debtTotal=renderList('debt');
     const refundsTotal=renderList('refunds');
-    const net=refundsTotal-spendingTotal;
-    netEl.textContent=`Net: ${net<0?'-':''}${fmt(Math.abs(net))}`;
+    const otherTotal=renderList('other');
+    renderList('personal');
+    const net=refundsTotal+otherTotal-debtTotal;
+    netEl.textContent=`${showSelectedTotals?'Selected Net':'Net'}: ${net<0?'-':''}${fmt(Math.abs(net))}`;
     netEl.classList.toggle('positive',net>=0);
     netEl.classList.toggle('negative',net<0);
   }
@@ -2608,9 +2935,12 @@ initTasksUI();
   function addEntry(kind){
     const labelInput=labelInputs[kind],amountInput=amountInputs[kind];
     const label=(labelInput.value||'').trim();
-    const amount=parseFloat(amountInput.value);
-    if(!label||!isFinite(amount)||amount<=0)return;
-    data[kind].push({id:genId(),label,amount});
+    const amount=Math.abs(parseFloat(amountInput.value));
+    if(!label||!isFinite(amount)||amount===0)return;
+    data[kind].push(kind==='refunds'
+      ? {id:genId(),label,amount,blue_toggle:false,green_toggle:false}
+      : {id:genId(),label,amount}
+    );
     persist();
     render();
     labelInput.value='';
@@ -2618,7 +2948,7 @@ initTasksUI();
     labelInput.focus();
   }
 
-  ['spending','refunds'].forEach(kind=>{
+  KINDS.forEach(kind=>{
     addBtns[kind].addEventListener('click',()=>addEntry(kind));
     amountInputs[kind].addEventListener('keydown',e=>{if(e.key==='Enter')addEntry(kind);});
     labelInputs[kind].addEventListener('keydown',e=>{if(e.key==='Enter')amountInputs[kind].focus();});
@@ -2626,8 +2956,8 @@ initTasksUI();
 
   async function syncDown(){
     const remote=await kvGet('expenses');
-    if(remote&&Array.isArray(remote.spending)&&Array.isArray(remote.refunds)){
-      data=remote;
+    if(remote){
+      data=normalizeData(remote);
       saveLocal(data);
       render();
     }
@@ -2637,12 +2967,17 @@ initTasksUI();
   render();
   syncDown();
 
-  document.getElementById('expenses-toggle-btn')?.addEventListener('click',()=>{
-    const panel=document.getElementById('expenses-panel');
-    const btn=document.getElementById('expenses-toggle-btn');
-    panel.classList.toggle('show');
-    btn.classList.toggle('active',panel.classList.contains('show'));
-    if(panel.classList.contains('show'))syncDown();
+  const expensesPanel=document.getElementById('expenses-panel');
+  const expensesBtn=document.getElementById('expenses-toggle-btn');
+  const applyExpensesVisibility=visible=>{
+    expensesPanel.classList.toggle('show',visible);
+    expensesBtn.classList.toggle('active',visible);
+    setPanelPref('expenses_open',visible);
+    if(visible)syncDown();
+  };
+  applyExpensesVisibility(!!getPanelPref('expenses_open',expensesPanel.classList.contains('show')));
+  expensesBtn?.addEventListener('click',()=>{
+    applyExpensesVisibility(!expensesPanel.classList.contains('show'));
   });
 })();
 
@@ -2729,7 +3064,7 @@ async function kvSet(key,value){
   let dragOverPill=null;
   let dragGoalSource=null;
   let inputSaveTimer=null;
-  let plannerMode='cards';
+  let plannerMode=getPanelPref('schedule_mode','cards');
   let commentEditorState=null;
   let commentPopover=null;
   let commentPopoverInput=null;
@@ -3943,6 +4278,8 @@ async function kvSet(key,value){
   function openSchedule(mode='cards'){
     const panel=document.getElementById('schedule-panel');
     plannerMode=mode;
+    setPanelPref('schedule_mode',plannerMode);
+    setPanelPref('schedule_open',true);
     panel.classList.add('show');
     render();
   }
@@ -3977,6 +4314,7 @@ async function kvSet(key,value){
     const panel=document.getElementById('schedule-panel');
     if(panel.classList.contains('show') && plannerMode === 'cards'){
       panel.classList.remove('show');
+      setPanelPref('schedule_open',false);
       updatePlannerModeUI();
       return;
     }
@@ -3987,6 +4325,7 @@ async function kvSet(key,value){
     const panel=document.getElementById('schedule-panel');
     if(panel.classList.contains('show') && plannerMode === 'calendar'){
       panel.classList.remove('show');
+      setPanelPref('schedule_open',false);
       updatePlannerModeUI();
       return;
     }
@@ -4038,7 +4377,8 @@ async function kvSet(key,value){
     if(document.getElementById('schedule-panel')?.classList.contains('show')) render();
   },60000);
 
-  openSchedule('cards');
+  if(getPanelPref('schedule_open',false)) openSchedule(plannerMode);
+  else updatePlannerModeUI();
   syncFromSupabase();
 })();
 
@@ -4382,17 +4722,22 @@ async function kvSet(key,value){
     });
   }
 
-  document.getElementById('dt-toggle-btn')?.addEventListener('click',()=>{
-    const panel=document.getElementById('dt-panel');
-    const btn=document.getElementById('dt-toggle-btn');
-    panel?.classList.toggle('show');
-    btn?.classList.toggle('active',panel?.classList.contains('show'));
-    if(panel?.classList.contains('show')){
+  const dtPanel=document.getElementById('dt-panel');
+  const dtBtn=document.getElementById('dt-toggle-btn');
+  const applyDtVisibility=visible=>{
+    dtPanel?.classList.toggle('show',visible);
+    dtBtn?.classList.toggle('active',visible);
+    setPanelPref('dt_open',visible);
+    if(visible){
       render();
       if(state.active&&!state.ended) startTick();
     } else {
       stopTick();
     }
+  };
+  applyDtVisibility(!!getPanelPref('dt_open',dtPanel?.classList.contains('show')));
+  dtBtn?.addEventListener('click',()=>{
+    applyDtVisibility(!dtPanel?.classList.contains('show'));
   });
 
   document.getElementById('dt-task-input')?.addEventListener('keydown',e=>{
@@ -4419,6 +4764,20 @@ async function kvSet(key,value){
     }
   }).catch(()=>{});
 })();
+
+document.querySelectorAll('.panel-close-x[data-close]').forEach(btn=>{
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    document.getElementById(btn.dataset.close)?.click();
+  });
+});
+document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
+  e.stopPropagation();
+  document.getElementById('schedule-panel')?.classList.remove('show');
+  setPanelPref('schedule_open',false);
+  document.getElementById('schedule-toggle-btn')?.classList.remove('active');
+  document.getElementById('cal-toggle-btn')?.classList.remove('active');
+});
 </script>
 </body>
 </html>
