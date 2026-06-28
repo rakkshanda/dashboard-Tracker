@@ -1,0 +1,15 @@
+background.js
+popup.html
+popup.js
+scrape.js
+floating-button.js
+manifest.json
+config.js
+latex-batch/
+supabase/
+SUPABASE_SECURITY.md
+sticky-schedule/
+pwa/
+.push-test.txt
+.claude/
+.git/

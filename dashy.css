@@ -936,9 +936,6 @@
   [data-theme="dark"] .fab { box-shadow: 5px 5px 0 var(--line); border-color: var(--line); }
   [data-theme="dark"] .fab:hover { box-shadow: 7px 7px 0 var(--line); }
 
-  /* hide stats */
-  [data-show-stats="false"] .stat-strip { display: none; }
-
   /* density tweaks */
   [data-density="compact"] .mega-num { font-size: 90px; }
   [data-density="compact"] .stat-card .stat-num { font-size: 44px; }
