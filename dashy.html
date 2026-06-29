@@ -1384,7 +1384,7 @@ let panelPrefs=(()=>{
     return saved&&typeof saved==='object'?saved:{};
   }catch{
     return{};
-    
+
   }
 })();
 function getPanelPref(key,fallback){
@@ -1394,7 +1394,6 @@ function setPanelPref(key,value){
   panelPrefs[key]=value;
   try{localStorage.setItem(PANEL_PREFS_KEY,JSON.stringify(panelPrefs));}catch{}
 }
-
 const STATUS_LABELS = { saved:'Saved', applied:'Applied', resume_screening:'Resume Screening', interview:'Interview', offer:'Offer', rejected:'Rejected', withdrawn:'Withdrawn', ended:'Ended' };
 const ALL_STATUSES = ['saved','applied','rejected','resume_screening','interview','offer','withdrawn','ended'];
 
