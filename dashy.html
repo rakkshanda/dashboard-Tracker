@@ -667,6 +667,36 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-fs-controls{display:none;position:fixed;top:20px;right:24px;z-index:100000;gap:10px;align-items:center;}
 .timer-panel.t-fullscreen .t-fs-controls{display:flex;}
 .t-fs-ctl-btn{padding:8px 14px;border-radius:999px;border:2px solid currentColor;font-weight:700;font-size:.8rem;cursor:pointer;background:transparent;letter-spacing:.05em;transition:all .15s;}
+/* ===== DAILY EXPENSE TRACKER ===== */
+.daily-exp-panel{display:none;background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:-10px 18px 14px;padding:0;overflow:hidden}
+.expenses-panel.show + .daily-exp-panel{display:block}
+body.mobile-app-mode .daily-exp-panel{display:none!important}
+body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block!important}
+.daily-exp-head{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:#111;border-bottom:2.5px solid #333}
+.daily-exp-head h3{font-family:var(--display);font-size:17px;font-weight:900;color:#fff;margin:0;letter-spacing:-.02em}
+.daily-exp-total{font-family:var(--mono);font-size:13px;font-weight:800;color:#fff;padding:4px 12px;border-radius:999px;background:#333}
+.daily-exp-body{background:#fff;padding:0}
+.daily-exp-input-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.2fr) minmax(0,1fr) 80px auto;align-items:center;gap:6px;padding:10px 16px;background:#f5f5f5;border-bottom:2px solid #e0e0e0}
+@media(max-width:720px){.daily-exp-input-row{grid-template-columns:1fr 1fr;row-gap:6px}}
+@media(max-width:720px){.daily-exp-input-row .expense-add-btn{grid-column:1/-1}}
+.daily-exp-select{flex:1;min-width:0;padding:7px 10px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;transition:border-color .15s}
+.daily-exp-select:focus{border-color:#111}
+.daily-exp-date{padding:7px 10px;border:2px solid #ccc;border-radius:999px;font-size:12.5px;font-family:var(--mono);font-weight:600;background:#fff;color:var(--ink);outline:none;cursor:pointer;transition:border-color .15s;min-width:0}
+.daily-exp-date:focus{border-color:#111}
+.daily-exp-list{list-style:none;display:flex;flex-direction:column;gap:6px;padding:10px 16px 16px;margin:0;min-height:60px}
+.daily-exp-item{display:flex;align-items:center;gap:10px;background:#f4f4f4;border-radius:10px;padding:9px 12px}
+.daily-exp-cat{font-size:10px;font-weight:800;font-family:var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;letter-spacing:.04em;text-transform:uppercase}
+.daily-exp-cat.grocery{background:#dcfce7;color:#166534}
+.daily-exp-cat.makeup{background:#fae8ff;color:#7e22ce}
+.daily-exp-cat.food{background:#ffedd5;color:#c2410c}
+.daily-exp-item-label{flex:1;font-size:13px;font-family:var(--sans);font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daily-exp-item-date{font-size:11px;font-family:var(--mono);font-weight:600;color:var(--ink-3);white-space:nowrap;flex-shrink:0}
+.daily-exp-item-amount{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;flex-shrink:0}
+.daily-exp-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
+.daily-exp-item-del:hover{color:#ef4444}
+.daily-exp-item-del svg{width:13px;height:13px}
+.daily-exp-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);gap:10px}
+.daily-exp-footer-total{font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
 </style>
 </head>
 <template id="__bundler_thumbnail" data-bg-color="#F2EFE8">
@@ -946,6 +976,32 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
           <span>Total</span>
           <span class="expense-total" id="personal-total-footer">$0.00</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY EXPENSE TRACKER (shown alongside Expense Tracker panel) -->
+  <div class="daily-exp-panel" id="daily-exp-panel">
+    <div class="daily-exp-head">
+      <h3>Daily Expenses</h3>
+      <span class="daily-exp-total" id="daily-exp-total">Total: $0.00</span>
+    </div>
+    <div class="daily-exp-body">
+      <div class="daily-exp-input-row">
+        <input type="text" class="expense-label-input" id="daily-exp-label" placeholder="Description (optional)" autocomplete="off" />
+        <select class="daily-exp-select" id="daily-exp-type">
+          <option value="grocery">🛒 Grocery</option>
+          <option value="makeup">💄 Makeup / Clothes</option>
+          <option value="food">🍜 Outside Food</option>
+        </select>
+        <input type="date" class="daily-exp-date" id="daily-exp-date" />
+        <input type="number" class="expense-amount-input" id="daily-exp-amount" placeholder="0.00" step="0.01" inputmode="decimal" />
+        <button type="button" class="expense-add-btn" id="daily-exp-add-btn">+ Add</button>
+      </div>
+      <ul class="daily-exp-list" id="daily-exp-list"></ul>
+      <div class="daily-exp-footer">
+        <span>Total Spent</span>
+        <span class="daily-exp-footer-total" id="daily-exp-footer-total">$0.00</span>
       </div>
     </div>
   </div>
@@ -4881,6 +4937,72 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
   document.getElementById('schedule-toggle-btn')?.classList.remove('active');
   document.getElementById('cal-toggle-btn')?.classList.remove('active');
 });
+
+// ===== DAILY EXPENSE TRACKER =====
+(function(){
+  const STORAGE_KEY='dashy_daily_expenses_v1';
+  const CAT_META={grocery:{label:'Grocery',cls:'grocery'},makeup:{label:'Makeup/Clothes',cls:'makeup'},food:{label:'Outside Food',cls:'food'}};
+  const genId=()=>crypto.randomUUID?crypto.randomUUID():`d_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  const fmt=n=>`$${(Math.round(n*100)/100).toFixed(2)}`;
+  const fmtDate=d=>{if(!d)return'';const[y,m,day]=d.split('-');return`${m}/${day}/${y.slice(2)}`;};
+
+  let data=[];
+  function load(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)data=JSON.parse(s)||[];}catch{}if(!Array.isArray(data))data=[];}
+  function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch{}}
+  function persist(){save();kvSet('daily_expenses',data);}
+
+  function render(){
+    const ul=document.getElementById('daily-exp-list');
+    if(!ul)return;
+    ul.innerHTML='';
+    if(!data.length){const li=document.createElement('li');li.className='expense-empty';li.style.cssText='background:none;padding:16px 0';li.textContent='No entries yet.';ul.appendChild(li);}
+    data.slice().reverse().forEach(item=>{
+      const li=document.createElement('li');li.className='daily-exp-item';
+      const meta=CAT_META[item.type]||{label:item.type,cls:'grocery'};
+      const catEl=document.createElement('span');catEl.className=`daily-exp-cat ${meta.cls}`;catEl.textContent=meta.label;
+      const labelEl=document.createElement('span');labelEl.className='daily-exp-item-label';labelEl.textContent=item.label||'—';
+      const dateEl=document.createElement('span');dateEl.className='daily-exp-item-date';dateEl.textContent=fmtDate(item.date);
+      const amtEl=document.createElement('span');amtEl.className='daily-exp-item-amount';amtEl.textContent=fmt(item.amount);
+      const delBtn=document.createElement('button');delBtn.className='daily-exp-item-del';delBtn.title='Delete';
+      delBtn.innerHTML=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg>`;
+      delBtn.addEventListener('click',()=>{data=data.filter(e=>e.id!==item.id);persist();render();});
+      li.append(catEl,labelEl,dateEl,amtEl,delBtn);
+      ul.appendChild(li);
+    });
+    const total=data.reduce((s,e)=>s+e.amount,0);
+    const fmt2=fmt(total);
+    const hEl=document.getElementById('daily-exp-total');if(hEl)hEl.textContent=`Total: ${fmt2}`;
+    const fEl=document.getElementById('daily-exp-footer-total');if(fEl)fEl.textContent=fmt2;
+  }
+
+  function addEntry(){
+    const labelEl=document.getElementById('daily-exp-label');
+    const typeEl=document.getElementById('daily-exp-type');
+    const dateEl=document.getElementById('daily-exp-date');
+    const amtEl=document.getElementById('daily-exp-amount');
+    const amount=Math.abs(parseFloat(amtEl?.value));
+    if(!isFinite(amount)||amount===0)return;
+    const today=new Date().toISOString().slice(0,10);
+    data.push({id:genId(),label:(labelEl?.value||'').trim(),type:typeEl?.value||'grocery',date:dateEl?.value||today,amount});
+    persist();render();
+    if(labelEl)labelEl.value='';
+    if(amtEl){amtEl.value='';amtEl.focus();}
+    if(dateEl)dateEl.value=today;
+  }
+
+  load();
+  kvGet('daily_expenses').then(remote=>{
+    if(Array.isArray(remote)&&remote.length>=data.length){data=remote;save();render();}
+  }).catch(()=>{});
+
+  const dateInput=document.getElementById('daily-exp-date');
+  if(dateInput)dateInput.value=new Date().toISOString().slice(0,10);
+
+  document.getElementById('daily-exp-add-btn')?.addEventListener('click',addEntry);
+  document.getElementById('daily-exp-amount')?.addEventListener('keydown',e=>{if(e.key==='Enter')addEntry();});
+  document.getElementById('daily-exp-label')?.addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('daily-exp-amount')?.focus();});
+  render();
+})();
 
 // ===== MOBILE APP NAV =====
 (function(){
