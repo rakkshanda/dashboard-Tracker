@@ -667,6 +667,13 @@ tr.drag-over td{border-top:2px solid var(--acc)!important}
 .t-fs-controls{display:none;position:fixed;top:20px;right:24px;z-index:100000;gap:10px;align-items:center;}
 .timer-panel.t-fullscreen .t-fs-controls{display:flex;}
 .t-fs-ctl-btn{padding:8px 14px;border-radius:999px;border:2px solid currentColor;font-weight:700;font-size:.8rem;cursor:pointer;background:transparent;letter-spacing:.05em;transition:all .15s;}
+/* ===== TIMER POPUP MODE ===== */
+.timer-popout-btn{position:absolute;top:12px;left:14px;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:none;border:none;cursor:pointer;color:var(--ink-4);font-size:15px;line-height:1;z-index:5;transition:all .12s}
+.timer-popout-btn:hover{color:var(--ink);background:var(--acc-5)}
+body.timer-popup-mode header.top,body.timer-popup-mode .mobile-tabbar,body.timer-popup-mode .mobile-more-sheet,body.timer-popup-mode .timer-popout-btn,body.timer-popup-mode .panel-close-x{display:none!important}
+body.timer-popup-mode #timer-panel{display:block!important;position:fixed!important;inset:0!important;margin:0!important;z-index:99999!important;overflow:hidden}
+body.timer-popup-mode .t-card{border-radius:0!important;border:none!important;box-shadow:none!important;min-height:100vh;display:flex!important;flex-direction:column;justify-content:center;padding:32px 28px!important}
+body.timer-popup-mode .shell{padding:0}
 /* ===== DAILY EXPENSE TRACKER ===== */
 .daily-exp-panel{display:none;background:#111;border:2.5px solid var(--line);border-radius:var(--radius);margin:-10px 18px 14px;padding:0;overflow:hidden}
 .expenses-panel.show + .daily-exp-panel{display:block}
@@ -1014,6 +1021,9 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
     </div>
     <div class="t-card" id="t-card">
       <button class="panel-close-x on-light" data-close="timer-toggle-btn" title="Close">×</button>
+      <button class="timer-popout-btn" id="timer-popout-btn" title="Pop out timer">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" style="width:14px;height:14px"><path d="M7 3H3v10h10V9"/><path d="M10 2h4v4"/><path d="M14 2L9 7"/></svg>
+      </button>
       <div class="t-controls">
         <div class="t-field">
           <div class="t-lbl pink">Rounds</div>
@@ -4937,6 +4947,19 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
   document.getElementById('schedule-toggle-btn')?.classList.remove('active');
   document.getElementById('cal-toggle-btn')?.classList.remove('active');
 });
+
+// ===== TIMER POPUP =====
+(function(){
+  if(new URLSearchParams(location.search).get('popup')==='timer'){
+    document.body.classList.add('timer-popup-mode');
+    const tp=document.getElementById('timer-panel');
+    if(tp)tp.classList.add('show');
+  }
+  document.getElementById('timer-popout-btn')?.addEventListener('click',()=>{
+    const url=location.href.split('?')[0]+'?popup=timer';
+    window.open(url,'dashy-timer','width=400,height=600,popup=yes,resizable=yes');
+  });
+})();
 
 // ===== DAILY EXPENSE TRACKER =====
 (function(){
