@@ -139,9 +139,7 @@ const server = http.createServer((req, res) => {
         const { jobs } = JSON.parse(body);
         if (!Array.isArray(jobs) || !jobs.length) throw new Error('No jobs provided');
 
-        const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
-        const now = new Date();
-        const dayFolder = `${MONTHS[now.getMonth()]}${now.getDate()}`;
+        const dayFolder = 'July resume';
         const dayDir = path.join(OUTPUT_DIR, dayFolder);
 
         const slug = s => (s || '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
