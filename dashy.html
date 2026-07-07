@@ -699,9 +699,15 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
 .daily-exp-item-label{flex:1;font-size:13px;font-family:var(--sans);font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .daily-exp-item-date{font-size:11px;font-family:var(--mono);font-weight:600;color:var(--ink-3);white-space:nowrap;flex-shrink:0}
 .daily-exp-item-amount{font-family:var(--mono);font-size:13px;font-weight:800;color:var(--ink);white-space:nowrap;flex-shrink:0}
-.daily-exp-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
+.daily-exp-item-edit,.daily-exp-item-del{background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#bbb;transition:color .15s;display:flex;align-items:center;flex-shrink:0}
+.daily-exp-item-edit:hover{color:var(--acc)}
 .daily-exp-item-del:hover{color:#ef4444}
-.daily-exp-item-del svg{width:13px;height:13px}
+.daily-exp-item-edit svg,.daily-exp-item-del svg{width:13px;height:13px}
+.daily-exp-item.editing{flex-wrap:wrap;align-items:center}
+.daily-exp-item-edit-fields{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1.2fr) minmax(0,1fr) 90px;gap:8px;flex:1;min-width:0}
+@media(max-width:720px){.daily-exp-item-edit-fields{grid-template-columns:1fr 1fr}}
+.daily-exp-item-edit-fields .expense-item-edit-input{width:100%}
+.daily-exp-item-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px}
 .daily-exp-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);gap:10px}
 .daily-exp-footer-total{font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
 </style>
@@ -4970,6 +4976,7 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
   const fmtDate=d=>{if(!d)return'';const[y,m,day]=d.split('-');return`${m}/${day}/${y.slice(2)}`;};
 
   let data=[];
+  let editingId=null;
   function load(){try{const s=localStorage.getItem(STORAGE_KEY);if(s)data=JSON.parse(s)||[];}catch{}if(!Array.isArray(data))data=[];}
   function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch{}}
   function persist(){save();kvSet('daily_expenses',data);}
@@ -4981,15 +4988,54 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
     if(!data.length){const li=document.createElement('li');li.className='expense-empty';li.style.cssText='background:none;padding:16px 0';li.textContent='No entries yet.';ul.appendChild(li);}
     data.slice().reverse().forEach(item=>{
       const li=document.createElement('li');li.className='daily-exp-item';
+      if(editingId===item.id){
+        li.classList.add('editing');
+        li.innerHTML=`<div class="daily-exp-item-edit-fields">
+          <input class="expense-item-edit-input label" type="text" placeholder="Description" />
+          <select class="daily-exp-select type">
+            <option value="grocery">🛒 Grocery</option>
+            <option value="makeup">💄 Makeup / Clothes</option>
+            <option value="food">🍜 Outside Food</option>
+          </select>
+          <input class="expense-item-edit-input date" type="date" />
+          <input class="expense-item-edit-input amount" type="number" step="0.01" inputmode="decimal" />
+        </div>
+        <div class="daily-exp-item-actions"><button type="button" class="expense-item-save">Save</button><button type="button" class="expense-item-cancel">Cancel</button></div>`;
+        const labelInput=li.querySelector('.expense-item-edit-input.label');
+        const typeInput=li.querySelector('.daily-exp-select.type');
+        const dateInput=li.querySelector('.expense-item-edit-input.date');
+        const amountInput=li.querySelector('.expense-item-edit-input.amount');
+        labelInput.value=item.label||'';
+        typeInput.value=item.type||'grocery';
+        dateInput.value=item.date||'';
+        amountInput.value=String(item.amount);
+        li.querySelector('.expense-item-save').addEventListener('click',()=>{
+          const amount=Math.abs(parseFloat(amountInput.value));
+          if(!isFinite(amount)||amount===0)return;
+          item.label=labelInput.value.trim();
+          item.type=typeInput.value;
+          item.date=dateInput.value||item.date;
+          item.amount=amount;
+          editingId=null;persist();render();
+        });
+        li.querySelector('.expense-item-cancel').addEventListener('click',()=>{editingId=null;render();});
+        ul.appendChild(li);
+        return;
+      }
       const meta=CAT_META[item.type]||{label:item.type,cls:'grocery'};
       const catEl=document.createElement('span');catEl.className=`daily-exp-cat ${meta.cls}`;catEl.textContent=meta.label;
       const labelEl=document.createElement('span');labelEl.className='daily-exp-item-label';labelEl.textContent=item.label||'—';
       const dateEl=document.createElement('span');dateEl.className='daily-exp-item-date';dateEl.textContent=fmtDate(item.date);
       const amtEl=document.createElement('span');amtEl.className='daily-exp-item-amount';amtEl.textContent=fmt(item.amount);
+      const actionsEl=document.createElement('div');actionsEl.className='daily-exp-item-actions';
+      const editBtn=document.createElement('button');editBtn.className='daily-exp-item-edit';editBtn.title='Edit';
+      editBtn.innerHTML=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 2l3 3-8 8H3v-3z"/></svg>`;
+      editBtn.addEventListener('click',()=>{editingId=item.id;render();});
       const delBtn=document.createElement('button');delBtn.className='daily-exp-item-del';delBtn.title='Delete';
       delBtn.innerHTML=`<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M6 4V2h4v2M5 4l1 10h4l1-10"/></svg>`;
       delBtn.addEventListener('click',()=>{data=data.filter(e=>e.id!==item.id);persist();render();});
-      li.append(catEl,labelEl,dateEl,amtEl,delBtn);
+      actionsEl.append(editBtn,delBtn);
+      li.append(catEl,labelEl,dateEl,amtEl,actionsEl);
       ul.appendChild(li);
     });
     const total=data.reduce((s,e)=>s+e.amount,0);
