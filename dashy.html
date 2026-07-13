@@ -5602,7 +5602,7 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
 (function(){
   const STICKERS_KEY='dashy_stickers_v1';
   const STICKER_FOLDER='stickers%20png/';
-  const FALLBACK_STICKER_FILES=['smile.png','badge.png','cat-lover.png','rainy.png','excited.png','meditation.png','pray.png','wave.png','yes.png'];
+  const FALLBACK_STICKER_FILES=['smile.png','badge.png','cat-lover.png','rainy.png','excited.png','meditation.png','pray.png','wave.png','yes.png','bear.png'];
   async function getStickerFiles(){
     try{
       const res=await fetch('/api/stickers');
@@ -5811,38 +5811,43 @@ document.getElementById('schedule-close-btn')?.addEventListener('click',e=>{
   }
   renderStickers();
 
-  if(cardEl){
-    cardEl.addEventListener('dragover',e=>{
-      if(stickerDragSrc||draggingPlaced) e.preventDefault();
-    });
-    cardEl.addEventListener('drop',e=>{
-      const rect=cardEl.getBoundingClientRect();
-      if(stickerDragSrc){
-        e.preventDefault();
-        const size=44;
-        const entry={id:genId(),src:stickerDragSrc,x:e.clientX-rect.left-size/2,y:e.clientY-rect.top-size/2,size};
-        clampToCard(entry);
-        currentStickers().push(entry);
-        saveStickers();
-        mountSticker(entry);
-        stickerDragSrc=null;
-        return;
-      }
-      if(draggingPlaced){
-        e.preventDefault();
-        const entry=currentStickers().find(s=>s.id===draggingPlaced.id);
-        if(entry){
-          entry.x=e.clientX-rect.left-draggingPlaced.offsetX;
-          entry.y=e.clientY-rect.top-draggingPlaced.offsetY;
-          clampToCard(entry);
-          saveStickers();
-          const el=document.querySelector(`.placed-sticker[data-id="${entry.id}"]`);
-          if(el){ el.style.left=entry.x+'px'; el.style.top=entry.y+'px'; }
-        }
-        draggingPlaced=null;
-      }
-    });
+  function withinCard(e){
+    if(!cardEl) return false;
+    const rect=cardEl.getBoundingClientRect();
+    const pad=CARD_OVERFLOW_ALLOW;
+    return e.clientX>=rect.left-pad&&e.clientX<=rect.right+pad&&e.clientY>=rect.top-pad&&e.clientY<=rect.bottom+pad;
   }
+  document.addEventListener('dragover',e=>{
+    if((stickerDragSrc||draggingPlaced)&&withinCard(e)) e.preventDefault();
+  });
+  document.addEventListener('drop',e=>{
+    if(!cardEl||!withinCard(e)) return;
+    const rect=cardEl.getBoundingClientRect();
+    if(stickerDragSrc){
+      e.preventDefault();
+      const size=44;
+      const entry={id:genId(),src:stickerDragSrc,x:e.clientX-rect.left-size/2,y:e.clientY-rect.top-size/2,size};
+      clampToCard(entry);
+      currentStickers().push(entry);
+      saveStickers();
+      mountSticker(entry);
+      stickerDragSrc=null;
+      return;
+    }
+    if(draggingPlaced){
+      e.preventDefault();
+      const entry=currentStickers().find(s=>s.id===draggingPlaced.id);
+      if(entry){
+        entry.x=e.clientX-rect.left-draggingPlaced.offsetX;
+        entry.y=e.clientY-rect.top-draggingPlaced.offsetY;
+        clampToCard(entry);
+        saveStickers();
+        const el=document.querySelector(`.placed-sticker[data-id="${entry.id}"]`);
+        if(el){ el.style.left=entry.x+'px'; el.style.top=entry.y+'px'; }
+      }
+      draggingPlaced=null;
+    }
+  });
   document.addEventListener('dragend',()=>{ stickerDragSrc=null; draggingPlaced=null; });
 
   // ----- free-floating text boxes -----

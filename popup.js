@@ -1,6 +1,19 @@
 const $ = (id) => document.getElementById(id);
 const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 const DEFAULT_STATUS = 'saved';
+let selectedResumeFile = null;
+
+function resetResumeField() {
+  selectedResumeFile = null;
+  const input = $('resumeFile');
+  const lbl = $('resumeUploadLbl');
+  const nameEl = $('resumeFileName');
+  const clearBtn = $('resumeClearBtn');
+  if (input) input.value = '';
+  if (lbl) lbl.classList.remove('has-file', 'uploading');
+  if (nameEl) nameEl.textContent = '⬆ Upload PDF';
+  if (clearBtn) clearBtn.style.display = 'none';
+}
 
 function getJobTag(title) {
   const t = (title || '').toLowerCase();
@@ -424,6 +437,46 @@ function getWebAppUrl() {
 const SUPABASE_URL = window.ENV_SUPABASE_URL;
 const SUPABASE_KEY = window.ENV_SUPABASE_KEY;
 
+async function uploadResumeForJob(jobId, file) {
+  if (!jobId || !file) return { success: false, message: 'Missing job id or file' };
+  const ext = file.name.split('.').pop();
+  const path = `${jobId}/resume.${ext}`;
+  try {
+    const upRes = await fetch(`${SUPABASE_URL}/storage/v1/object/resumes/${path}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': file.type || 'application/pdf',
+        'x-upsert': 'true'
+      },
+      body: file
+    });
+    if (!upRes.ok) {
+      const errText = await upRes.text();
+      return { success: false, message: 'Resume upload failed: ' + errText };
+    }
+    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/resumes/${path}`;
+    const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/jobs?id=eq.${jobId}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ resume_url: publicUrl })
+    });
+    if (!patchRes.ok) {
+      const errText = await patchRes.text();
+      return { success: false, message: 'Saved resume but failed to link it: ' + errText };
+    }
+    return { success: true, url: publicUrl };
+  } catch (e) {
+    return { success: false, message: 'Error: ' + e.message };
+  }
+}
+
 async function saveRow(payload) {
   console.log('=== SAVING JOB TO SUPABASE ===');
   console.log('Payload:', payload);
@@ -519,10 +572,11 @@ async function saveRow(payload) {
       // STEP 3: Notify dashboard to refresh
       notifyDashboardRefresh();
       
-      return { 
-        success: true, 
+      return {
+        success: true,
         message: 'Job saved to Supabase!',
-        supabaseSaved: true
+        supabaseSaved: true,
+        jobId: result[0]?.id
       };
     } else {
       const errorText = await response.text();
@@ -566,7 +620,8 @@ function clearFields() {
   enableLocationTabs();
   $('url').value = '';
   $('description').value = '';
-  
+  resetResumeField();
+
   // Clear the draft from storage
   try { chrome.storage?.local?.remove?.(DRAFT_KEY); } catch {}
   
@@ -594,6 +649,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveDraft();
         markMissing();
       });
+    });
+  }
+
+  // Resume upload wiring
+  const resumeFileInput = $('resumeFile');
+  const resumeClearBtn = $('resumeClearBtn');
+  if (resumeFileInput) {
+    resumeFileInput.addEventListener('change', () => {
+      const file = resumeFileInput.files[0];
+      if (!file) return;
+      selectedResumeFile = file;
+      const lbl = $('resumeUploadLbl');
+      const nameEl = $('resumeFileName');
+      if (lbl) lbl.classList.add('has-file');
+      if (nameEl) nameEl.textContent = '📄 ' + file.name;
+      if (resumeClearBtn) resumeClearBtn.style.display = '';
+    });
+  }
+  if (resumeClearBtn) {
+    resumeClearBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      resetResumeField();
     });
   }
 
@@ -992,6 +1070,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         throw new Error(result?.message || 'Save failed — unknown error');
       }
 
+      let resumeWarning = '';
+      if (selectedResumeFile && result.jobId) {
+        setStatus('saving', 'Uploading resume…');
+        const resumeResult = await uploadResumeForJob(result.jobId, selectedResumeFile);
+        if (!resumeResult.success) {
+          console.warn('Resume upload failed:', resumeResult.message);
+          resumeWarning = ' (resume upload failed)';
+        }
+      }
+
       try { chrome.storage?.local?.remove?.(DRAFT_KEY); } catch {}
       progress.style.width = '100%';
 
@@ -999,15 +1087,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.parent.postMessage({ type: 'JOB_SAVED' }, '*');
       }
 
-      btn.innerHTML = '✓ Saved!';
-      setStatus('success', '✅ Job saved successfully!');
+      btn.innerHTML = resumeWarning ? '⚠️ Saved (resume failed)' : '✓ Saved!';
+      setStatus(resumeWarning ? 'error' : 'success', resumeWarning ? '⚠️ Job saved, but resume upload failed.' : '✅ Job saved successfully!');
       btn.disabled = false;
-      btn.classList.remove('saving','error');
-      btn.classList.add('success');
+      btn.classList.remove('saving','error','success');
+      btn.classList.add(resumeWarning ? 'error' : 'success');
       progress.style.width = '0%';
       clearFields();
       setTimeout(() => {
-        btn.classList.remove('success');
+        btn.classList.remove('success','error');
         btn.textContent = 'Save Job';
         setStatus('', '');
       }, 3000);

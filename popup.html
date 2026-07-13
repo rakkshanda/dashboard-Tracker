@@ -63,6 +63,12 @@
       .location-tab.active { background: var(--ink); color: var(--bg); border-color: var(--ink); box-shadow: 3px 3px 0 var(--acc); }
       .location-tabs.disabled .location-tab { opacity: 0.5; pointer-events: none; }
       .missing { border-color: #f33 !important; }
+      .resume-upload-lbl { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; border:1.5px dashed var(--line-soft); border-radius: var(--radius-sm); font-size:12px; font-family: var(--sans); color: var(--ink-3); cursor:pointer; transition: all .15s; }
+      .resume-upload-lbl:hover { border-color: var(--acc); color: var(--ink); }
+      .resume-upload-lbl.has-file { border-style:solid; border-color: var(--acc-3); color: var(--ink); background: rgba(107,227,176,.12); }
+      .resume-upload-lbl.uploading { border-color: var(--acc-6); color: var(--ink); }
+      .resume-clear-btn { background:none; border:none; color:var(--ink-3); cursor:pointer; font-size:14px; padding:2px 4px; line-height:1; flex-shrink:0; }
+      .resume-clear-btn:hover { color:#ef4444; }
       #close { background: none !important; border-color: transparent !important; color: var(--ink-3) !important; width: 28px; height: 28px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; border-radius: 50% !important; }
       #close:hover { background: var(--bg-2) !important; color: var(--ink) !important; }
       .role-tag-tab { border-radius: var(--radius-sm) !important; border: 1.5px solid var(--line-soft) !important; font-family: var(--mono) !important; font-size: 10px !important; font-weight: 700 !important; letter-spacing: .06em !important; transition: all .15s !important; }
@@ -218,6 +224,13 @@
 
     <label>Link</label>
     <input id="url" />
+
+    <label>Resume (optional)</label>
+    <label class="resume-upload-lbl" id="resumeUploadLbl" for="resumeFile">
+      <span id="resumeFileName">⬆ Upload PDF</span>
+      <button type="button" id="resumeClearBtn" class="resume-clear-btn" title="Remove selected resume" style="display:none">×</button>
+      <input type="file" id="resumeFile" accept="application/pdf" style="display:none;" />
+    </label>
 
     <label>Job description</label>
     <textarea id="description"></textarea>
