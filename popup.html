@@ -75,15 +75,18 @@
 
       /* SAVE BUTTON */
       button#save {
-        background: #FF5C2C; color: #0E0E10; border: 2.5px solid #0E0E10;
+        background: rgba(248,207,227,.55);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        color: #0E0E10; border: 2px solid rgba(163,25,91,.5);
         border-radius: 999px; font-weight: 800; font-family: var(--sans);
         font-size: 13px; padding: 10px 20px;
-        box-shadow: 5px 5px 0 #0E0E10;
+        box-shadow: 0 8px 20px rgba(163,25,91,.25), inset 0 1px 0 rgba(255,255,255,.6);
         transition: all .15s ease;
         letter-spacing: .01em;
       }
-      button#save:hover { transform: translate(-2px,-2px); box-shadow: 7px 7px 0 #0E0E10; }
-      button#save:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 #0E0E10; }
+      button#save:hover { transform: translateY(-2px); background: rgba(248,207,227,.75); box-shadow: 0 12px 26px rgba(163,25,91,.32), inset 0 1px 0 rgba(255,255,255,.7); }
+      button#save:active { transform: translateY(0); box-shadow: 0 4px 10px rgba(163,25,91,.25), inset 0 1px 0 rgba(255,255,255,.5); }
       #save.saving { background: var(--acc-6); color: #fff; }
       #save.success { background: var(--acc-3); color: var(--ink); animation: pop .4s ease; }
       #save.error { background: var(--acc-5); color: var(--ink); animation: shake .3s ease; }
