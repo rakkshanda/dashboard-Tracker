@@ -848,11 +848,16 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
 .scan-check-spacer{width:20px;flex-shrink:0}
 .scan-row-main{flex:1;min-width:0}
 .scan-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.scan-identity{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
 .scan-co{font-family:var(--display);font-size:16px;font-weight:800;color:var(--ink)}
 .scan-co.empty{color:var(--ink-4)}
-.scan-role{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-left:8px}
+.scan-status{border:1.5px solid var(--line);border-radius:999px;padding:3px 9px;font-family:var(--mono);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;line-height:1}
+.scan-status.application{background:#4DA3FF}.scan-status.rejection{background:#FF8B8B}.scan-status.update{background:#FFD45C}.scan-status.misc{background:var(--bg-2)}
+.scan-role{font-family:var(--sans);font-size:14px;color:var(--ink-2);margin-top:4px}
 .scan-date{font-family:var(--mono);font-size:12px;color:var(--ink-4);text-align:right;line-height:1.5;white-space:nowrap;flex-shrink:0}
-.scan-desc{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin:7px 0 10px;line-height:1.5}
+.scan-desc{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin:4px 0 9px;line-height:1.5}
+.scan-row-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.scan-add-date{background:#6EE7B7;border:1.5px solid var(--line);border-radius:999px;padding:6px 13px;font-family:var(--mono);font-size:11px;font-weight:800;color:var(--ink)}
 .scan-view{background:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 15px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .12s}
 .scan-view:hover{background:var(--ink);color:var(--card)}
 .scan-email-body{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--ink-2);max-height:52vh;overflow:auto;background:var(--bg-2);padding:16px;border-radius:10px;margin:0}
@@ -1962,6 +1967,15 @@ async function init() {
 
 // ===== REVIEW SCAN =====
 let SCAN_ROWS=[];
+let SCAN_LOCAL_MODE=false;
+const SCAN_LOCAL_KEY='dashy_email_scan_pending_v1';
+const SCAN_SEED_ROWS=[
+  {id:'local:yoh:19faaa310e130202',message_id:'19faaa310e130202',category:'update',status:'Assessment',company:'Yoh',title:'Full Stack Engineer — Hybrid NH, W2 Only',applied_date:'2026-07-28',email_date:'2026-07-28T21:30:40Z',subject:'Next Step for Your Application with Yoh',sender:'Suman Dabbeta <suman.dabbeta@yoh.com>',body:'Thank you for applying for the Full Stack Engineer Hybrid NH W2 Only position with Yoh. The next step is a brief automated screening. It takes about 10 minutes and can be completed from a phone or computer. Participation is optional; the email also provides an option to request screening with a recruiter.',classification:'automated screening — action needed',source:'Email',review_state:'pending'},
+  {id:'local:texas-sports:19fa9ecf33866114',message_id:'19fa9ecf33866114',category:'update',status:'Assessment',company:'Texas Sports Academy',title:'Junior Software Engineer',applied_date:'2026-07-28',email_date:'2026-07-28T18:11:40Z',subject:'Action Required: Update on your Junior Software Engineer Application',sender:'Moniquea Brown <moniquea.brown@texassportsacademy.com>',body:'To move forward, candidates must be a U.S. citizen or permanent resident, currently local to Austin, Texas, and have completed the proctored exam. If all three apply, reply directly with the proctored exam score. Otherwise, no further action is needed.',classification:'eligibility and proctored exam — action needed',source:'Email',review_state:'pending'},
+  {id:'local:infosys:19faac3f95f0f9a7',message_id:'19faac3f95f0f9a7',category:'update',status:'Interview',company:'Infosys',title:'Java Developer',applied_date:'2026-07-28',email_date:'2026-07-28T22:06:31Z',subject:'Infosys Hiring for Java Developer Position - Full Time',sender:'Jeyavas Rani <jeyavas.rani@infosys.com>',body:'Infosys is hiring for onsite Java Developer roles in North Carolina and Texas. The recruiter requests an updated resume plus answers about work authorization and future sponsorship, willingness to relocate and work onsite from day one, and whether you have worked with Infosys before. The role asks for 7+ years of Java experience plus Angular, React, AWS, Spring Boot, microservices, REST APIs, SQL, and related skills.',classification:'recruiter outreach — response needed',source:'Email',review_state:'pending'},
+  {id:'local:symple-rejection:19fa9fe7195a6673',message_id:'19fa9fe7195a6673',category:'rejection',status:'Rejected',company:'Symple Lending',title:'Software Engineer — Full Stack',applied_date:'2026-07-28',email_date:'2026-07-28T18:30:51Z',subject:'Symple Lending - Software Engineer – Full Stack',sender:'Symple Lending Recruiting <recruiting@applytojob.com>',body:'Symple Lending thanked you for applying but is not moving forward with your application for the current openings. They will keep your information on file for possible future opportunities.',classification:'rejection — not moving forward',source:'Email',review_state:'pending'},
+  {id:'local:symple-application:19fa769eb54adc75',message_id:'19fa769eb54adc75',category:'application',status:'Applied',company:'Symple Lending',title:'Software Engineer — Full Stack',applied_date:'2026-07-28',email_date:'2026-07-28T06:29:23Z',subject:"Rakshanda, we've received your resume! - Symple Lending",sender:'Symple Lending <noreply@applytojob.com>',body:'Symple Lending confirmed receipt of your resume for the Software Engineer — Full Stack position and said they would contact you if your qualifications match their needs.',classification:'application confirmed',source:'Email',review_state:'pending'}
+];
 const SCAN_CATS=[
   {key:'application',label:'APPLICATIONS',add:true},
   {key:'rejection',label:'REJECTIONS',add:true},
@@ -1971,19 +1985,41 @@ const SCAN_CATS=[
 const SCAN_STATUS_MAP={applied:'applied',application:'applied',rejected:'rejected',rejection:'rejected',interview:'interview',assessment:'resume_screening',screener:'resume_screening','screener completed':'resume_screening',offer:'offer',update:'applied'};
 function scanStatusToJob(s){if(!s)return'applied';return SCAN_STATUS_MAP[String(s).toLowerCase().trim()]||'applied';}
 function scanCatOf(r){const c=(r.category||'').toLowerCase();return SCAN_CATS.some(x=>x.key===c)?c:'misc';}
+function loadLocalEmailScan(){
+  SCAN_LOCAL_MODE=true;
+  try{
+    const saved=JSON.parse(localStorage.getItem(SCAN_LOCAL_KEY)||'null');
+    if(Array.isArray(saved)){SCAN_ROWS=saved;return;}
+    localStorage.setItem(SCAN_LOCAL_KEY,JSON.stringify(SCAN_SEED_ROWS));
+  }catch{}
+  SCAN_ROWS=SCAN_SEED_ROWS.map(r=>({...r}));
+}
+function saveLocalEmailScan(rows){
+  SCAN_ROWS=rows;
+  try{localStorage.setItem(SCAN_LOCAL_KEY,JSON.stringify(rows));}catch{}
+}
 
 async function loadEmailScan(){
   try{
     const res=await _sb.from('email_scan').select('*').eq('review_state','pending').order('email_date',{ascending:false});
-    if(res.error){console.warn('[scan] load skipped (table missing or RLS?):',res.error.message);SCAN_ROWS=[];renderScanCard();return;}
+    if(res.error){console.warn('[scan] using local review queue:',res.error.message);loadLocalEmailScan();renderScanCard();return;}
+    SCAN_LOCAL_MODE=false;
     SCAN_ROWS=res.data||[];
-  }catch(e){console.warn('[scan] load error:',e);SCAN_ROWS=[];}
+  }catch(e){console.warn('[scan] using local review queue:',e);loadLocalEmailScan();}
   renderScanCard();
 }
 
 function scanFmtDate(d){
   if(!d)return'';const dt=new Date(d);if(isNaN(dt))return'';
   return `${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}<br>${dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+}
+function scanAddDate(r){
+  const raw=r.applied_date||r.email_date;if(!raw)return'';
+  const dt=/^\d{4}-\d{2}-\d{2}$/.test(raw)?new Date(raw+'T12:00:00'):new Date(raw);
+  return isNaN(dt)?'':dt.toLocaleDateString('en-US',{month:'long',day:'numeric'});
+}
+function scanStatusLabel(r,cat){
+  return String(r.status||({application:'Applied',rejection:'Rejected',update:'Update',misc:'Misc'}[cat.key])).replaceAll('_',' ');
 }
 
 function renderScanCard(){
@@ -2005,14 +2041,16 @@ function renderScanCard(){
     html+=`<div class="scan-group-h">${san(cat.label)}<span class="scan-group-n">${rows.length}</span></div>`;
     rows.forEach(r=>{
       const co=(r.company||'').trim();
-      const coHtml=co?`<span class="scan-co">${san(co)}</span>`+(r.title?`<span class="scan-role">${san(r.title)}</span>`:''):'<span class="scan-co empty">(no company)</span>';
+      const coHtml=co?`<span class="scan-co">${san(co)}</span>`:'<span class="scan-co empty">(no company)</span>';
+      const role=r.title?`<div class="scan-role">${san(r.title)}</div>`:'';
       const desc=r.classification?san(r.classification):(cat.add?'detected — will be added':'not job-related — will be ignored');
       const subj=r.subject?` · "${san(r.subject)}"`:'';
       const check=cat.add?`<input type="checkbox" class="scan-check" data-id="${san(String(r.id))}"${cat.key==='application'?' checked':''}>`:'<span class="scan-check-spacer"></span>';
+      const addDate=cat.add&&scanAddDate(r)?`<span class="scan-add-date">add to ${san(scanAddDate(r))}</span>`:'';
       html+=`<div class="scan-row">${check}<div class="scan-row-main">`+
-        `<div class="scan-row-top"><div>${coHtml}</div><div class="scan-date">${scanFmtDate(r.email_date)}</div></div>`+
+        `<div class="scan-row-top"><div><div class="scan-identity">${coHtml}<span class="scan-status ${cat.key}">${san(scanStatusLabel(r,cat))}</span></div>${role}</div><div class="scan-date">${scanFmtDate(r.email_date)}</div></div>`+
         `<div class="scan-desc">${desc}${subj}</div>`+
-        `<button class="scan-view" onclick="viewScanEmail('${san(String(r.id))}')">view email</button>`+
+        `<div class="scan-row-actions">${addDate}<button class="scan-view" onclick="viewScanEmail('${san(String(r.id))}')">view email</button></div>`+
         `</div></div>`;
     });
   });
@@ -2062,16 +2100,20 @@ async function approveScan(){
       });
     }
   }
-  await _sb.from('email_scan').update({review_state:'approved'}).in('id',rows.map(r=>r.id));
+  if(SCAN_LOCAL_MODE){
+    saveLocalEmailScan(SCAN_ROWS.filter(r=>!ids.includes(String(r.id))));
+  }else{
+    await _sb.from('email_scan').update({review_state:'approved'}).in('id',rows.map(r=>r.id));
+  }
   if(btn){btn.textContent='Approve & add ( 0 )';}
   await refreshJobsData();
-  await loadEmailScan();
+  if(SCAN_LOCAL_MODE)renderScanCard();else await loadEmailScan();
 }
 
 async function dismissScan(){
   if(!SCAN_ROWS.length)return;
-  await _sb.from('email_scan').update({review_state:'dismissed'}).in('id',SCAN_ROWS.map(r=>r.id));
-  await loadEmailScan();
+  if(SCAN_LOCAL_MODE){saveLocalEmailScan([]);renderScanCard();}
+  else{await _sb.from('email_scan').update({review_state:'dismissed'}).in('id',SCAN_ROWS.map(r=>r.id));await loadEmailScan();}
 }
 
 async function refreshJobsData(){
