@@ -10,7 +10,9 @@
       "Bash(sips -z 512 512 images/icon16.png --out images/icon-512.png)",
       "Bash(vercel link *)",
       "Bash(vercel login *)",
-      "Bash(vercel whoami *)"
+      "Bash(vercel whoami *)",
+      "mcp__claude_ai_Gmail__search_threads",
+      "Bash(node -e ' *)"
     ]
   }
 }

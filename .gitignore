@@ -24,6 +24,8 @@ npm-debug.log*
 config.js
 **/api-keys.txt
 **/*_secret.js
+email-scanner/credentials.json
+email-scanner/token.json
 
 # Overleaf cloned repo
 latex-batch/overleaf-repo/

@@ -568,6 +568,34 @@ tr.row-selected td{background:color-mix(in srgb,var(--acc) 8%,transparent)}
 .expenses-net{font-family:var(--mono);font-size:13px;font-weight:800;color:#fff;padding:5px 14px;border-radius:999px;background:#444;transition:background .15s}
 .expenses-net.positive{background:#16a34a}
 .expenses-net.negative{background:#dc2626}
+.expense-tools{display:grid;grid-template-columns:minmax(280px,1fr) minmax(260px,.72fr);background:#1b1b1b;border-bottom:2.5px solid #333}
+.expense-calculator{display:grid;grid-template-columns:repeat(4,minmax(44px,80px));justify-content:center;gap:7px;align-content:start;padding:11px 16px}
+.expense-calc-display{grid-column:1/-1;min-width:0;border:2px solid #444;border-radius:10px;background:#090909;color:#fff;padding:8px 12px;text-align:right;font:800 17px var(--mono);outline:none;box-sizing:border-box}
+.expense-calc-display:focus{border-color:var(--acc)}
+.expense-calc-btn{border:0;border-radius:9px;background:#383838;color:#fff;cursor:pointer;font:800 14px var(--mono);min-height:38px;transition:background .12s,transform .08s}
+.expense-calc-btn:hover{background:#505050}
+.expense-calc-btn:active{transform:translateY(1px)}
+.expense-calc-btn.operator{background:#5b4a16;color:#ffe38a}
+.expense-calc-btn.equals{background:var(--acc);color:#111}
+.expense-calc-btn.clear{background:#7f1d1d}
+.expense-converter{border-left:2px solid #333;padding:16px;display:flex;flex-direction:column;justify-content:center;gap:11px;color:#fff}
+.expense-converter-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.expense-converter h3{margin:0;font:900 16px var(--display);letter-spacing:-.02em}
+.expense-converter-flip{border:0;border-radius:999px;background:var(--acc);color:#111;padding:6px 11px;cursor:pointer;font:900 11px var(--mono);transition:transform .15s,opacity .15s}
+.expense-converter-flip:hover{opacity:.85}
+.expense-converter-flip:active{transform:rotate(180deg)}
+.expense-converter-row{display:grid;grid-template-columns:1fr 42px;align-items:center}
+.expense-converter-input{width:100%;min-width:0;border:2px solid #444;border-right:0;border-radius:10px 0 0 10px;background:#090909;color:#fff;padding:10px 12px;text-align:right;font:800 16px var(--mono);outline:none;box-sizing:border-box}
+.expense-converter-input:focus{border-color:var(--acc)}
+.expense-converter-input[readonly]{color:#b7ffcf}
+.expense-converter-code{align-self:stretch;display:flex;align-items:center;justify-content:center;border-radius:0 10px 10px 0;background:#444;color:#fff;font:800 10px var(--mono)}
+.expense-converter-rate{min-height:14px;margin:0;color:#aaa;font:700 10px var(--mono);line-height:1.4}
+.expense-converter-rate.error{color:#fca5a5}
+@media(max-width:680px){
+  .expense-tools{grid-template-columns:1fr}
+  .expense-calculator{grid-template-columns:repeat(4,1fr);padding:10px}
+  .expense-converter{border-left:0;border-top:2px solid #333}
+}
 .expenses-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;align-items:stretch;grid-auto-rows:1fr}
 @media(max-width:680px){.expenses-body{grid-template-columns:1fr}}
 .expense-col{display:flex;flex-direction:column;height:100%;min-width:0;overflow:hidden}
@@ -799,6 +827,36 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
 .daily-exp-item-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:8px}
 .daily-exp-footer{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:#f5f5f5;border-top:2px solid #e0e0e0;font-family:var(--mono);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);gap:10px}
 .daily-exp-footer-total{font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
+
+/* ===== REVIEW SCAN CARD ===== */
+.scan-panel{position:relative;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);margin:0 18px 14px;padding:24px 26px;box-shadow:6px 7px 0 var(--acc-2)}
+.scan-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.scan-title{font-family:var(--display);font-size:26px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.scan-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.scan-approve{background:var(--acc);color:#fff;border:none;border-radius:999px;padding:11px 22px;font-family:var(--display);font-size:15px;font-weight:700;cursor:pointer;transition:opacity .12s,transform .1s}
+.scan-approve:hover:not(:disabled){transform:translateY(-1px)}
+.scan-approve:disabled{background:#F3B3A0;cursor:default}
+.scan-dismiss{background:none;color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:11px 22px;font-family:var(--display);font-size:15px;font-weight:700;cursor:pointer;transition:all .12s}
+.scan-dismiss:hover{background:var(--ink);color:var(--card)}
+.scan-chips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.scan-chip{background:var(--bg-2);border:1.5px solid var(--line-soft);border-radius:999px;padding:8px 16px;font-family:var(--mono);font-size:13px;color:var(--ink-3);letter-spacing:.02em}
+.scan-chip b{color:var(--ink);font-weight:800;margin-right:5px}
+.scan-group-h{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:16px 0 10px}
+.scan-group-n{background:var(--ink-4);color:#fff;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:800}
+.scan-row{display:flex;align-items:flex-start;gap:14px;background:var(--card);border:1.5px solid var(--line-soft);border-radius:12px;padding:15px 18px;margin-bottom:10px}
+.scan-check{width:20px;height:20px;margin-top:2px;flex-shrink:0;accent-color:var(--acc);cursor:pointer}
+.scan-check-spacer{width:20px;flex-shrink:0}
+.scan-row-main{flex:1;min-width:0}
+.scan-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.scan-co{font-family:var(--display);font-size:16px;font-weight:800;color:var(--ink)}
+.scan-co.empty{color:var(--ink-4)}
+.scan-role{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin-left:8px}
+.scan-date{font-family:var(--mono);font-size:12px;color:var(--ink-4);text-align:right;line-height:1.5;white-space:nowrap;flex-shrink:0}
+.scan-desc{font-family:var(--mono);font-size:13px;color:var(--ink-3);margin:7px 0 10px;line-height:1.5}
+.scan-view{background:none;border:1.5px solid var(--line);border-radius:999px;padding:6px 15px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .12s}
+.scan-view:hover{background:var(--ink);color:var(--card)}
+.scan-email-body{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:13px;line-height:1.65;color:var(--ink-2);max-height:52vh;overflow:auto;background:var(--bg-2);padding:16px;border-radius:10px;margin:0}
+@media(max-width:600px){.scan-panel{padding:18px 16px}.scan-title{font-size:22px}}
 </style>
 </head>
 <template id="__bundler_thumbnail" data-bg-color="#F2EFE8">
@@ -1054,6 +1112,46 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
         </button>
       </h2>
       <div class="expenses-net" id="expenses-net">Net: $0.00</div>
+    </div>
+    <div class="expense-tools">
+      <div class="expense-calculator" id="expense-calculator" aria-label="Calculator">
+        <input class="expense-calc-display" id="expense-calc-display" value="0" aria-label="Calculator display" inputmode="decimal" autocomplete="off" spellcheck="false" />
+        <button type="button" class="expense-calc-btn clear" data-calc-action="clear">C</button>
+        <button type="button" class="expense-calc-btn" data-calc-action="backspace" aria-label="Backspace">⌫</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value="(">(</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value=")">)</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="7">7</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="8">8</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="9">9</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value="/">÷</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="4">4</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="5">5</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="6">6</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value="*">×</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="1">1</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="2">2</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="3">3</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value="-">−</button>
+        <button type="button" class="expense-calc-btn" data-calc-value="0">0</button>
+        <button type="button" class="expense-calc-btn" data-calc-value=".">.</button>
+        <button type="button" class="expense-calc-btn equals" data-calc-action="equals">=</button>
+        <button type="button" class="expense-calc-btn operator" data-calc-value="+">+</button>
+      </div>
+      <div class="expense-converter" aria-labelledby="expense-converter-title">
+        <div class="expense-converter-head">
+          <h3 id="expense-converter-title">INR → USD</h3>
+          <button type="button" class="expense-converter-flip" id="expense-converter-flip" aria-label="Flip conversion direction" title="Flip currencies">⇄ Flip</button>
+        </div>
+        <label class="expense-converter-row">
+          <input type="number" class="expense-converter-input" id="expense-converter-input" value="100" min="0" step="0.01" inputmode="decimal" aria-label="Indian rupees" />
+          <span class="expense-converter-code" id="expense-converter-from-code">INR</span>
+        </label>
+        <label class="expense-converter-row">
+          <input type="text" class="expense-converter-input" id="expense-converter-output" value="Loading…" readonly aria-label="US dollars" />
+          <span class="expense-converter-code" id="expense-converter-to-code">USD</span>
+        </label>
+        <p class="expense-converter-rate" id="expense-converter-rate">Loading latest rate…</p>
+      </div>
     </div>
     <div class="expenses-body" id="expenses-body">
       <div class="expense-col" data-kind="debt">
@@ -1326,6 +1424,19 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
     </div>
   </section>
 
+  <!-- REVIEW SCAN CARD -->
+  <section class="scan-panel" id="scan-panel" style="display:none">
+    <div class="scan-head">
+      <div class="scan-title">Review scan</div>
+      <div class="scan-actions">
+        <button class="scan-approve" id="scan-approve" disabled>Approve &amp; add ( <span id="scan-approve-n">0</span> )</button>
+        <button class="scan-dismiss" id="scan-dismiss">Dismiss</button>
+      </div>
+    </div>
+    <div class="scan-chips" id="scan-chips"></div>
+    <div class="scan-groups" id="scan-groups"></div>
+  </section>
+
   <!-- JOBS PANEL -->
   <section class="jobs-panel">
     <div class="jobs-head">
@@ -1569,6 +1680,16 @@ body.mobile-app-mode[data-mobile-page="expenses"] .daily-exp-panel{display:block
       <button class="mbtn mbtn-secondary" id="archive-confirm-cancel">Cancel</button>
       <button class="mbtn mbtn-danger" id="archive-confirm-confirm">Archive</button>
     </div>
+  </div>
+</div>
+
+<!-- SCAN EMAIL MODAL -->
+<div class="modal-overlay" id="scan-email-modal">
+  <div class="modal-box" style="max-width:660px">
+    <button class="modal-close" id="scan-email-close">×</button>
+    <h2 id="scan-email-subject" style="font-size:19px;line-height:1.35;margin-right:30px;word-break:break-word">Subject</h2>
+    <div id="scan-email-meta" style="font-family:var(--mono);font-size:12px;color:var(--ink-3);margin:8px 0 14px"></div>
+    <pre id="scan-email-body" class="scan-email-body"></pre>
   </div>
 </div>
 
@@ -1835,6 +1956,135 @@ async function init() {
   google.charts.load('current', {'packages':['sankey']});
   google.charts.setOnLoadCallback(() => { sankeyReady = true; });
   await loadJobs();
+  setupScan();
+  loadEmailScan();
+}
+
+// ===== REVIEW SCAN =====
+let SCAN_ROWS=[];
+const SCAN_CATS=[
+  {key:'application',label:'APPLICATIONS',add:true},
+  {key:'rejection',label:'REJECTIONS',add:true},
+  {key:'update',label:'UPDATES — INTERVIEW / ASSESSMENT / OFFER',add:true},
+  {key:'misc',label:'MISC — OTP, PROMOTIONS, NEWSLETTERS',add:false}
+];
+const SCAN_STATUS_MAP={applied:'applied',application:'applied',rejected:'rejected',rejection:'rejected',interview:'interview',assessment:'resume_screening',screener:'resume_screening','screener completed':'resume_screening',offer:'offer',update:'applied'};
+function scanStatusToJob(s){if(!s)return'applied';return SCAN_STATUS_MAP[String(s).toLowerCase().trim()]||'applied';}
+function scanCatOf(r){const c=(r.category||'').toLowerCase();return SCAN_CATS.some(x=>x.key===c)?c:'misc';}
+
+async function loadEmailScan(){
+  try{
+    const res=await _sb.from('email_scan').select('*').eq('review_state','pending').order('email_date',{ascending:false});
+    if(res.error){console.warn('[scan] load skipped (table missing or RLS?):',res.error.message);SCAN_ROWS=[];renderScanCard();return;}
+    SCAN_ROWS=res.data||[];
+  }catch(e){console.warn('[scan] load error:',e);SCAN_ROWS=[];}
+  renderScanCard();
+}
+
+function scanFmtDate(d){
+  if(!d)return'';const dt=new Date(d);if(isNaN(dt))return'';
+  return `${dt.toLocaleDateString('en-US',{month:'short',day:'numeric'})}<br>${dt.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}`;
+}
+
+function renderScanCard(){
+  const panel=document.getElementById('scan-panel');if(!panel)return;
+  if(!SCAN_ROWS.length){panel.style.display='none';return;}
+  panel.style.display='';
+  const counts={};SCAN_CATS.forEach(c=>counts[c.key]=0);
+  SCAN_ROWS.forEach(r=>counts[scanCatOf(r)]++);
+  document.getElementById('scan-chips').innerHTML=
+    `<span class="scan-chip"><b>${SCAN_ROWS.length}</b>emails</span>`+
+    `<span class="scan-chip"><b>${counts.application}</b>applications</span>`+
+    `<span class="scan-chip"><b>${counts.rejection}</b>rejections</span>`+
+    `<span class="scan-chip"><b>${counts.update}</b>updates</span>`+
+    `<span class="scan-chip"><b>${counts.misc}</b>misc</span>`;
+  let html='';
+  SCAN_CATS.forEach(cat=>{
+    const rows=SCAN_ROWS.filter(r=>scanCatOf(r)===cat.key);
+    if(!rows.length)return;
+    html+=`<div class="scan-group-h">${san(cat.label)}<span class="scan-group-n">${rows.length}</span></div>`;
+    rows.forEach(r=>{
+      const co=(r.company||'').trim();
+      const coHtml=co?`<span class="scan-co">${san(co)}</span>`+(r.title?`<span class="scan-role">${san(r.title)}</span>`:''):'<span class="scan-co empty">(no company)</span>';
+      const desc=r.classification?san(r.classification):(cat.add?'detected — will be added':'not job-related — will be ignored');
+      const subj=r.subject?` · "${san(r.subject)}"`:'';
+      const check=cat.add?`<input type="checkbox" class="scan-check" data-id="${san(String(r.id))}"${cat.key==='application'?' checked':''}>`:'<span class="scan-check-spacer"></span>';
+      html+=`<div class="scan-row">${check}<div class="scan-row-main">`+
+        `<div class="scan-row-top"><div>${coHtml}</div><div class="scan-date">${scanFmtDate(r.email_date)}</div></div>`+
+        `<div class="scan-desc">${desc}${subj}</div>`+
+        `<button class="scan-view" onclick="viewScanEmail('${san(String(r.id))}')">view email</button>`+
+        `</div></div>`;
+    });
+  });
+  document.getElementById('scan-groups').innerHTML=html;
+  updateScanApproveCount();
+}
+
+function updateScanApproveCount(){
+  const n=document.querySelectorAll('#scan-groups .scan-check:checked').length;
+  const el=document.getElementById('scan-approve-n');if(el)el.textContent=n;
+  const btn=document.getElementById('scan-approve');if(btn)btn.disabled=n===0;
+}
+
+function viewScanEmail(id){
+  const r=SCAN_ROWS.find(x=>String(x.id)===String(id));if(!r)return;
+  document.getElementById('scan-email-subject').textContent=r.subject||'(no subject)';
+  document.getElementById('scan-email-meta').textContent=`${r.sender||''}${r.email_date?'  ·  '+new Date(r.email_date).toLocaleString():''}`;
+  document.getElementById('scan-email-body').textContent=r.body||'(no body stored for this email)';
+  document.getElementById('scan-email-modal').classList.add('show');
+}
+
+function scanJobKey(company,title){return `${(company||'').toLowerCase().trim()}||${(title||'').toLowerCase().trim()}`;}
+
+async function approveScan(){
+  const checks=[...document.querySelectorAll('#scan-groups .scan-check:checked')];
+  if(!checks.length)return;
+  const ids=checks.map(c=>c.dataset.id);
+  const rows=SCAN_ROWS.filter(r=>ids.includes(String(r.id)));
+  const btn=document.getElementById('scan-approve');if(btn){btn.disabled=true;btn.textContent='Adding…';}
+  const nowIso=new Date().toISOString();
+  const t=new Date();const todayStr=`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+  for(const r of rows){
+    const jobStatus=scanStatusToJob(r.status||r.category);
+    let match=null;
+    if(scanCatOf(r)!=='application'){
+      match=ALL_JOBS.find(j=>(r.job_id&&j.job_id&&String(j.job_id)===String(r.job_id))||scanJobKey(j.company,j.title)===scanJobKey(r.company,r.title));
+    }
+    if(match){
+      await _sb.from('jobs').update({status:jobStatus}).eq('id',match.id);
+    }else{
+      await _sb.from('jobs').insert({
+        title:r.title||'',company:r.company||'',location:'',job_id:r.job_id||'',
+        status:jobStatus,applied_date:r.applied_date||todayStr,url:'',description:'',
+        notes:r.subject?('From email: '+r.subject):'',comments:'',source:r.source||'Email',
+        favorite:false,role_tag:'sde',
+        status_history:[{status:jobStatus,timestamp:nowIso,date:new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}]
+      });
+    }
+  }
+  await _sb.from('email_scan').update({review_state:'approved'}).in('id',rows.map(r=>r.id));
+  if(btn){btn.textContent='Approve & add ( 0 )';}
+  await refreshJobsData();
+  await loadEmailScan();
+}
+
+async function dismissScan(){
+  if(!SCAN_ROWS.length)return;
+  await _sb.from('email_scan').update({review_state:'dismissed'}).in('id',SCAN_ROWS.map(r=>r.id));
+  await loadEmailScan();
+}
+
+async function refreshJobsData(){
+  const {data,error}=await _sb.from('jobs').select('*').order('applied_date',{ascending:false}).order('created_at',{ascending:false});
+  if(!error&&data){saveCache(data);applyJobData(data);}
+}
+
+function setupScan(){
+  document.getElementById('scan-approve')?.addEventListener('click',approveScan);
+  document.getElementById('scan-dismiss')?.addEventListener('click',dismissScan);
+  document.getElementById('scan-groups')?.addEventListener('change',e=>{if(e.target.classList&&e.target.classList.contains('scan-check'))updateScanApproveCount();});
+  document.getElementById('scan-email-close')?.addEventListener('click',()=>document.getElementById('scan-email-modal').classList.remove('show'));
+  document.getElementById('scan-email-modal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('show');});
 }
 
 // ===== CLOCK =====
@@ -3159,6 +3409,202 @@ function initTasksUI(){
   });
 }
 initTasksUI();
+
+// ===== EXPENSE CALCULATOR =====
+(function(){
+  const calculator=document.getElementById('expense-calculator');
+  const display=document.getElementById('expense-calc-display');
+  if(!calculator||!display)return;
+
+  const sanitize=value=>value.replace(/[×]/g,'*').replace(/[÷]/g,'/').replace(/[−]/g,'-').replace(/[^0-9+\-*/.() ]/g,'');
+
+  function evaluateExpression(expression){
+    const source=sanitize(expression).replace(/\s+/g,'');
+    if(!source)throw new Error('Empty expression');
+    let index=0;
+    const peek=()=>source[index];
+    const consume=char=>peek()===char?(index++,true):false;
+
+    function number(){
+      const start=index;
+      let dots=0;
+      while(index<source.length&&/[0-9.]/.test(peek())){
+        if(peek()==='.')dots++;
+        index++;
+      }
+      if(start===index||dots>1)throw new Error('Invalid number');
+      const value=Number(source.slice(start,index));
+      if(!Number.isFinite(value))throw new Error('Invalid number');
+      return value;
+    }
+    function factor(){
+      if(consume('+'))return factor();
+      if(consume('-'))return -factor();
+      if(consume('(')){
+        const value=expressionValue();
+        if(!consume(')'))throw new Error('Missing parenthesis');
+        return value;
+      }
+      return number();
+    }
+    function term(){
+      let value=factor();
+      while(peek()==='*'||peek()==='/'){
+        const operator=source[index++];
+        const right=factor();
+        if(operator==='/'&&right===0)throw new Error('Division by zero');
+        value=operator==='*'?value*right:value/right;
+      }
+      return value;
+    }
+    function expressionValue(){
+      let value=term();
+      while(peek()==='+'||peek()==='-'){
+        const operator=source[index++];
+        const right=term();
+        value=operator==='+'?value+right:value-right;
+      }
+      return value;
+    }
+
+    const result=expressionValue();
+    if(index!==source.length||!Number.isFinite(result))throw new Error('Invalid expression');
+    return Math.round((result+Number.EPSILON)*1e10)/1e10;
+  }
+
+  let justEvaluated=false;
+  function append(value){
+    const operator=/[+\-*/]/.test(value);
+    let current=display.value==='Error'?'':sanitize(display.value);
+    if(justEvaluated&&!operator)current='';
+    justEvaluated=false;
+    if(operator&&/[+\-*/]$/.test(current))current=current.slice(0,-1);
+    display.value=(current==='0'&&!operator?'':current)+value;
+    if(!display.value)display.value='0';
+  }
+  function calculate(){
+    try{
+      display.value=String(evaluateExpression(display.value));
+      justEvaluated=true;
+    }catch{
+      display.value='Error';
+      justEvaluated=true;
+    }
+  }
+
+  calculator.addEventListener('click',event=>{
+    const button=event.target.closest('.expense-calc-btn');
+    if(!button)return;
+    if(button.dataset.calcValue)append(button.dataset.calcValue);
+    else if(button.dataset.calcAction==='clear'){display.value='0';justEvaluated=false;}
+    else if(button.dataset.calcAction==='backspace'){
+      display.value=display.value==='Error'?'0':display.value.slice(0,-1)||'0';
+      justEvaluated=false;
+    }else if(button.dataset.calcAction==='equals')calculate();
+    display.focus();
+  });
+  display.addEventListener('input',()=>{
+    const cleaned=sanitize(display.value);
+    if(display.value!==cleaned)display.value=cleaned;
+    justEvaluated=false;
+  });
+  display.addEventListener('keydown',event=>{
+    if(event.key==='Enter'||event.key==='='){
+      event.preventDefault();
+      calculate();
+    }else if(event.key==='Escape'){
+      event.preventDefault();
+      display.value='0';
+      justEvaluated=false;
+    }
+  });
+})();
+
+// ===== INR / USD CONVERTER =====
+(function(){
+  const amountInput=document.getElementById('expense-converter-input');
+  const convertedOutput=document.getElementById('expense-converter-output');
+  const rateEl=document.getElementById('expense-converter-rate');
+  const titleEl=document.getElementById('expense-converter-title');
+  const fromCodeEl=document.getElementById('expense-converter-from-code');
+  const toCodeEl=document.getElementById('expense-converter-to-code');
+  const flipBtn=document.getElementById('expense-converter-flip');
+  if(!amountInput||!convertedOutput||!rateEl||!titleEl||!fromCodeEl||!toCodeEl||!flipBtn)return;
+
+  const CACHE_KEY='dashy_usd_inr_rate_v1';
+  let rate=null;
+  let rateDate='';
+  let fromCurrency='INR';
+  const moneyFormat=new Intl.NumberFormat('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+  function render(){
+    const amount=Number(amountInput.value);
+    if(rate==null||!Number.isFinite(amount)||amount<0){
+      convertedOutput.value='—';
+      return;
+    }
+    const converted=fromCurrency==='INR'?amount/rate:amount*rate;
+    convertedOutput.value=moneyFormat.format(converted);
+  }
+  function renderDirection(){
+    const toCurrency=fromCurrency==='INR'?'USD':'INR';
+    titleEl.textContent=`${fromCurrency} → ${toCurrency}`;
+    fromCodeEl.textContent=fromCurrency;
+    toCodeEl.textContent=toCurrency;
+    amountInput.setAttribute('aria-label',fromCurrency==='INR'?'Indian rupees':'US dollars');
+    convertedOutput.setAttribute('aria-label',toCurrency==='INR'?'Indian rupees':'US dollars');
+  }
+  function showRate(cached=false){
+    rateEl.classList.remove('error');
+    rateEl.textContent=`1 USD = ${moneyFormat.format(rate)} INR${rateDate?` · ${rateDate}`:''}${cached?' · cached':''}`;
+  }
+  function readCache(){
+    try{
+      const cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');
+      if(cached&&Number.isFinite(cached.rate)&&cached.rate>0){
+        rate=cached.rate;
+        rateDate=cached.date||'';
+        render();
+        showRate(true);
+        return true;
+      }
+    }catch{}
+    return false;
+  }
+
+  amountInput.addEventListener('input',render);
+  flipBtn.addEventListener('click',()=>{
+    const converted=convertedOutput.value.replace(/,/g,'');
+    fromCurrency=fromCurrency==='INR'?'USD':'INR';
+    renderDirection();
+    if(converted!=='—'&&converted!=='Loading…')amountInput.value=converted;
+    render();
+    amountInput.focus();
+    amountInput.select();
+  });
+  renderDirection();
+  const hasCache=readCache();
+  fetch('https://api.frankfurter.dev/v2/rate/USD/INR')
+    .then(response=>{
+      if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(data=>{
+      const nextRate=Number(data.rate);
+      if(!Number.isFinite(nextRate)||nextRate<=0)throw new Error('Invalid rate');
+      rate=nextRate;
+      rateDate=data.date||'';
+      try{localStorage.setItem(CACHE_KEY,JSON.stringify({rate,date:rateDate,savedAt:Date.now()}));}catch{}
+      render();
+      showRate(false);
+    })
+    .catch(()=>{
+      if(hasCache)return;
+      rateEl.classList.add('error');
+      rateEl.textContent='Live rate unavailable — check your connection';
+      convertedOutput.value='—';
+    });
+})();
 
 // ===== EXPENSE TRACKER =====
 (function(){
